@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28010.2050
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "altcode.fake.dotnet.testing.gendarme.core", "AltCode.Fake.DotNet.Testing.Gendarme\altcode.fake.dotnet.testing.gendarme.core.fsproj", "{4A0C7CBE-713F-46FA-95D8-EAF2AD073DFB}"
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "altcode.fake.dotnet.gendarme.core", "AltCode.Fake.DotNet.Gendarme\altcode.fake.dotnet.gendarme.core.fsproj", "{4A0C7CBE-713F-46FA-95D8-EAF2AD073DFB}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "AltCode.Fake.DotNet.Testing.Gendarme", "AltCode.Fake.DotNet.Testing.Gendarme\AltCode.Fake.DotNet.Testing.Gendarme.fsproj", "{17662DB6-7BB1-4ECE-BF37-D6D439762CFD}"
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "AltCode.Fake.DotNet.Gendarme", "AltCode.Fake.DotNet.Gendarme\AltCode.Fake.DotNet.Gendarme.fsproj", "{17662DB6-7BB1-4ECE-BF37-D6D439762CFD}"
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "AltCode.Nuget.Placeholder", "AltCode.Nuget.Placeholder\AltCode.Nuget.Placeholder.fsproj", "{F87AFAFF-29FA-41A5-AFC1-26DB73FA64F9}"
 EndProject

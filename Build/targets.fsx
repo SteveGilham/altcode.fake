@@ -182,7 +182,7 @@ _Target "Lint" (fun _ ->
 _Target "Gendarme" (fun _ -> // Needs debug because release is compiled --standalone which contaminates everything
   Directory.ensure "./_Reports"
   [ ("./Build/rules-fake.xml",
-     [ "_Binaries/AltCode.Fake.DotNet.Testing.Gendarme/Debug+AnyCPU/AltCode.Fake.DotNet.Testing.Gendarme.dll" ]) ]
+     [ "_Binaries/AltCode.Fake.DotNet.Gendarme/Debug+AnyCPU/AltCode.Fake.DotNet.Gendarme.dll" ]) ]
   |> Seq.iter (fun (ruleset, files) ->
        Gendarme.run { Gendarme.Params.Create() with WorkingDirectory = "."
                                                     Severity = Gendarme.Severity.All
@@ -195,9 +195,9 @@ _Target "Gendarme" (fun _ -> // Needs debug because release is compiled --standa
 
 _Target "FxCop" (fun _ -> // Needs debug because release is compiled --standalone which contaminates everything
   Directory.ensure "./_Reports"
-  [ ([ "_Binaries/AltCode.Fake.DotNet.Testing.Gendarme/Debug+AnyCPU/AltCode.Fake.DotNet.Testing.Gendarme.dll" ],
+  [ ([ "_Binaries/AltCode.Fake.DotNet.Gendarme/Debug+AnyCPU/AltCode.Fake.DotNet.Gendarme.dll" ],
      [],
-     [ //"AltCover_Fake.DotNet.Testing.AltCover.CollectParams"
+     [ 
        "-Microsoft.Design#CA1006"; "-Microsoft.Design#CA1011"; "-Microsoft.Design#CA1020";
        "-Microsoft.Design#CA1062"; "-Microsoft.Design#CA1034"; "-Microsoft.Naming#CA1704";
        "-Microsoft.Naming#CA1707"; "-Microsoft.Naming#CA1709"; "-Microsoft.Naming#CA1724";
@@ -352,21 +352,21 @@ _Target "OperationalTest" ignore
 
 _Target "Packaging" (fun _ ->
   let gendarmeDir =
-    Path.getFullName "_Binaries/AltCode.Fake.DotNet.Testing.Gendarme/Release+AnyCPU"
+    Path.getFullName "_Binaries/AltCode.Fake.DotNet.Gendarme/Release+AnyCPU"
   let packable = Path.getFullName "./_Binaries/README.html"
 
   let gendarmeFiles =
-    [ (gendarmeDir @@ "AltCode.Fake.DotNet.Testing.Gendarme.dll", Some "lib/net462", None)
+    [ (gendarmeDir @@ "AltCode.Fake.DotNet.Gendarme.dll", Some "lib/net462", None)
       (packable, Some "", None) ]
 
   let gendarmeNetcoreFiles =
-    (!!(gendarmeDir @@ "netstandard2.0/AltCode.Fake.DotNet.Testing.Gendarme.*"))
+    (!!(gendarmeDir @@ "netstandard2.0/AltCode.Fake.DotNet.Gendarme.*"))
     |> Seq.map (fun x -> (x, Some "lib/netstandard2.0", None))
     |> Seq.toList
 
   printfn "Executing on %A" Environment.OSVersion
   [ (List.concat [ gendarmeFiles; gendarmeNetcoreFiles ], "_Packaging.Gendarme",
-     "./_Generated/altcode.fake.dotnet.testing.gendarme.nuspec", "AltCode.Fake.DotNet.Testing.Gendarme") ]
+     "./_Generated/altcode.fake.dotnet.gendarme.nuspec", "AltCode.Fake.DotNet.Gendarme") ]
   |> List.iter (fun (files, output, nuspec, project) ->
        let outputPath = "./" + output
        let workingDir = "./_Binaries/" + output
@@ -392,8 +392,8 @@ _Target "Packaging" (fun _ ->
 _Target "PrepareFrameworkBuild" (fun _ -> ())
 
 _Target "PrepareDotNetBuild" (fun _ ->
-  [ (String.Empty, "./_Generated/altcode.fake.dotnet.testing.gendarme.nuspec",
-     "AltCode.Fake.DotNet.Testing.Gendarme (FAKE task helper)", None,
+  [ (String.Empty, "./_Generated/altcode.fake.dotnet.gendarme.nuspec",
+     "AltCode.Fake.DotNet.Gendarme (FAKE task helper)", None,
      Some "FAKE build Gendarme") ]
   |> List.iter (fun (ptype, path, caption, icon, tags) ->
        let x s = XName.Get(s, "http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd")

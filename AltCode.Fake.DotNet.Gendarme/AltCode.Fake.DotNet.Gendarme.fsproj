@@ -8,12 +8,12 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>17662db6-7bb1-4ece-bf37-d6d439762cfd</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>AltCode.Fake.DotNet.Testing.Gendarme</RootNamespace>
-    <AssemblyName>AltCode.Fake.DotNet.Testing.Gendarme</AssemblyName>
+    <RootNamespace>AltCode.Fake.DotNet.Gendarme</RootNamespace>
+    <AssemblyName>AltCode.Fake.DotNet.Gendarme</AssemblyName>
     <UseStandardResourceNames>true</UseStandardResourceNames>
     <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <Name>AltCode.Fake.DotNet.Testing.Gendarme</Name>
+    <Name>AltCode.Fake.DotNet.Gendarme</Name>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
     <ResolveNuGetPackages>false</ResolveNuGetPackages>
