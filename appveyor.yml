@@ -1,0 +1,32 @@
+version: 5.9.3.{build}-pre
+branches:
+  except:
+  - /develop.*/
+skip_tags: true
+image: Visual Studio 2017
+clone_depth: 2
+cache: 
+  - packages -> **\packages.config
+  - '%USERPROFILE%\.nuget\packages -> **\*.*proj'
+nuget:
+  disable_publish_on_pr: true
+build_script:
+- ps: >-
+    $ErrorActionPreference = 'Continue'
+
+    & dotnet restore dotnet-fake.fsproj
+
+    & dotnet fake run .\Build\setup.fsx
+
+    & dotnet fake run .\Build\build.fsx
+
+    $save = $LASTEXITCODE
+    
+    $error.Clear()
+
+    Write-Host "Exit code $save"
+
+    if ($save -ne 0) { exit $save }
+artifacts:
+- path: _Packagin*\*.nupkg
+  name: NuGet

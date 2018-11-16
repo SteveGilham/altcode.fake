@@ -1,0 +1,49 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <GenerateProgramFile>false</GenerateProgramFile>
+    <SolutionDir Condition="'$(SolutionDir)' == ''">$(ProjectDir)../</SolutionDir>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)'=='Debug'">
+    <DefineConstants>TRACE;DEBUG;CODE_ANALYSIS;$(GlobalDefineConstants)</DefineConstants>
+    <OutputPath>$(SolutionDir)_Binaries/$(AssemblyName)/$(Configuration)+$(Platform)/</OutputPath>
+    <IntermediateOutputPath>$(SolutionDir)_Intermediate/$(AssemblyName)/$(Configuration)+$(Platform)/</IntermediateOutputPath>
+    <OtherFlags>--tailcalls+</OtherFlags>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)'=='Release'">
+    <DefineConstants>TRACE;$(GlobalDefineConstants)</DefineConstants>
+    <OutputPath>$(SolutionDir)_Binaries/$(AssemblyName)/$(Configuration)+$(Platform)/</OutputPath>
+    <IntermediateOutputPath>$(SolutionDir)_Intermediate/$(AssemblyName)/$(Configuration)+$(Platform)/</IntermediateOutputPath>
+    <OtherFlags>--keyfile:$(SolutionDir)Build\Infrastructure.snk</OtherFlags>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <WarningLevel>5</WarningLevel>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <WarningsAsErrors />
+    <NoWarn>52</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="AltCode.Fake.DotNet.Testing.Gendarme.fs" />
+    <Compile Include="Main.fs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AltCover.API" Version="4.0.655" />
+    <PackageReference Include="Expecto" Version="7.0.0" />
+    <PackageReference Include="Expecto.FsCheck" Version="7.0.0" />
+    <PackageReference Include="Expecto.VisualStudio.TestAdapter" Version="9.0.0" />
+    <PackageReference Include="FsCheck" Version="2.13.0" />
+    <PackageReference Include="FSharp.Core" Version="4.3.4" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.8.0" />
+    <PackageReference Include="YoloDev.Expecto.TestSdk" Version="0.5.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AltCode.Fake.DotNet.Testing.Gendarme\altcode.fake.dotnet.testing.gendarme.core.fsproj" />
+    <ProjectReference Include="..\AltCode.Nuget.Placeholder\AltCode.Nuget.Placeholder.fsproj" />
+  </ItemGroup>
+</Project>

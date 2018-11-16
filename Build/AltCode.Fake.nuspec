@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <metadata xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+    <title>AltCode.Fake (dummy install)</title>
+    <id>@project@</id>
+    <version>@build.number@</version>
+    <authors>@authors@</authors>
+    <owners>@authors@</owners>
+    <summary>@summary@</summary>
+    <licenseUrl> https://cdn.rawgit.com/SteveGilham/altcode.fake/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/SteveGilham/altcode.fake/wiki</projectUrl>
+    <repository type="git" url="https://github.com/SteveGilham/altcode.fake" />
+    <iconUrl>https://cdn.rawgit.com/SteveGilham/altcode.fake/master/Build/AltCode.Fake_128.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>@description@</description>
+    <releaseNotes>@releaseNotes@</releaseNotes>
+    <copyright>@copyright@</copyright>
+    <tags>FAKE build</tags>
+    @dependencies@
+    @references@
+  </metadata>
+  @files@
+</package>
