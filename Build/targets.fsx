@@ -331,7 +331,7 @@ _Target "UnitTestDotNetWithAltCoverApi" (fun _ ->
                TargetDir = "_Reports/_UnitTestWithAltCoverApi" }) xml
     if not <| String.IsNullOrWhiteSpace(Environment.environVar "APPVEYOR_BUILD_NUMBER") then
       let full = total @ [ "  </Modules>"; "</CoverageSession>" ]
-      let coverage = "./_Reports/CombinedTestWithAltCoverRunner.coveralls"
+      let coverage = Path.getFullName "./_Reports/coveralls.xml"
       File.WriteAllLines(coverage, full)
       Actions.Run
         (Tools.findToolInSubPath "coveralls.net.exe" nugetCache, "_Reports",
