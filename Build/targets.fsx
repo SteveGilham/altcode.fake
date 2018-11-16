@@ -82,14 +82,12 @@ _Target "SetVersion" (fun _ ->
     else appveyor
 
   let (v, majmin, y) = Actions.LocalVersion ci version
-  printfn "CI version %A" ci
-  printfn "Version %A" v
   Version := v
   let copy = sprintf "© 2010-%d by Steve Gilham <SteveGilham@users.noreply.github.com>" y
   Copyright := "Copyright " + copy
   Directory.ensure "./_Generated"
   Actions.InternalsVisibleTo(!Version)
-  let v' = !Version
+  let v' = String.Join(".", (!Version).Split('.') |> Seq.take 4)
   [ "./_Generated/AssemblyVersion.fs"; "./_Generated/AssemblyVersion.cs" ]
   |> List.iter
        (fun file ->
