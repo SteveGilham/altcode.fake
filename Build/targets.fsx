@@ -366,7 +366,7 @@ _Target "Packaging" (fun _ ->
 
   printfn "Executing on %A" Environment.OSVersion
   [ (List.concat [ gendarmeFiles; gendarmeNetcoreFiles ], "_Packaging.Gendarme",
-     "./Build/AltCode.Fake.nuspec", "altcode.fake.dotnet.testing.gendarme.core") ]
+     "./_Generated/altcode.fake.dotnet.testing.gendarme.nuspec", "AltCode.Fake.DotNet.Testing.Gendarme") ]
   |> List.iter (fun (files, output, nuspec, project) ->
        let outputPath = "./" + output
        let workingDir = "./_Binaries/" + output
@@ -376,7 +376,7 @@ _Target "Packaging" (fun _ ->
          { p with Authors = [ "Steve Gilham" ]
                   Project = project
                   Description =
-                    "A cross-platform pre-instrumenting code coverage tool set for .net/.net core and Mono"
+                    "A helper task for running Mono.Gendarme from FAKE ( >= 5.9.3 )"
                   OutputPath = outputPath
                   WorkingDir = workingDir
                   Files = files
