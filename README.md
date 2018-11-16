@@ -19,7 +19,7 @@ For FAKE >= 5.9.3 or later for .net framework and .net core
 
 ## Usage
 
-See the [Wiki page](https://github.com/SteveGilham/altcode.fake/wiki/Usage) for details
+See the [Wiki page](https://github.com/SteveGilham/altcode.fake/wiki) for details
 
 
 ## Building
