@@ -5,6 +5,9 @@ branches:
 skip_tags: true
 image: Visual Studio 2017
 clone_depth: 2
+environment:
+  COVERALLS_REPO_TOKEN:
+    secure: REZBaTQymYRQdGEJgpMw1O75r2pVJ7yNlhwLXwoj1NWaEYs5sTwpPdGlvjlWAf13
 cache: 
   - packages -> **\packages.config
   - '%USERPROFILE%\.nuget\packages -> **\*.*proj'

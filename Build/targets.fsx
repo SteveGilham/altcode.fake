@@ -274,8 +274,10 @@ _Target "BuildForAltCoverApi"
 
 _Target "UnitTestDotNetWithAltCoverApi" (fun _ ->
   Directory.ensure "./_Reports"
-  let p0 = { PrepareParams.Create() with AssemblyExcludeFilter = [ "Tests" ]
-                                         TypeFilter = [ """^Microsoft\.""" ] }
+  let p0 =
+    { PrepareParams.Create() with AssemblyExcludeFilter = [ "Tests" ]
+                                  TypeFilter = [ """^Microsoft\.""" ] }
+
   let c0 = CollectParams.Create()
 
   let setBaseOptions here (o : DotNet.Options) =
@@ -288,10 +290,10 @@ _Target "UnitTestDotNetWithAltCoverApi" (fun _ ->
                                          DisableInternalBinLog = true }
 
   try
-    let xml =
+    let (xml, total) =
       !!(@"./*Tests/*.fsproj")
       |> Seq.zip [ p0 ]
-      |> Seq.fold (fun l (p, f) ->
+      |> Seq.fold (fun (l, c) (p, f) ->
            let here = Path.GetDirectoryName f
            let p' = { p with XmlReport = here @@ "coverage.xml" }
            try
@@ -308,12 +310,32 @@ _Target "UnitTestDotNetWithAltCoverApi" (fun _ ->
                                                                                   NoBuild =
                                                                                     true })
            with x -> eprintf "%A" x
-           (here @@ "coverage.xml") :: l) []
+           let file = here @@ "coverage.xml"
+
+           let cover =
+             file
+             |> File.ReadAllLines
+             |> Seq.skipWhile (fun l -> l.StartsWith("    <Module") |> not)
+             |> Seq.takeWhile (fun l -> l <> "  </Modules>")
+             |> Seq.toList
+           (file :: l, c @ cover))
+           ([],
+            [ """<?xml version="1.0" encoding="utf-8" standalone="yes"?>""";
+              """<CoverageSession xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">""";
+              """  <Summary numSequencePoints="39" visitedSequencePoints="39" numBranchPoints="32" visitedBranchPoints="24" sequenceCoverage="100" branchCoverage="75" maxCyclomaticComplexity="5" minCyclomaticComplexity="1" visitedClasses="13" numClasses="13" visitedMethods="15" numMethods="15" minCrapScore="1" maxCrapScore="5" />""";
+              """  <Modules>""" ])
     ReportGenerator.generateReports (fun p ->
       { p with ExePath = Tools.findToolInSubPath "ReportGenerator.exe" "."
                ReportTypes =
                  [ ReportGenerator.ReportType.Html; ReportGenerator.ReportType.XmlSummary ]
                TargetDir = "_Reports/_UnitTestWithAltCoverApi" }) xml
+    if not <| String.IsNullOrWhiteSpace(Environment.environVar "APPVEYOR_BUILD_NUMBER") then
+      let full = total @ [ "  </Modules>"; "</CoverageSession>" ]
+      let coverage = "./_Reports/CombinedTestWithAltCoverRunner.coveralls"
+      File.WriteAllLines(coverage, full)
+      Actions.Run
+        (Tools.findToolInSubPath "coveralls.net.exe" nugetCache, "_Reports",
+         [ "--opencover"; coverage ]) "Coveralls upload failed"
   with x ->
     printfn "%A" x
     reraise())
