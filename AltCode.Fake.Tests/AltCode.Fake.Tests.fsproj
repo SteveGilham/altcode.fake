@@ -27,7 +27,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="AltCode.Fake.DotNet.Testing.Gendarme.fs" />
+    <Compile Include="AltCode.Fake.DotNet.Gendarme.fs" />
     <Compile Include="Main.fs" />
   </ItemGroup>
 
@@ -43,7 +43,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\AltCode.Fake.DotNet.Testing.Gendarme\altcode.fake.dotnet.testing.gendarme.core.fsproj" />
+    <ProjectReference Include="..\AltCode.Fake.DotNet.Gendarme\altcode.fake.dotnet.gendarme.core.fsproj" />
     <ProjectReference Include="..\AltCode.Nuget.Placeholder\AltCode.Nuget.Placeholder.fsproj" />
   </ItemGroup>
 </Project>

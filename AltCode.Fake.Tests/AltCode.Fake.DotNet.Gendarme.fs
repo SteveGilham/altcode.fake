@@ -1,4 +1,4 @@
-module AltCode.Fake.DotNet.Testing.Gendarme
+module AltCode.Fake.DotNet.Gendarme
 
 open System
 open System.IO
