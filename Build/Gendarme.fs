@@ -76,7 +76,10 @@ type Params =
     Severity : Severity
     /// Filter defects for the specified confidence levels.
     /// Default is 'normal+'
-    Confidence : Confidence }
+    Confidence : Confidence
+    /// Fail the build if a defect is reported
+    /// Default is true
+    FailBuildOnDefect : bool }
   /// ILMerge default parameters. Tries to automatically locate ilmerge.exe in a subfolder.
   static member Create() =
     { ToolPath = Tools.findToolInSubPath "gendarme.exe" <| Shell.pwd()
@@ -98,7 +101,8 @@ type Params =
       Severity = Severity.Medium Grade.Plus
       /// Filter defects for the specified confidence levels.
       /// Default is 'normal+'
-      Confidence = Confidence.Normal Grade.Plus }
+      Confidence = Confidence.Normal Grade.Plus
+      FailBuildOnDefect = true }
 
 /// Builds the arguments for the Gendarme task
 /// [omit]
@@ -127,7 +131,9 @@ let internal getArguments parameters =
      | Xml -> Item "--xml"
      | _ -> Item "--html") parameters.Log
     ItemList "--ignore" parameters.Ignore
-    Item "--limit" <| parameters.Limit.ToString(CultureInfo.InvariantCulture)
+    (if parameters.Limit > 0uy then
+       Item "--limit" <| parameters.Limit.ToString(CultureInfo.InvariantCulture)
+     else [])
     Flag "--console" parameters.Console
     Flag "--quiet" parameters.Quiet
 
@@ -143,26 +149,28 @@ let internal getArguments parameters =
        |> Seq.map (fun _ -> "--v")
        |> Seq.toList
      else [])
+
     ((ItemList String.Empty parameters.Targets)
      |> List.filter (String.isNullOrWhiteSpace >> not)) ]
   |> List.concat
 
 let internal createProcess args parameters =
-    CreateProcess.fromRawCommand parameters.ToolPath args
-    |> if String.IsNullOrWhiteSpace parameters.WorkingDirectory then id
-       else CreateProcess.withWorkingDirectory parameters.WorkingDirectory
+  CreateProcess.fromRawCommand parameters.ToolPath args
+  |> if String.IsNullOrWhiteSpace parameters.WorkingDirectory then id
+     else CreateProcess.withWorkingDirectory parameters.WorkingDirectory
 
 /// Uses ILMerge to merge .NET assemblies.
 /// ## Parameters
 ///
 ///  - `parameters` - A Gendarme.Params value with your required settings.
 let run parameters =
-  use __ = Trace.traceTask "Gendarme" ""
+  use __ = Trace.traceTask "Gendarme" String.Empty
   let args = getArguments parameters
 
   let run =
     createProcess args parameters
     |> CreateProcess.withFramework
     |> Proc.run
-  if 0 <> run.ExitCode then failwithf "Gendarme %s failed." (String.separated " " args)
+  if 0 <> run.ExitCode && parameters.FailBuildOnDefect then
+    failwithf "Gendarme %s failed." (String.separated " " args)
   __.MarkSuccess()

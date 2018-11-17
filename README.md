@@ -15,11 +15,11 @@ For FAKE >= 5.9.3 or later for .net framework and .net core
 | **Build** | <sup>AppVeyor</sup> [![Build status](https://img.shields.io/appveyor/ci/SteveGilham/altcode-fake/master.svg)](https://ci.appveyor.com/project/SteveGilham/altcode-fake) ![Build history](https://buildstats.info/appveyor/chart/SteveGilham/altcode-fake?branch=master) | <sup>Travis</sup> [![Build status](https://travis-ci.com/SteveGilham/altcode.fake.svg?branch=master)](https://travis-ci.com/SteveGilham/altcode.fake#) [![Build history](https://buildstats.info/travisci/chart/SteveGilham/altcode.fake?branch=master)](https://travis-ci.com/SteveGilham/altcode.fake/builds)|
 | **Unit Test coverage** | <sup>Coveralls</sup> [![Coverage Status](https://coveralls.io/repos/github/SteveGilham/altcode.fake/badge.svg?branch=master)](https://coveralls.io/github/SteveGilham/altcode.fake?branch=master) |
 | **Nuget** | |
-| Gendarme | [![Nuget](https://buildstats.info/nuget/altcode.fake.dotnet.gendarme)](http://nuget.org/packages/altcode.fake.dotnet.gendarme) [![Nuget](https://img.shields.io/nuget/vpre/altcode.fake.svg)](http://nuget.org/packages/altcode.fake.dotnet.gendarme) |
+| Gendarme | [![Nuget](https://buildstats.info/nuget/AltCode.Fake.DotNet.Gendarme)](http://nuget.org/packages/altcode.fake.dotnet.gendarme) [![Nuget](https://img.shields.io/nuget/vpre/AltCode.Fake.DotNet.Gendarme.svg)](http://nuget.org/packages/altcode.fake.dotnet.gendarme) |
 
 ## Usage
 
-See the [Wiki page](https://github.com/SteveGilham/altcode.fake/wiki/Usage) for details
+See the [Wiki page](https://github.com/SteveGilham/altcode.fake/wiki) for details
 
 
 ## Building
