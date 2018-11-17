@@ -4,9 +4,11 @@ open System.IO
 open System.Reflection
 open System.Xml
 open System.Xml.Linq
+
 open Actions
 open AltCode.Fake.DotNet
 open AltCover
+
 open Fake.Core
 open Fake.Core.TargetOperators
 open Fake.DotNet
@@ -18,8 +20,11 @@ open Fake.IO
 open Fake.IO.FileSystemOperators
 open Fake.IO.Globbing
 open Fake.IO.Globbing.Operators
+open Fake.Tools.Git
+
 open FSharpLint.Application
 open FSharpLint.Framework
+
 open NUnit.Framework
 
 let Copyright = ref String.Empty
@@ -59,6 +64,16 @@ let withCLIArgs (o : Fake.DotNet.DotNet.TestOptions) =
 let withMSBuildParams (o : Fake.DotNet.DotNet.BuildOptions) =
   { o with MSBuildParams = cliArguments }
 
+let currentBranch = 
+  "."
+  |> Path.getFullName
+  |> Information.getBranchName
+
+let package project =
+  if currentBranch.StartsWith("release/", StringComparison.Ordinal) then
+     currentBranch = "release/" + project
+  else true
+
 let _Target s f =
   Target.description s
   Target.create s f
@@ -67,7 +82,7 @@ let _Target s f =
 _Target "Preparation" ignore
 
 _Target "Clean" (fun _ ->
-  printfn "Cleaning the build and deploy folders"
+  printfn "Cleaning the build and deploy folders for %A" currentBranch
   Actions.Clean())
 
 _Target "SetVersion" (fun _ ->
@@ -379,8 +394,10 @@ _Target "Packaging" (fun _ ->
 
   printfn "Executing on %A" Environment.OSVersion
   [ (List.concat [ gendarmeFiles; gendarmeNetcoreFiles ], "_Packaging.Gendarme",
-     "./_Generated/altcode.fake.dotnet.gendarme.nuspec", "AltCode.Fake.DotNet.Gendarme") ]
-  |> List.iter (fun (files, output, nuspec, project) ->
+     "./_Generated/altcode.fake.dotnet.gendarme.nuspec", "AltCode.Fake.DotNet.Gendarme",
+     package "Gendarme") ]
+  |> List.filter (fun (_,_,_,_,ok) -> ok)
+  |> List.iter (fun (files, output, nuspec, project, _) ->
        let outputPath = "./" + output
        let workingDir = "./_Binaries/" + output
        Directory.ensure workingDir

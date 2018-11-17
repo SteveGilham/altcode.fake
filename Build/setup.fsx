@@ -40,6 +40,7 @@ nuget Fake.DotNet.Testing.NUnit >= 5.10.1
 nuget Fake.DotNet.Testing.OpenCover >= 5.10.1
 nuget Fake.DotNet.Testing.XUnit2 >= 5.10.1
 nuget Fake.IO.FileSystem >= 5.10.1
+nuget Fake.Tools.Git >= 5.10.1
 nuget Fake.Testing.ReportGenerator >= 5.10.1
 nuget AltCover.Api >= 4.0.655
 nuget coveralls.io >= 1.4.2
