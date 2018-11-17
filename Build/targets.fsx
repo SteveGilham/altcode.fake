@@ -436,7 +436,7 @@ _Target "PrepareDotNetBuild" (fun _ ->
   let publish = Path.getFullName "./_Publish"
 
   DotNet.publish (fun options ->
-    { options with OutputPath = Some(publish + ".vswhat")
+    { options with OutputPath = Some(publish + ".vsWhat")
                    Configuration = DotNet.BuildConfiguration.Release
                    Framework = Some "netcoreapp2.1" })
     (Path.getFullName "./AltCode.VsWhat/AltCode.VsWhat.fsproj")
