@@ -208,15 +208,6 @@ _Target "Gendarme" (fun _ -> // Needs debug because release is compiled --standa
 
 _Target "FxCop" (fun _ -> // Needs debug because release is compiled --standalone which contaminates everything
   Directory.ensure "./_Reports"
-  let installPath () =
-            use hklmKey =
-                Microsoft.Win32.RegistryKey.OpenBaseKey
-                    (Microsoft.Win32.RegistryHive.LocalMachine, Microsoft.Win32.RegistryView.Registry32)
-            use key = hklmKey.OpenSubKey(@"SOFTWARE\Microsoft\VisualStudio\SxS\VS7")
-            key.GetValue("15.0", String.Empty) :?> string
- 
-  let toolPath = installPath() @@ "Team Tools/Static Analysis Tools/FxCop/FxCopCmd.exe"
-
   [ ([ "_Binaries/AltCode.Fake.DotNet.Gendarme/Debug+AnyCPU/AltCode.Fake.DotNet.Gendarme.dll" ],
      [],
      [ 
@@ -227,7 +218,6 @@ _Target "FxCop" (fun _ -> // Needs debug because release is compiled --standalon
   |> Seq.iter (fun (files, types, ruleset) ->
        files
        |> FxCop.run { FxCop.Params.Create() with WorkingDirectory = "."
-                                                 ToolPath = toolPath
                                                  UseGAC = true
                                                  Verbose = false
                                                  ReportFileName =
