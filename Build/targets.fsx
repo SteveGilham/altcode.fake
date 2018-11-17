@@ -480,6 +480,35 @@ _Target "PrepareReadMe"
 
 // Post-packaging deployment touch test
 
+_Target "AltCodeVsWhatGlobalIntegration" (fun _ ->
+  let working = Path.getFullName "./_AltCodeVsWhatTest"
+  let mutable set = false
+  try
+    Directory.ensure working
+    Shell.cleanDir working
+
+    Actions.RunDotnet (fun o' -> { dotnetOptions o' with WorkingDirectory = working })
+      "tool"
+      ("install -g altcode.vswhat --add-source "
+       + (Path.getFullName "./_Packaging.VsWhat") + " --version " + !Version) "Installed"
+
+    Actions.RunDotnet (fun o' -> { dotnetOptions o' with WorkingDirectory = working })
+      "tool" ("list -g ") "Checked"
+    set <- true
+
+    CreateProcess.fromRawCommand "altcode-vswhat" [ ]
+    |> CreateProcess.withWorkingDirectory working
+    |> Proc.run
+    |> (Actions.AssertResult "altcode.vswhat")
+
+  finally
+    if set then
+      Actions.RunDotnet (fun o' -> { dotnetOptions o' with WorkingDirectory = working })
+        "tool" ("uninstall -g altcode.vswhat") "uninstalled"
+    let folder = (nugetCache @@ "altcode.vswhat") @@ !Version
+    Shell.mkdir folder
+    Shell.deleteDir folder)
+
 _Target "Deployment" ignore
 
 // AOB
@@ -578,7 +607,13 @@ Target.activateFinal "ResetConsoleColours"
 
 "OperationalTest" ==> "All"
 
-"Deployment" ==> "BulkReport" ==> "All"
+"Packaging"
+==> "AltCodeVsWhatGlobalIntegration"
+=?> ("Deployment", Environment.isWindows) // Not sure about VS for non-Windows
+
+"Deployment" 
+==> "BulkReport"
+==> "All"
 
 let defaultTarget() =
   resetColours()
