@@ -65,9 +65,15 @@ let withMSBuildParams (o : Fake.DotNet.DotNet.BuildOptions) =
   { o with MSBuildParams = cliArguments }
 
 let currentBranch = 
-  "."
-  |> Path.getFullName
-  |> Information.getBranchName
+  let env = Environment.environVar "APPVEYOR_REPO_BRANCH"
+  if env |> String.IsNullOrWhiteSpace then
+    let env1 = Environment.environVar "TRAVIS_BRANCH"
+    if env1 |> String.IsNullOrWhiteSpace then
+      "."
+      |> Path.getFullName
+      |> Information.getBranchName
+    else env1
+  else env
 
 let package project =
   if currentBranch.StartsWith("release/", StringComparison.Ordinal) then
@@ -83,24 +89,17 @@ _Target "Preparation" ignore
 
 _Target "Clean" (fun _ ->
   printfn "Cleaning the build and deploy folders for %A" currentBranch
-  let dir = System.Environment.GetEnvironmentVariables()
-  dir.Keys 
-  |> Seq.cast<string>
-  |> Seq.iter (fun k -> printfn "%s => %A" k dir.[k])
-
   Actions.Clean())
 
 _Target "SetVersion" (fun _ ->
   let appveyor = Environment.environVar "APPVEYOR_BUILD_VERSION"
-  let travis = Environment.environVar "TRAVIS_JOB_NUMBER"
+  let travis = Environment.environVar "TRAVIS_BUILD_NUMBER"
   let version = Actions.GetVersionFromYaml()
 
   let ci =
     if String.IsNullOrWhiteSpace appveyor then
       if String.IsNullOrWhiteSpace travis then String.Empty
-      else
-        (String.Join(".", version.Replace("{build}", travis).Split('.') |> Seq.take 4)
-         + "-travis")
+      else version.Replace("{build}", travis + "-travis")
     else appveyor
 
   let (v, majmin, y) = Actions.LocalVersion ci version
@@ -109,7 +108,7 @@ _Target "SetVersion" (fun _ ->
   Copyright := "Copyright " + copy
   Directory.ensure "./_Generated"
   Actions.InternalsVisibleTo(!Version)
-  let v' = String.Join(".", (!Version).Split('.') |> Seq.take 4)
+  let v' = !Version
   [ "./_Generated/AssemblyVersion.fs"; "./_Generated/AssemblyVersion.cs" ]
   |> List.iter
        (fun file ->
