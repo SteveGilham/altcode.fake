@@ -1,2 +1,2 @@
-# 1.0.11.0
+# 1.0.11
 * [NEW PACKAGE] `AltCode.VsWhat` containing a global to list Visual Studio instances and their installed packages; a thin wrapper over [BlackFox.VsWhere](https://github.com/vbfox/FoxSharp/blob/master/src/BlackFox.VsWhere/Readme.md) to make this one specific query. See Wiki entry [The `AltCode.VsWhat` package](https://github.com/SteveGilham/altcode.Fake/wiki/The-AltCode.VsWhat-package)
