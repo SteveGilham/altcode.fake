@@ -40,7 +40,7 @@ It is assumed that the following are available
 
 #### Windows
 
-You will need Visual Studio VS2017 (Community Edition) v15.8.latest with F# language support (or just the associated build tools and your editor of choice).  The NUnit3 Test Runner will simplify the basic in-IDE development cycle.
+You will need Visual Studio VS2017 (Community Edition) v15.9.latest with F# language support (or just the associated build tools and your editor of choice).
 
 #### *nix
 
@@ -60,6 +60,6 @@ Use `dotnet fake run ./Build/build.fsx --target <targetname>` to run to a specif
 
 ## Thanks to
 
-* [AppVeyor](https://ci.appveyor.com/project/SteveGilham/altcode.fake) for allowing free build CI services for Open Source projects
+* [AppVeyor](https://ci.appveyor.com/project/SteveGilham/altcode-fake) for allowing free build CI services for Open Source projects
 * [travis-ci](https://travis-ci.com/SteveGilham/altcode.fake) for allowing free build CI services for Open Source projects
 * [Coveralls](https://coveralls.io/r/SteveGilham/altcode.fake) for allowing free services for Open Source projects
