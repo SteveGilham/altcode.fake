@@ -403,13 +403,13 @@ _Target "Packaging" (fun _ ->
   [ (List.concat [ gendarmeFiles; gendarmeNetcoreFiles ], "_Packaging.Gendarme",
      "./_Generated/altcode.fake.dotnet.gendarme.nuspec", "AltCode.Fake.DotNet.Gendarme",
      "A helper task for running Mono.Gendarme from FAKE ( >= 5.9.3 )",
-     package "Gendarme")
+     "Gendarme")
     (whatFiles "tools/netcoreapp2.1/any", "_Packaging.VsWhat",
      "./_Generated/altcode.vswhat.nuspec", "AltCode.VsWhat",
      "A tool to list Visual Studio instances and their installed packages",
-     package "VsWhat") ]
-  |> List.filter (fun (_,_,_,_,_,ok) -> ok)
-  |> List.iter (fun (files, output, nuspec, project, description, _) ->
+     "VsWhat") ]
+  |> List.filter (fun (_,_,_,_,_,what) -> package what)
+  |> List.iter (fun (files, output, nuspec, project, description, what) ->
        let outputPath = "./" + output
        let workingDir = "./_Binaries/" + output
        Directory.ensure workingDir
@@ -424,7 +424,7 @@ _Target "Packaging" (fun _ ->
                   Version = !Version
                   Copyright = (!Copyright).Replace("©", "(c)")
                   Publish = false
-                  ReleaseNotes = Path.getFullName "ReleaseNotes.md" |> File.ReadAllText
+                  ReleaseNotes = Path.getFullName ("ReleaseNotes." + what + ".md") |> File.ReadAllText
                   ToolPath =
                     if Environment.isWindows then
                       Tools.findToolInSubPath "NuGet.exe" "./packages"

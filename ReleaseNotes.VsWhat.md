@@ -1,0 +1,2 @@
+# 1.0.xx
+* [NEW PACKAGE] `AltCode.VsWhat` containing a global to list Visual Studio instances and their installed packages : see Wiki entry [The `AltCode.VsWhat` package](https://github.com/SteveGilham/altcode.Fake/wiki/The-AltCode.VsWhat-package)

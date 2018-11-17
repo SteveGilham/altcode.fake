@@ -9,7 +9,7 @@ For FAKE >= 5.9.3 or later for .net framework and .net core
 
 DotNet global tools
 
-* `AltCode.VsWhat`, a tool to list Visual Studio instances and their installed packages
+* `AltCode.VsWhat`, a tool to list Visual Studio instances and their installed packages; a thin wrapper over [BlackFox.VsWhere](https://github.com/vbfox/FoxSharp/blob/master/src/BlackFox.VsWhere/Readme.md) to make this one specific query.
 
 
 ## Continuous Integration
