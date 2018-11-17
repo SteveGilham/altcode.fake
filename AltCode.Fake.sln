@@ -25,6 +25,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BuildItems", "BuildItems", 
 		Build\targets.fsx = Build\targets.fsx
 	EndProjectSection
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "AltCode.VsWhat", "AltCode.VsWhat\AltCode.VsWhat.fsproj", "{2DA60580-0A84-460A-AE2C-4A7718BF08C7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +47,10 @@ Global
 		{48B1CD14-45DC-4447-AE36-DBAB19B62D3F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{48B1CD14-45DC-4447-AE36-DBAB19B62D3F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{48B1CD14-45DC-4447-AE36-DBAB19B62D3F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2DA60580-0A84-460A-AE2C-4A7718BF08C7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2DA60580-0A84-460A-AE2C-4A7718BF08C7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2DA60580-0A84-460A-AE2C-4A7718BF08C7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2DA60580-0A84-460A-AE2C-4A7718BF08C7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,9 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <RootNamespace>AltCode.Fake.DotNet.Gendarme</RootNamespace>
-    <AssemblyName>AltCode.Fake.DotNet.Gendarme</AssemblyName>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <ContinuousIntegrationBuild Condition="'$(APPVEYOR)'=='True'">true</ContinuousIntegrationBuild>
@@ -30,14 +29,13 @@
 
   <ItemGroup>
     <Compile Include="..\_Generated\VisibleToTest.fs" Link="VisibleToTest.fs" />
-    <Compile Include="AssemblyInfo.fs" />
+    <Compile Include="..\AltCode.Fake.DotNet.Gendarme\AssemblyInfo.fs" Link="AssemblyInfo.fs" />
     <Compile Include="..\_Generated\AssemblyVersion.fs" Link="AssemblyVersion.fs" />
-    <Compile Include="..\Build\Gendarme.fs" Link="Gendarme.fs" />
+    <Compile Include="Program.fs" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="FAKE.Core.Process" Version="5.9.3" />
-    <PackageReference Include="FAKE.DotNet.Cli" Version="5.9.3" />
+    <PackageReference Include="BlackFox.VsWhere" Version="0.3.2" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-beta-63127-02" Condition="'$(OS)' == 'Windows_NT'">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
@@ -45,6 +43,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Update="FSharp.Core" Version="4.3.4" />
+    <PackageReference Update="FSharp.Core" Version="4.5.3" />
   </ItemGroup>
+
 </Project>
