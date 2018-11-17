@@ -83,6 +83,11 @@ _Target "Preparation" ignore
 
 _Target "Clean" (fun _ ->
   printfn "Cleaning the build and deploy folders for %A" currentBranch
+  let dir = System.Environment.GetEnvironmentVariables()
+  dir.Keys 
+  |> Seq.cast<string>
+  |> Seq.iter (fun k -> printfn "%s => %A" k dir.[k])
+
   Actions.Clean())
 
 _Target "SetVersion" (fun _ ->
