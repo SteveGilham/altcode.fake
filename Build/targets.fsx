@@ -392,12 +392,24 @@ _Target "Packaging" (fun _ ->
     |> Seq.map (fun x -> (x, Some "lib/netstandard2.0", None))
     |> Seq.toList
 
-  printfn "Executing on %A" Environment.OSVersion
+  let publishWhat = (Path.getFullName "./_Publish.vsWhat").Length
+  let whatFiles where =
+    (!!"./_Publish.vsWhat/**/*.*")
+    |> Seq.map
+         (fun x ->
+           (x, Some(where + Path.GetDirectoryName(x).Substring(publishWhat).Replace("\\", "/")), None))
+    |> Seq.toList
+
   [ (List.concat [ gendarmeFiles; gendarmeNetcoreFiles ], "_Packaging.Gendarme",
      "./_Generated/altcode.fake.dotnet.gendarme.nuspec", "AltCode.Fake.DotNet.Gendarme",
-     package "Gendarme") ]
-  |> List.filter (fun (_,_,_,_,ok) -> ok)
-  |> List.iter (fun (files, output, nuspec, project, _) ->
+     "A helper task for running Mono.Gendarme from FAKE ( >= 5.9.3 )",
+     package "Gendarme")
+    (whatFiles "tools/netcoreapp2.1/any", "_Packaging.VsWhat",
+     "./_Generated/altcode.vswhat.nuspec", "AltCode.VsWhat",
+     "A tool to list Visual Studio instances and their installed packages",
+     package "VsWhat") ]
+  |> List.filter (fun (_,_,_,_,_,ok) -> ok)
+  |> List.iter (fun (files, output, nuspec, project, description, _) ->
        let outputPath = "./" + output
        let workingDir = "./_Binaries/" + output
        Directory.ensure workingDir
@@ -405,8 +417,7 @@ _Target "Packaging" (fun _ ->
        NuGet (fun p ->
          { p with Authors = [ "Steve Gilham" ]
                   Project = project
-                  Description =
-                    "A helper task for running Mono.Gendarme from FAKE ( >= 5.9.3 )"
+                  Description = description
                   OutputPath = outputPath
                   WorkingDir = workingDir
                   Files = files
@@ -422,9 +433,20 @@ _Target "Packaging" (fun _ ->
 _Target "PrepareFrameworkBuild" (fun _ -> ())
 
 _Target "PrepareDotNetBuild" (fun _ ->
+  let publish = Path.getFullName "./_Publish"
+
+  DotNet.publish (fun options ->
+    { options with OutputPath = Some(publish + ".vswhat")
+                   Configuration = DotNet.BuildConfiguration.Release
+                   Framework = Some "netcoreapp2.1" })
+    (Path.getFullName "./AltCode.VsWhat/AltCode.VsWhat.fsproj")
+
   [ (String.Empty, "./_Generated/altcode.fake.dotnet.gendarme.nuspec",
      "AltCode.Fake.DotNet.Gendarme (FAKE task helper)", None,
-     Some "FAKE build Gendarme") ]
+     Some "FAKE build Gendarme") 
+    ("DotnetTool", "./_Generated/altcode.vswhat.nuspec",
+     "AltCode.VsWhat (Visual Studio package listing tool)", Some "Build/AltCode.VsWhat_128.png",
+     Some "Visual Studio") ]
   |> List.iter (fun (ptype, path, caption, icon, tags) ->
        let x s = XName.Get(s, "http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd")
        let dotnetNupkg = XDocument.Load "./Build/AltCode.Fake.nuspec"
