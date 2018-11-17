@@ -68,9 +68,8 @@ let testCases =
 
            let args = Gendarme.getArguments p
            Expect.equal args
-             [ name; log; "--console"; "--severity"; "medium+";
-               "--confidence"; "normal+" ] ("The log kind should be " + name))
-
+             [ name; log; "--console"; "--severity"; "medium+"; "--confidence"; "normal+" ]
+             ("The log kind should be " + name))
     testCase "Test that limit arguments are processed as expected" <| fun _ ->
       let p = { Gendarme.Params.Create() with Limit = uint8 (23 + DateTime.Now.Second) }
       let args = Gendarme.getArguments p
@@ -85,16 +84,15 @@ let testCases =
     testCase "Test that console may be switched off" <| fun _ ->
       let p = { Gendarme.Params.Create() with Console = false }
       let args = Gendarme.getArguments p
-      Expect.equal args
-        [ "--severity"; "medium+"; "--confidence"; "normal+" ]
+      Expect.equal args [ "--severity"; "medium+"; "--confidence"; "normal+" ]
         "The console should be gone"
 
     testCase "Test that output may be hushed" <| fun _ ->
       let p = { Gendarme.Params.Create() with Quiet = true }
       let args = Gendarme.getArguments p
       Expect.equal args
-        [ "--console"; "--quiet"; "--severity"; "medium+"; "--confidence";
-          "normal+" ] "The output should be quieted"
+        [ "--console"; "--quiet"; "--severity"; "medium+"; "--confidence"; "normal+" ]
+        "The output should be quieted"
 
     testProperty "Test that verbosity may be set" <| fun (x : uint8) ->
       let p = { Gendarme.Params.Create() with Verbosity = x }
@@ -126,8 +124,7 @@ let testCases =
            (fun (s, m) ->
            let p = { Gendarme.Params.Create() with Severity = s }
            let args = Gendarme.getArguments p
-           Expect.equal args
-             [ "--console"; "--severity"; m; "--confidence"; "normal+" ]
+           Expect.equal args [ "--console"; "--severity"; m; "--confidence"; "normal+" ]
              ("The severity should be " + m))
 
     testCase "Test that confidence may be set" <| fun _ ->
@@ -148,8 +145,7 @@ let testCases =
            (fun (c, m) ->
            let p = { Gendarme.Params.Create() with Confidence = c }
            let args = Gendarme.getArguments p
-           Expect.equal args
-             [ "--console"; "--severity"; "medium+"; "--confidence"; m ]
+           Expect.equal args [ "--console"; "--severity"; "medium+"; "--confidence"; m ]
              ("The severity should be " + m))
 
     testCase "Test that command arguments are processed as expected" <| fun _ ->
@@ -196,6 +192,16 @@ let testCases =
       let args =
         { Gendarme.Params.Create() with ToolPath = fake
                                         Targets = [ fake ] }
+      Expect.equal (Gendarme.run args) () "Should be silent"
+
+    testCase "A non-failing run should proceed as expected" <| fun _ ->
+      let here = Assembly.GetExecutingAssembly().Location |> Path.GetDirectoryName
+      let fake = Path.Combine(here, "AltCode.Nuget.Placeholder.exe")
+
+      let args =
+        { Gendarme.Params.Create() with ToolPath = fake
+                                        Targets = [ fake + ".nonesuch" ]
+                                        FailBuildOnDefect = false }
       Expect.equal (Gendarme.run args) () "Should be silent"
 
     testCase "A bad run should proceed as expected" <| fun _ ->

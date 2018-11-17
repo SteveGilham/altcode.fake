@@ -76,7 +76,10 @@ type Params =
     Severity : Severity
     /// Filter defects for the specified confidence levels.
     /// Default is 'normal+'
-    Confidence : Confidence }
+    Confidence : Confidence
+    /// Fail the build if a defect is reported
+    /// Default is true
+    FailBuildOnDefect : bool }
   /// ILMerge default parameters. Tries to automatically locate ilmerge.exe in a subfolder.
   static member Create() =
     { ToolPath = Tools.findToolInSubPath "gendarme.exe" <| Shell.pwd()
@@ -98,7 +101,8 @@ type Params =
       Severity = Severity.Medium Grade.Plus
       /// Filter defects for the specified confidence levels.
       /// Default is 'normal+'
-      Confidence = Confidence.Normal Grade.Plus }
+      Confidence = Confidence.Normal Grade.Plus
+      FailBuildOnDefect = true }
 
 /// Builds the arguments for the Gendarme task
 /// [omit]
@@ -167,5 +171,6 @@ let run parameters =
     createProcess args parameters
     |> CreateProcess.withFramework
     |> Proc.run
-  if 0 <> run.ExitCode then failwithf "Gendarme %s failed." (String.separated " " args)
+  if 0 <> run.ExitCode && parameters.FailBuildOnDefect then
+    failwithf "Gendarme %s failed." (String.separated " " args)
   __.MarkSuccess()
