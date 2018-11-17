@@ -181,7 +181,20 @@ _Target "Lint" (fun _ ->
 
 _Target "Gendarme" (fun _ -> // Needs debug because release is compiled --standalone which contaminates everything
   Directory.ensure "./_Reports"
-  [ ("./Build/rules-fake.xml",
+
+  let baseRules = Path.getFullName "./Build/rules-fake.xml"
+  let rules =
+    if Environment.isWindows then baseRules
+    else 
+      // Gendarme mono doesn't into .pdb files
+      let lines = baseRules
+                  |> File.ReadAllLines
+                  |> Seq.map (fun l -> l.Replace ("AvoidSwitchStatementsRule", "AvoidSwitchStatementsRule | AvoidLongMethodsRule"))
+      let fixup = Path.getFullName  "./_Generated/rules-fake.xml"
+      File.WriteAllLines(fixup, lines)
+      fixup
+  
+  [ (rules,
      [ "_Binaries/AltCode.Fake.DotNet.Gendarme/Debug+AnyCPU/AltCode.Fake.DotNet.Gendarme.dll" ]) ]
   |> Seq.iter (fun (ruleset, files) ->
        Gendarme.run { Gendarme.Params.Create() with WorkingDirectory = "."
