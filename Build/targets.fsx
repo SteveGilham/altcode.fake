@@ -92,17 +92,20 @@ _Target "Clean" (fun _ ->
   Actions.Clean())
 
 _Target "SetVersion" (fun _ ->
-  let appveyor = Environment.environVar "APPVEYOR_BUILD_VERSION"
+  let appveyor = Environment.environVar "APPVEYOR_BUILD_NUMBER"
   let travis = Environment.environVar "TRAVIS_BUILD_NUMBER"
-  let version = Actions.GetVersionFromYaml()
+  let now = DateTimeOffset.UtcNow
+  let version = sprintf "%d.%d.%d.{build}" (now.Year-2000) now.Month now.Day
+  printfn "Raw version %s" version
 
   let ci =
     if String.IsNullOrWhiteSpace appveyor then
       if String.IsNullOrWhiteSpace travis then String.Empty
       else version.Replace("{build}", travis + "-travis")
-    else appveyor
+    else version.Replace("{build}", appveyor)
 
   let (v, majmin, y) = Actions.LocalVersion ci version
+  printfn " => %A" (v, majmin, y)
   Version := v
   let copy = sprintf "© 2010-%d by Steve Gilham <SteveGilham@users.noreply.github.com>" y
   Copyright := "Copyright " + copy
