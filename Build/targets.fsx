@@ -64,7 +64,7 @@ let withCLIArgs (o : Fake.DotNet.DotNet.TestOptions) =
 let withMSBuildParams (o : Fake.DotNet.DotNet.BuildOptions) =
   { o with MSBuildParams = cliArguments }
 
-let currentBranch = 
+let currentBranch =
   let env = Environment.environVar "APPVEYOR_REPO_BRANCH"
   if env |> String.IsNullOrWhiteSpace then
     let env1 = Environment.environVar "TRAVIS_BRANCH"
@@ -204,7 +204,7 @@ _Target "Gendarme" (fun _ -> // Needs debug because release is compiled --standa
   let baseRules = Path.getFullName "./Build/rules-fake.xml"
   let rules =
     if Environment.isWindows then baseRules
-    else 
+    else
       // Gendarme mono doesn't into .pdb files
       let lines = baseRules
                   |> File.ReadAllLines
@@ -212,7 +212,7 @@ _Target "Gendarme" (fun _ -> // Needs debug because release is compiled --standa
       let fixup = Path.getFullName  "./_Generated/rules-fake.xml"
       File.WriteAllLines(fixup, lines)
       fixup
-  
+
   [ (rules,
      [ "_Binaries/AltCode.Fake.DotNet.Gendarme/Debug+AnyCPU/AltCode.Fake.DotNet.Gendarme.dll" ]) ]
   |> Seq.iter (fun (ruleset, files) ->
@@ -229,7 +229,7 @@ _Target "FxCop" (fun _ -> // Needs debug because release is compiled --standalon
   Directory.ensure "./_Reports"
   [ ([ "_Binaries/AltCode.Fake.DotNet.Gendarme/Debug+AnyCPU/AltCode.Fake.DotNet.Gendarme.dll" ],
      [],
-     [ 
+     [
        "-Microsoft.Design#CA1006"; "-Microsoft.Design#CA1011"; "-Microsoft.Design#CA1020";
        "-Microsoft.Design#CA1062"; "-Microsoft.Design#CA1034"; "-Microsoft.Naming#CA1704";
        "-Microsoft.Naming#CA1707"; "-Microsoft.Naming#CA1709"; "-Microsoft.Naming#CA1724";
@@ -447,7 +447,7 @@ _Target "PrepareDotNetBuild" (fun _ ->
 
   [ (String.Empty, "./_Generated/altcode.fake.dotnet.gendarme.nuspec",
      "AltCode.Fake.DotNet.Gendarme (FAKE task helper)", None,
-     Some "FAKE build Gendarme") 
+     Some "FAKE build Gendarme")
     ("DotnetTool", "./_Generated/altcode.vswhat.nuspec",
      "AltCode.VsWhat (Visual Studio package listing tool)", Some "Build/AltCode.VsWhat_128.png",
      Some "Visual Studio") ]
@@ -615,7 +615,7 @@ Target.activateFinal "ResetConsoleColours"
 ==> "AltCodeVsWhatGlobalIntegration"
 =?> ("Deployment", Environment.isWindows) // Not sure about VS for non-Windows
 
-"Deployment" 
+"Deployment"
 ==> "BulkReport"
 ==> "All"
 
