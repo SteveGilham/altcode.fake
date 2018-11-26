@@ -5,11 +5,11 @@ FAKE helper code that I've written as a side-effect of other projects
 
 For FAKE >= 5.9.3 or later for .net framework and .net core
 
-* `AltCode.Fake.DotNet.Gendarme`, a gendarme helper along the lines of the FxCop task `Fake.DotNet.FxCop`
+* [`AltCode.Fake.DotNet.Gendarme` ![Nuget](https://buildstats.info/nuget/AltCode.Fake.DotNet.Gendarme)](http://nuget.org/packages/altcode.fake.dotnet.gendarme), a gendarme helper along the lines of the FxCop task `Fake.DotNet.FxCop`
 
 DotNet global tools
 
-* `AltCode.VsWhat`, a tool to list Visual Studio instances and their installed packages; a thin wrapper over [BlackFox.VsWhere](https://github.com/vbfox/FoxSharp/blob/master/src/BlackFox.VsWhere/Readme.md) to make this one specific query.
+*  [`AltCode.VsWhat` ![Nuget](https://buildstats.info/nuget/AltCode.VsWhat)](http://nuget.org/packages/altcode.vswhat), a tool to list Visual Studio instances and their installed packages; a thin wrapper over [BlackFox.VsWhere](https://github.com/vbfox/FoxSharp/blob/master/src/BlackFox.VsWhere/Readme.md) to make this one specific query.
 
 
 ## Continuous Integration
@@ -19,9 +19,6 @@ DotNet global tools
 | --- | --- | --- | 
 | **Build** | <sup>AppVeyor</sup> [![Build status](https://img.shields.io/appveyor/ci/SteveGilham/altcode-fake/master.svg)](https://ci.appveyor.com/project/SteveGilham/altcode-fake) ![Build history](https://buildstats.info/appveyor/chart/SteveGilham/altcode-fake?branch=master) | <sup>Travis</sup> [![Build status](https://travis-ci.com/SteveGilham/altcode.fake.svg?branch=master)](https://travis-ci.com/SteveGilham/altcode.fake#) [![Build history](https://buildstats.info/travisci/chart/SteveGilham/altcode.fake?branch=master)](https://travis-ci.com/SteveGilham/altcode.fake/builds)|
 | **Unit Test coverage** | <sup>Coveralls</sup> [![Coverage Status](https://coveralls.io/repos/github/SteveGilham/altcode.fake/badge.svg?branch=master)](https://coveralls.io/github/SteveGilham/altcode.fake?branch=master) |
-| **Nuget** | |
-| Gendarme | [![Nuget](https://buildstats.info/nuget/AltCode.Fake.DotNet.Gendarme)](http://nuget.org/packages/altcode.fake.dotnet.gendarme) [![Nuget](https://img.shields.io/nuget/vpre/AltCode.Fake.DotNet.Gendarme.svg)](http://nuget.org/packages/altcode.fake.dotnet.gendarme) |
-| VsWhat | [![Nuget](https://buildstats.info/nuget/AltCode.VsWhat)](http://nuget.org/packages/altcode.vswhat) [![Nuget](https://img.shields.io/nuget/vpre/AltCode.VsWhat.svg)](http://nuget.org/packages/altcode.vswhat) |
 
 ## Usage
 
