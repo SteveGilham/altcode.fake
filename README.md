@@ -7,6 +7,8 @@ For FAKE >= 5.9.3 or later for .net framework and .net core
 
 * [`AltCode.Fake.DotNet.Gendarme` ![Nuget](https://buildstats.info/nuget/AltCode.Fake.DotNet.Gendarme)](http://nuget.org/packages/altcode.fake.dotnet.gendarme), a gendarme helper along the lines of the FxCop task `Fake.DotNet.FxCop`
 
+Can be used with the most recent [homebrew release from my fork](https://github.com/SteveGilham/Gendarme/releases) to analyze netcore/netstandard builds, even though this is still a classic Framewotk/Mono tool built with the pre-Roslyn compiler (VS2013).  
+
 DotNet global tools
 
 *  [`AltCode.VsWhat` ![Nuget](https://buildstats.info/nuget/AltCode.VsWhat)](http://nuget.org/packages/altcode.vswhat), a tool to list Visual Studio instances and their installed packages; a thin wrapper over [BlackFox.VsWhere](https://github.com/vbfox/FoxSharp/blob/master/src/BlackFox.VsWhere/Readme.md) to make this one specific query.
