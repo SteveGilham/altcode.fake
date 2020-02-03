@@ -7,7 +7,7 @@ For FAKE >= 5.9.3 or later for .net framework and .net core
 
 * [`AltCode.Fake.DotNet.Gendarme` ![Nuget](https://buildstats.info/nuget/AltCode.Fake.DotNet.Gendarme)](http://nuget.org/packages/altcode.fake.dotnet.gendarme), a gendarme helper along the lines of the FxCop task `Fake.DotNet.FxCop`
 
-Can be used with the most recent [homebrew release from my fork](https://github.com/SteveGilham/Gendarme/releases) to analyze netcore/netstandard builds, even though this homebrew Gendarme is still a classic Framewotk/Mono tool built with the pre-Roslyn compiler (VS2013).  
+Can be used with the most recent [homebrew release from my fork](https://github.com/SteveGilham/Gendarme/releases) to analyze netcore/netstandard builds, even though this homebrew Gendarme is still a classic Framework/Mono tool built with the pre-Roslyn compiler (VS2013).  
 
 DotNet global tools
 
