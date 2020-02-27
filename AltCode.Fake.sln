@@ -24,7 +24,9 @@ Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "AltCode.VsWhat", "AltCode.V
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "dotnet-cli", "Build\dotnet-cli.csproj", "{02A6B76A-7762-4637-A14F-5FBEBC9C574A}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "AltCode.Fake.Tests", "AltCode.Fake.Tests\AltCode.Fake.Tests.fsproj", "{48EB7F76-32EA-4015-A835-6DFE6F5A24F0}"
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "AltCode.Fake.Tests", "AltCode.Fake.Tests\AltCode.Fake.Tests.fsproj", "{48EB7F76-32EA-4015-A835-6DFE6F5A24F0}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "AltCode.Nuget.Placeholder", "AltCode.Nuget.Placeholder\AltCode.Nuget.Placeholder.fsproj", "{F87AFAFF-29FA-41A5-AFC1-26DB73FA64F9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -50,6 +52,10 @@ Global
 		{48EB7F76-32EA-4015-A835-6DFE6F5A24F0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{48EB7F76-32EA-4015-A835-6DFE6F5A24F0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{48EB7F76-32EA-4015-A835-6DFE6F5A24F0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F87AFAFF-29FA-41A5-AFC1-26DB73FA64F9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F87AFAFF-29FA-41A5-AFC1-26DB73FA64F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F87AFAFF-29FA-41A5-AFC1-26DB73FA64F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F87AFAFF-29FA-41A5-AFC1-26DB73FA64F9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

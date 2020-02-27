@@ -13,6 +13,5 @@
     <PackageReference Include="altcode.gendarme" version="2020.2.20.18134-pre-release" />
     <PackageReference Include="FSharp.Core" version="4.7.0" />
     <PackageReference Include="NUnit.ConsoleRunner" version="3.11.1" />
-    <PackageReference Include="OpenCover" version="4.7.922" />
   </ItemGroup>
 </Project>

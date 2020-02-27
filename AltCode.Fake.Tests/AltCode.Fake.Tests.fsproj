@@ -23,7 +23,7 @@
     <WarningLevel>5</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <WarningsAsErrors />
-    <NoWarn>52</NoWarn>  
+    <NoWarn>52</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
@@ -44,6 +44,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\AltCode.Fake.DotNet.Gendarme\altcode.fake.dotnet.gendarme.core.fsproj" />
+    <ProjectReference Include="..\AltCode.Nuget.Placeholder\AltCode.Nuget.Placeholder.fsproj" />
   </ItemGroup>
-
 </Project>

@@ -154,13 +154,9 @@ let testCases =
       let p = Gendarme.Params.Create()
       let args = Gendarme.composeCommandLine p
       let proc = Gendarme.createProcess args p
-      let info =
-        proc.GetType()
-            .GetProperty("WorkingDirectory",
-                         BindingFlags.Instance ||| BindingFlags.NonPublic)
-      let w = info.GetValue(proc) :?> string option
+      let w = proc.WorkingDirectory
       Expect.equal proc.CommandLine
-        (fake + " --console --severity medium+ --confidence normal+")
+        ("gendarme --console --severity medium+ --confidence normal+")
         "The defaults should be simple"
       Expect.equal w None "Default working directory should be empty"
 
@@ -178,11 +174,7 @@ let testCases =
       let p = { Gendarme.Params.Create() with WorkingDirectory = fake }
       let args = Gendarme.composeCommandLine p
       let proc = Gendarme.createProcess args p
-      let info =
-        proc.GetType()
-            .GetProperty("WorkingDirectory",
-                         BindingFlags.Instance ||| BindingFlags.NonPublic)
-      let w = info.GetValue(proc) :?> string option
+      let w = proc.WorkingDirectory
       Expect.equal w (Some fake) "Default working directory should be as given"
 
     testCase "A good run should proceed as expected" <| fun _ ->
@@ -214,8 +206,9 @@ let testCases =
       Expect.throwsC (fun () -> Gendarme.run args)
         (fun ex ->
         Expect.equal ex.Message
-          ("Gendarme --console --severity medium+ --confidence normal+ " + fake
-           + ".nonesuch failed.") "Message should reflect inputs")
+          ("Process exit code '1' <> 0. Command Line: " +
+           fake + " --console --severity medium+ --confidence normal+ \"" + fake
+           + ".nonesuch\"") ("Message should reflect inputs " + ex.Message))
 
     testCase "Test that null arguments are processed as expected" <| fun _ ->
       let p =
