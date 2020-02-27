@@ -53,10 +53,17 @@ let nugetCache =
   Path.Combine
     (Environment.GetFolderPath Environment.SpecialFolder.UserProfile, ".nuget/packages")
 
-let pwsh =
-  match "pwsh" |> Fake.Core.ProcessUtils.tryFindFileOnPath with
-  | Some path -> path
-  | _ -> "pwsh"
+let fxcop =
+  if Environment.isWindows then
+    BlackFox.VsWhere.VsInstances.getAll()
+    |> Seq.filter (fun i -> System.Version(i.InstallationVersion).Major = 16)
+    |> Seq.map
+         (fun i ->
+         i.InstallationPath @@ "Team Tools/Static Analysis Tools/FxCop/FxCopCmd.exe")
+    |> Seq.filter File.Exists
+    |> Seq.tryHead
+  else
+    None
 
 let cliArguments =
   { MSBuild.CliArguments.Create() with
@@ -307,6 +314,7 @@ _Target "FxCop" (fun _ -> // Needs debug because release is compiled --standalon
        |> FxCop.run
             { FxCop.Params.Create() with
                 WorkingDirectory = "."
+                ToolPath = Option.get fxcop
                 UseGAC = true
                 Verbose = false
                 ReportFileName = "_Reports/FxCopReport.xml"
