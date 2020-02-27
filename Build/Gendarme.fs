@@ -44,11 +44,13 @@ type LogKind =
   | Xml
   | Html
 
-/// Parameter type for ILMerge
-[<NoComparison>]
+/// Parameter type for Gendarme
+[<NoComparison; NoEquality>]
 type Params =
   { /// Path to gendarme.exe
     ToolPath : string
+    /// Define the tool through FAKE 5.18 ToolType -- if set, overrides
+    ToolType : Fake.DotNet.ToolType
     /// Working Directory
     WorkingDirectory : string
     /// Specify the rule sets and rule settings. Default is 'rules.xml'.
@@ -82,7 +84,8 @@ type Params =
     FailBuildOnDefect : bool }
   /// ILMerge default parameters. Tries to automatically locate ilmerge.exe in a subfolder.
   static member Create() =
-    { ToolPath = Tools.findToolInSubPath "gendarme.exe" <| Shell.pwd()
+    { ToolPath = (ProcessUtils.tryFindLocalTool "PATH" "gendarme.exe" ["."]) |> Option.get
+      ToolType = Fake.DotNet.ToolType.CreateFullFramework()
       WorkingDirectory = String.Empty
       Configuration = String.Empty
       RuleSet = String.Empty
@@ -108,7 +111,7 @@ type Params =
 /// [omit]
 [<System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA1308",
                                                   Justification = "Lower-casing is safe here")>]
-let internal getArguments parameters =
+let internal composeCommandLine parameters =
   let Item a x =
     if x |> String.IsNullOrWhiteSpace then []
     else [ a; x ]
@@ -159,18 +162,27 @@ let internal createProcess args parameters =
   |> if String.IsNullOrWhiteSpace parameters.WorkingDirectory then id
      else CreateProcess.withWorkingDirectory parameters.WorkingDirectory
 
-/// Uses ILMerge to merge .NET assemblies.
+let internal withWorkingDirectory parameters c =
+  c
+  |> if String.IsNullOrWhiteSpace parameters.WorkingDirectory
+      then id
+      else CreateProcess.withWorkingDirectory parameters.WorkingDirectory
+
+/// Uses Gendarme to analyse .NET assemblies.
 /// ## Parameters
-///
 ///  - `parameters` - A Gendarme.Params value with your required settings.
 let run parameters =
   use __ = Trace.traceTask "Gendarme" String.Empty
-  let args = getArguments parameters
+  let args = (composeCommandLine parameters)
+  let command =  CreateProcess.fromCommand (RawCommand(parameters.ToolPath, args |> Arguments.OfArgs))
+                 |> CreateProcess.withToolType (parameters.ToolType.WithDefaultToolCommandName "gendarme")
+                 |> withWorkingDirectory parameters
+                 |> CreateProcess.ensureExitCode
+                 |> fun command ->
+                   Trace.trace command.CommandLine
+                   command
 
-  let run =
-    createProcess args parameters
-    |> CreateProcess.withFramework
-    |> Proc.run
-  if 0 <> run.ExitCode && parameters.FailBuildOnDefect then
-    failwithf "Gendarme %s failed." (String.separated " " args)
+  let run = command |> Proc.run
+  if 0 <> run.ExitCode && parameters.FailBuildOnDefect
+  then failwithf "Gendarme '%s' failed." command.CommandLine
   __.MarkSuccess()
