@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net47</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NuGet.CommandLine" version="5.4.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="coveralls.io" version="1.4.2" />
+    <PackageReference Include="altcode.gendarme" version="2020.2.20.18134-pre-release" />
+    <PackageReference Include="FSharp.Core" version="4.7.0" />
+    <PackageReference Include="NUnit.ConsoleRunner" version="3.11.1" />
+  </ItemGroup>
+</Project>

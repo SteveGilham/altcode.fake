@@ -1,48 +1,49 @@
 <gendarme>
   <ruleset name="default">
+    <!-- AvoidAssemblyVersionMismatchRule is silly as assembly version is a contract, and many file versions can satisfy it -->
     <rules include="*"
-      exclude="AvoidAssemblyVersionMismatchRule | AvoidVisibleConstantFieldRule"
-      from="Gendarme.Rules.BadPractice.dll" />
+           exclude="AvoidAssemblyVersionMismatchRule"
+           from="Gendarme.Rules.BadPractice.dll" />
     <rules include="*" from="Gendarme.Rules.Concurrency.dll" />
     <rules include="*"
-      exclude = "CheckParametersNullityInVisibleMethodsRule | EnsureLocalDisposalRule"
-      from="Gendarme.Rules.Correctness.dll" />
+           from="Gendarme.Rules.Correctness.dll" />
+    <!-- AvoidSmallNamespaceRule doesn't account for specialized code -->
+    <!-- AvoidVisibleNestedTypesRule can't usefully be applied for F# -->
     <rules include="*"
-      exclude="AvoidSmallNamespaceRule | ConsiderConvertingMethodToPropertyRule | AvoidVisibleNestedTypesRule | AvoidMultidimensionalIndexerRule"
-      from="Gendarme.Rules.Design.dll" />
+           exclude="AvoidSmallNamespaceRule | AvoidVisibleNestedTypesRule"
+           from="Gendarme.Rules.Design.dll" />
+    <!-- DoNotExposeNestedGenericSignaturesRule is a rule for morts at best and
+         doesn't really make any problems for F# -->
     <rules include="*"
-      exclude="AvoidMethodWithUnusedGenericTypeRule"
-      from="Gendarme.Rules.Design.Generic.dll" />
+           exclude="DoNotExposeNestedGenericSignaturesRule"
+           from="Gendarme.Rules.Design.Generic.dll" />
     <rules include="*"
-      from="Gendarme.Rules.Design.Linq.dll" />
+           from="Gendarme.Rules.Design.Linq.dll" />
     <rules include="*"
-      exclude="InstantiateArgumentExceptionCorrectlyRule"
-      from="Gendarme.Rules.Exceptions.dll" />
+           from="Gendarme.Rules.Exceptions.dll" />
     <rules include="*" from="Gendarme.Rules.Interoperability.dll" />
     <rules include="*" from="Gendarme.Rules.Interoperability.Com.dll" />
     <rules include="*"
-      exclude="UseCorrectCasingRule | AvoidNonAlphanumericIdentifierRule | UseCorrectPrefixRule | ParameterNamesShouldMatchOverriddenMethodRule | AvoidDeepNamespaceHierarchyRule"
-      from="Gendarme.Rules.Naming.dll" />
+           exclude="AvoidDeepNamespaceHierarchyRule"
+           from="Gendarme.Rules.Naming.dll" />
     <rules include="*"
-      exclude="AvoidUnsealedUninheritedInternalTypeRule"
-      from="Gendarme.Rules.Performance.dll" />
+           from="Gendarme.Rules.Performance.dll" />
     <rules include="*"
-      from="Gendarme.Rules.Portability.dll" />
+           from="Gendarme.Rules.Portability.dll" />
     <rules include="*" from="Gendarme.Rules.Security.dll" />
     <rules include="*" from="Gendarme.Rules.Security.Cas.dll" />
+    <!-- I have no real use for serialization -->
     <rules include="*"
-      exclude="MarkAllNonSerializableFieldsRule"
-     from="Gendarme.Rules.Serialization.dll" />
+           exclude="MarkAllNonSerializableFieldsRule"
+           from="Gendarme.Rules.Serialization.dll" />
+    <!-- Use the relaxed variant -->
     <rules include="*"
-      exclude="AvoidSwitchStatementsRule | AvoidLongParameterListsRule"
-      from="Gendarme.Rules.Smells.dll" />
+       exclude="AvoidCodeDuplicatedInSameClassRule"
+           from="Gendarme.Rules.Smells.dll" />
     <rules include="*" from="Gendarme.Rules.Ui.dll" />
     <rules include="*"
-      exclude="VariableNamesShouldNotMatchFieldNamesRule"
-      from="Gendarme.Rules.Maintainability.dll" />
-    <rules include="*" 
-      from="Gendarme.Rules.Gendarme.dll" />
-   <!-- Assembly not in nugget -->
-    <!-- rules include="*" from="Gendarme.Rules.Globalization.dll"/ -->
+           from="Gendarme.Rules.Maintainability.dll" />
+    <rules include="*" from="Gendarme.Rules.Gendarme.dll" />
+    <rules include="*" from="Gendarme.Rules.Globalization.dll" />
   </ruleset>
 </gendarme>

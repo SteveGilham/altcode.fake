@@ -19,6 +19,7 @@
     <ResolveNuGetPackages>false</ResolveNuGetPackages>
     <GlobalDefineConstants>
     </GlobalDefineConstants>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -56,7 +57,7 @@
   <PropertyGroup Condition=" '$(FSharpTargetsPath)' == '' AND Exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\FSharp\Microsoft.FSharp.Targets') ">
     <FSharpTargetsPath>$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\FSharp\Microsoft.FSharp.Targets</FSharpTargetsPath>
   </PropertyGroup>
-  <Import Project="$(FSharpTargetsPath)" Condition=" '$(FSharpTargetsPath)' != ''"/>
+  <Import Project="$(FSharpTargetsPath)" Condition=" '$(FSharpTargetsPath)' != ''" />
   <ItemGroup>
     <Compile Include="..\_Generated\AssemblyVersion.fs">
       <Link>AssemblyVersion.fs</Link>
@@ -69,25 +70,28 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Fake.Core.Process">
-      <HintPath>..\packages\Fake.Core.Process.5.9.3\lib\net46\Fake.Core.Process.dll</HintPath>
+      <HintPath>..\packages\Fake.Core.Process.5.19.1\lib\net462\Fake.Core.Process.dll</HintPath>
     </Reference>
     <Reference Include="Fake.Core.String">
-      <HintPath>..\packages\Fake.Core.String.5.9.3\lib\net46\Fake.Core.String.dll</HintPath>
+      <HintPath>..\packages\Fake.Core.String.5.19.1\lib\net462\Fake.Core.String.dll</HintPath>
     </Reference>
     <Reference Include="Fake.Core.Trace">
-      <HintPath>..\packages\Fake.Core.Trace.5.9.3\lib\net46\Fake.Core.Trace.dll</HintPath>
+      <HintPath>..\packages\Fake.Core.Trace.5.19.1\lib\net462\Fake.Core.Trace.dll</HintPath>
     </Reference>
     <Reference Include="Fake.DotNet.Cli">
-      <HintPath>..\packages\Fake.DotNet.Cli.5.9.3\lib\net462\Fake.DotNet.Cli.dll</HintPath>
+      <HintPath>..\packages\Fake.DotNet.Cli.5.19.1\lib\net462\Fake.DotNet.Cli.dll</HintPath>
     </Reference>
     <Reference Include="Fake.IO.FileSystem">
-      <HintPath>..\packages\Fake.IO.FileSystem.5.9.3\lib\net46\Fake.IO.FileSystem.dll</HintPath>
+      <HintPath>..\packages\Fake.IO.FileSystem.5.19.1\lib\net462\Fake.IO.FileSystem.dll</HintPath>
     </Reference>
     <Reference Include="FSharp.Core">
-      <HintPath>..\packages\FSharp.Core.4.5.2\lib\net45\FSharp.Core.dll</HintPath>
+      <HintPath>..\packages\FSharp.Core.4.7.0\lib\net45\FSharp.Core.dll</HintPath>
     </Reference>
     <Reference Include="mscorlib" />
     <Reference Include="System" />
+    <Reference Include="System.Collections.Immutable">
+      <HintPath>..\packages\System.Collections.Immutable.1.7.0\lib\netstandard2.0\System.Collections.Immutable.dll</HintPath>
+    </Reference>
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
