@@ -44,9 +44,9 @@ let nugetCache =
     (Environment.GetFolderPath Environment.SpecialFolder.UserProfile, ".nuget/packages")
 
 let pwsh =
-  if Environment.isWindows then
-    Tools.findToolInSubPath "pwsh.exe" (programFiles @@ "PowerShell")
-  else "pwsh"
+  match "pwsh" |> Fake.Core.ProcessUtils.tryFindFileOnPath with
+  | Some path -> path
+  | _ -> "pwsh"
 
 let cliArguments =
   { MSBuild.CliArguments.Create() with ConsoleLogParameters = []
@@ -64,7 +64,7 @@ let withCLIArgs (o : Fake.DotNet.DotNet.TestOptions) =
 let withMSBuildParams (o : Fake.DotNet.DotNet.BuildOptions) =
   { o with MSBuildParams = cliArguments }
 
-let currentBranch = 
+let currentBranch =
   let env = Environment.environVar "APPVEYOR_REPO_BRANCH"
   if env |> String.IsNullOrWhiteSpace then
     let env1 = Environment.environVar "TRAVIS_BRANCH"
@@ -166,37 +166,32 @@ _Target "BuildDebug" (fun _ ->
 _Target "Analysis" ignore
 
 _Target "Lint" (fun _ ->
-  let failOnIssuesFound (issuesFound : bool) =
+  let failOnIssuesFound (issuesFound: bool) =
     Assert.That(issuesFound, Is.False, "Lint issues were found")
-  try
-    let settings =
-      Configuration.SettingsFileName
-      |> Path.getFullName
-      |> File.ReadAllText
+  let options =
+    { Lint.OptionalLintParameters.Default with Configuration = FromFile (Path.getFullName "./fsharplint.json")
+    //Configuration.SettingsFileName
+    }
 
-    let lintConfig = Configuration.configuration settings
-    let options =
-      { Lint.OptionalLintParameters.Default with Configuration = Some lintConfig }
-    let fsVersion = System.Version("4.0")
-    !!"**/*.fsproj"
-    |> Seq.collect (fun n -> !!(Path.GetDirectoryName n @@ "*.fs"))
-    |> Seq.distinct
-    |> Seq.fold (fun _ f ->
-         match Lint.lintFile options f fsVersion with
-         | Lint.LintResult.Failure x -> failwithf "%A" x
-         | Lint.LintResult.Success w ->
-           w
-           |> Seq.filter (fun x ->
-                match x.Fix with
-                | None -> false
-                | Some fix -> fix.FromText <> "AltCover_Fake") // special case
-           |> Seq.fold (fun _ x ->
-                printfn "Info: %A\r\n Range: %A\r\n Fix: %A\r\n====" x.Info x.Range x.Fix
-                true) false) false
-    |> failOnIssuesFound
-  with ex ->
-    printfn "%A" ex
-    reraise())
+  !!"**/*.fsproj"
+  |> Seq.collect (fun n -> !!(Path.GetDirectoryName n @@ "*.fs"))
+  |> Seq.distinct
+  |> Seq.map (fun f ->
+        match Lint.lintFile options f with
+        | Lint.LintResult.Failure x -> failwithf "%A" x
+        | Lint.LintResult.Success w ->
+          w
+          |> Seq.filter (fun x ->
+              match x.Details.SuggestedFix with
+              | Some l -> match l.Force() with
+                          | Some fix -> fix.FromText <> "AltCover_Fake" // special case
+                          | _ -> false
+              | _ -> false))
+  |> Seq.concat
+  |> Seq.fold (fun _ x ->
+        printfn "Info: %A\r\n Range: %A\r\n Fix: %A\r\n====" x.Details.Message x.Details.Range x.Details.SuggestedFix
+        true) false
+  |> failOnIssuesFound)
 
 _Target "Gendarme" (fun _ -> // Needs debug because release is compiled --standalone which contaminates everything
   Directory.ensure "./_Reports"
@@ -204,7 +199,7 @@ _Target "Gendarme" (fun _ -> // Needs debug because release is compiled --standa
   let baseRules = Path.getFullName "./Build/rules-fake.xml"
   let rules =
     if Environment.isWindows then baseRules
-    else 
+    else
       // Gendarme mono doesn't into .pdb files
       let lines = baseRules
                   |> File.ReadAllLines
@@ -212,7 +207,7 @@ _Target "Gendarme" (fun _ -> // Needs debug because release is compiled --standa
       let fixup = Path.getFullName  "./_Generated/rules-fake.xml"
       File.WriteAllLines(fixup, lines)
       fixup
-  
+
   [ (rules,
      [ "_Binaries/AltCode.Fake.DotNet.Gendarme/Debug+AnyCPU/AltCode.Fake.DotNet.Gendarme.dll" ]) ]
   |> Seq.iter (fun (ruleset, files) ->
@@ -229,7 +224,7 @@ _Target "FxCop" (fun _ -> // Needs debug because release is compiled --standalon
   Directory.ensure "./_Reports"
   [ ([ "_Binaries/AltCode.Fake.DotNet.Gendarme/Debug+AnyCPU/AltCode.Fake.DotNet.Gendarme.dll" ],
      [],
-     [ 
+     [
        "-Microsoft.Design#CA1006"; "-Microsoft.Design#CA1011"; "-Microsoft.Design#CA1020";
        "-Microsoft.Design#CA1062"; "-Microsoft.Design#CA1034"; "-Microsoft.Naming#CA1704";
        "-Microsoft.Naming#CA1707"; "-Microsoft.Naming#CA1709"; "-Microsoft.Naming#CA1724";
@@ -447,7 +442,7 @@ _Target "PrepareDotNetBuild" (fun _ ->
 
   [ (String.Empty, "./_Generated/altcode.fake.dotnet.gendarme.nuspec",
      "AltCode.Fake.DotNet.Gendarme (FAKE task helper)", None,
-     Some "FAKE build Gendarme") 
+     Some "FAKE build Gendarme")
     ("DotnetTool", "./_Generated/altcode.vswhat.nuspec",
      "AltCode.VsWhat (Visual Studio package listing tool)", Some "Build/AltCode.VsWhat_128.png",
      Some "Visual Studio") ]
@@ -615,7 +610,7 @@ Target.activateFinal "ResetConsoleColours"
 ==> "AltCodeVsWhatGlobalIntegration"
 =?> ("Deployment", Environment.isWindows) // Not sure about VS for non-Windows
 
-"Deployment" 
+"Deployment"
 ==> "BulkReport"
 ==> "All"
 
