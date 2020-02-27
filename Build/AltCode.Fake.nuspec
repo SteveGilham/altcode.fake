@@ -7,10 +7,11 @@
     <authors>@authors@</authors>
     <owners>@authors@</owners>
     <summary>@summary@</summary>
-    <licenseUrl>https://cdn.jsdelivr.net/gh/SteveGilham/altcode.fake/LICENSE</licenseUrl>
+    <license type="file">LICENSE</license>
     <projectUrl>https://github.com/SteveGilham/altcode.fake/wiki</projectUrl>
     <repository type="git" url="https://github.com/SteveGilham/altcode.fake" />
     <iconUrl>https://cdn.jsdelivr.net/gh/SteveGilham/altcode.fake/Build/AltCode.Fake_128.png</iconUrl>
+    <icon>AltCode.Fake_128.png</icon>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>@description@</description>
     <releaseNotes>@releaseNotes@</releaseNotes>

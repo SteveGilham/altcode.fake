@@ -177,17 +177,12 @@ let run parameters =
   use __ = Trace.traceTask "Gendarme" String.Empty
   let args = (composeCommandLine parameters)
   let command = createProcess args parameters
-                |> CreateProcess.ensureExitCode
+                |> if parameters.FailBuildOnDefect
+                   then CreateProcess.ensureExitCode
+                   else id
                 |> fun command ->
                    Trace.trace command.CommandLine
                    command
 
-  let mutable exitCode = -1
-  try
-    let result = command |> Proc.run
-    exitCode <- result.ExitCode
-  with
-  | _ -> ()
-  if 0 <> exitCode && parameters.FailBuildOnDefect
-  then failwithf "Gendarme command '%s' failed." command.CommandLine
+  command |> Proc.run |> ignore
   __.MarkSuccess()

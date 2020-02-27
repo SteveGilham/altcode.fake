@@ -39,8 +39,8 @@ let AltCoverFilter(p : Primitive.PrepareParams) =
   { p with
       //MethodFilter = "WaitForExitCustom" :: (p.MethodFilter |> Seq.toList)
       AssemblyExcludeFilter =
-        @"NUnit3\." :: (@"Tests\." :: (p.AssemblyExcludeFilter |> Seq.toList))
-      AssemblyFilter = "FSharp" :: @"Test\.Rules" :: (p.AssemblyFilter |> Seq.toList)
+        @"NUnit3\." :: (@"\.Tests" :: (p.AssemblyExcludeFilter |> Seq.toList))
+      AssemblyFilter = "FSharp" :: @"\.Placeholder" :: (p.AssemblyFilter |> Seq.toList)
       LocalSource = true
       TypeFilter = [ @"System\."; "Microsoft" ] @ (p.TypeFilter |> Seq.toList) }
 
@@ -89,6 +89,19 @@ let package project =
   if currentBranch.StartsWith("release/", StringComparison.Ordinal) then
      currentBranch = "release/" + project
   else true
+
+let toolPackages =
+  let xml =
+    "./Build/dotnet-cli.csproj"
+    |> Path.getFullName
+    |> XDocument.Load
+  xml.Descendants(XName.Get("PackageReference"))
+  |> Seq.map
+       (fun x ->
+         (x.Attribute(XName.Get("Include")).Value, x.Attribute(XName.Get("version")).Value))
+  |> Map.ofSeq
+
+let packageVersion (p : string) = p.ToLowerInvariant() + "/" + (toolPackages.Item p)
 
 let misses = ref 0
 
@@ -284,30 +297,12 @@ _Target "FxCop" (fun _ -> // Needs debug because release is compiled --standalon
 // Unit Test
 
 _Target "UnitTest" (fun _ ->
-  let numbers =
-    !!(@"_Reports/_Unit*/Summary.xml")
-    |> Seq.collect (fun f ->
-         let xml = XDocument.Load f
-         xml.Descendants(XName.Get("Linecoverage"))
-         |> Seq.map (fun e ->
-              let coverage = e.Value.Replace("%", String.Empty)
-              match Double.TryParse coverage with
-              | (false, _) ->
-                Assert.Fail("Could not parse coverage " + coverage)
-                0.0
-              | (_, numeric) ->
-                printfn "%s : %A" (f
-                                   |> Path.GetDirectoryName
-                                   |> Path.GetFileName) numeric
-                numeric))
-    |> Seq.toList
-  if numbers
-     |> List.tryFind (fun n -> n <= 99.0)
-     |> Option.isSome
-  then Assert.Fail("Coverage is too low"))
-_Target "JustUnitTest" (fun _ -> ())
-_Target "BuildForUnitTestDotNet"
-  (fun _ ->
+  let numbers = (@"_Reports/_Unit*/Summary.xml") |> uncovered
+  let omitted = numbers |> List.sum
+  if omitted > 1
+  then omitted |> (sprintf "%d uncovered lines -- coverage too low") |> Assert.Fail)
+
+_Target "BuildForUnitTestDotNet" (fun _ ->
   !!(@"./*Tests/*.tests.core.fsproj")
   |> Seq.iter
        (DotNet.build
@@ -329,7 +324,7 @@ _Target "UnitTestDotNet" (fun _ ->
     printfn "%A" x
     reraise())
 
-_Target "BuildForAltCoverApi"
+_Target "BuildForAltCover"
   (fun _ ->
   !!(@"./*Tests/*.tests.core.fsproj")
   |> Seq.iter
@@ -339,14 +334,14 @@ _Target "BuildForAltCoverApi"
                                               DotNet.BuildConfiguration.Debug }
           |> withMSBuildParams)))
 
-_Target "UnitTestDotNetWithAltCoverApi" (fun _ ->
+_Target "UnitTestDotNetWithAltCover" (fun _ ->
   let reports = Path.getFullName "./_Reports"
   Directory.ensure reports
   let report = "./_Reports/_UnitTestWithAltCoverCoreRunner"
   Directory.ensure report
 
   let coverage =
-    !!(@"gendarme/**/Tests.*.csproj")
+    !!(@"./**/*.Tests.fsproj")
     |> Seq.fold (fun l test ->
          printfn "%A" test
          let tname = test |> Path.GetFileNameWithoutExtension
@@ -358,7 +353,7 @@ _Target "UnitTestDotNetWithAltCoverApi" (fun _ ->
 
          let altReport = reports @@ ("UnitTestWithAltCoverCoreRunner." + tname + ".xml")
          let altReport2 =
-           reports @@ ("UnitTestWithAltCoverCoreRunner." + tname + ".netcoreapp2.1.xml")
+           reports @@ ("UnitTestWithAltCoverCoreRunner." + tname + ".xml")
 
          let collect = AltCover.CollectParams.Primitive(Primitive.CollectParams.Create()) // FSApi
 
@@ -391,7 +386,6 @@ _Target "UnitTestDotNetWithAltCoverApi" (fun _ ->
            DotNet.test (fun to' ->
              { to'.WithCommon(setBaseOptions).WithAltCoverParameters prepare collect
                  ForceTrue with
-                 Framework = Some "netcoreapp2.1"
                  MSBuildParams = cliArguments }) test
          with x -> printfn "%A" x
          // reraise()) // while fixing
@@ -422,6 +416,9 @@ _Target "Packaging" (fun _ ->
 
   let gendarmeFiles =
     [ (gendarmeDir @@ "AltCode.Fake.DotNet.Gendarme.dll", Some "lib/net462", None)
+      (gendarmeDir @@ "AltCode.Fake.DotNet.Gendarme.pdb", Some "lib/net462", None)
+      (Path.getFullName "./LICENS*", Some "", None)
+      (Path.getFullName "./Build/AltCode.Fake_128.*g", Some "", None)
       (packable, Some "", None) ]
 
   let gendarmeNetcoreFiles =
@@ -437,16 +434,28 @@ _Target "Packaging" (fun _ ->
            (x, Some(where + Path.GetDirectoryName(x).Substring(publishWhat).Replace("\\", "/")), None))
     |> Seq.toList
 
+  let whatPack =
+    [
+      (Path.getFullName "./LICENS*", Some "", None)
+      (Path.getFullName "./Build/AltCode.VsWhat_128.*g", Some "", None)
+      (packable, Some "", None) ]
+
   [ (List.concat [ gendarmeFiles; gendarmeNetcoreFiles ], "_Packaging.Gendarme",
      "./_Generated/altcode.fake.dotnet.gendarme.nuspec", "AltCode.Fake.DotNet.Gendarme",
-     "A helper task for running Mono.Gendarme from FAKE ( >= 5.9.3 )",
-     "Gendarme")
-    (whatFiles "tools/netcoreapp2.1/any", "_Packaging.VsWhat",
+     "A helper task for running Mono.Gendarme from FAKE ( >= 5.18.1 )",
+     "Gendarme",
+        [ // make these explicit, as this package implies an opt-in
+        ("Fake.Core.Environment", "5.18.1")
+        ("Fake.DotNet.Cli", "5.18.1")
+        ("FSharp.Core", "4.7")
+        ("System.Collections.Immutable", "1.6.0")
+      ])
+    (List.concat [ whatFiles "tools/netcoreapp2.1/any"; whatPack], "_Packaging.VsWhat",
      "./_Generated/altcode.vswhat.nuspec", "AltCode.VsWhat",
      "A tool to list Visual Studio instances and their installed packages",
-     "VsWhat") ]
-  |> List.filter (fun (_,_,_,_,_,what) -> package what)
-  |> List.iter (fun (files, output, nuspec, project, description, what) ->
+     "VsWhat", []) ]
+  |> List.filter (fun (_,_,_,_,_,what, _) -> package what)
+  |> List.iter (fun (files, output, nuspec, project, description, what, dependencies) ->
        let outputPath = "./" + output
        let workingDir = "./_Binaries/" + output
        Directory.ensure workingDir
@@ -458,14 +467,17 @@ _Target "Packaging" (fun _ ->
                   OutputPath = outputPath
                   WorkingDir = workingDir
                   Files = files
+                  Dependencies = dependencies
                   Version = !Version
                   Copyright = (!Copyright).Replace("©", "(c)")
                   Publish = false
                   ReleaseNotes = Path.getFullName ("ReleaseNotes." + what + ".md") |> File.ReadAllText
                   ToolPath =
-                    if Environment.isWindows then
-                      Tools.findToolInSubPath "NuGet.exe" "./packages"
-                    else "/usr/bin/nuget" }) nuspec))
+                  if Environment.isWindows then
+                    ("./packages/" + (packageVersion "NuGet.CommandLine")
+                     + "/tools/NuGet.exe") |> Path.getFullName
+                  else
+                    "/usr/bin/nuget" }) nuspec))
 
 _Target "PrepareFrameworkBuild" (fun _ -> ())
 
@@ -503,6 +515,8 @@ _Target "PrepareDotNetBuild" (fun _ ->
          let tag = dotnetNupkg.Descendants(x "iconUrl") |> Seq.head
          let text = String.Concat(tag.Nodes()).Replace("Build/AltCode.Fake_128.png", logo)
          tag.Value <- text
+         let tag2 = dotnetNupkg.Descendants(x "icon") |> Seq.head
+         tag2.Value <- logo |> Path.GetFileName
        match tags with
        | None -> ()
        | Some line ->
@@ -558,7 +572,7 @@ _Target "BulkReport" (fun _ ->
        (fun f -> not <| f.EndsWith("Report.xml", StringComparison.OrdinalIgnoreCase))
   |> Seq.toList
   |> ReportGenerator.generateReports (fun p ->
-       { p with ExePath = Tools.findToolInSubPath "ReportGenerator.exe" "."
+       { p with ToolType = ToolType.CreateLocalTool()
                 ReportTypes = [ ReportGenerator.ReportType.Html ]
                 TargetDir = "_Reports/_BulkReport" }))
 _Target "All" ignore
@@ -602,18 +616,14 @@ Target.activateFinal "ResetConsoleColours"
 ?=> "UnitTest"
 
 "Compilation"
-==> "JustUnitTest"
-==> "UnitTest"
-
-"Compilation"
 ==> "BuildForUnitTestDotNet"
 ==> "UnitTestDotNet"
 ==> "UnitTest"
 
 "UnitTestDotNet"
-==> "BuildForAltCoverApi"
-==> "UnitTestDotNetWithAltCoverApi"
-=?> ("UnitTest", Environment.isWindows)
+==> "BuildForAltCover"
+==> "UnitTestDotNetWithAltCover"
+==> "UnitTest"
 
 "Compilation"
 ?=> "OperationalTest"

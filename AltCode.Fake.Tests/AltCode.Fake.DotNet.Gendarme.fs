@@ -206,8 +206,9 @@ let testCases =
       Expect.throwsC (fun () -> Gendarme.run args)
         (fun ex ->
         Expect.equal ex.Message
-          ("Gendarme command '" + fake + " --console --severity medium+ --confidence normal+ \"" + fake
-           + ".nonesuch\"' failed.") "Message should reflect inputs")
+          ("Process exit code '1' <> 0. Command Line: " +
+           fake + " --console --severity medium+ --confidence normal+ \"" + fake
+           + ".nonesuch\"") ("Message should reflect inputs " + ex.Message))
 
     testCase "Test that null arguments are processed as expected" <| fun _ ->
       let p =
