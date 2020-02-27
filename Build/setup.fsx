@@ -21,8 +21,9 @@ let dotnetOptions (o : DotNet.Options) =
   | None -> o
 
 DotNet.restore (fun o ->
-  { o with Packages = [ "./packages" ]
-           Common = dotnetOptions o.Common }) "./Build/dotnet-cli.csproj"
+  { o with
+      Packages = [ "./packages" ]
+      Common = dotnetOptions o.Common }) "./Build/dotnet-cli.csproj"
 // Restore the NuGet packages used by the build and the Framework version
 RestoreMSSolutionPackages id "./AltCode.Fake.sln"
 

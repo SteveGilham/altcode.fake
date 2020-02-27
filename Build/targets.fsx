@@ -59,13 +59,15 @@ let pwsh =
   | _ -> "pwsh"
 
 let cliArguments =
-  { MSBuild.CliArguments.Create() with ConsoleLogParameters = []
-                                       DistributedLoggers = None
-                                       DisableInternalBinLog = true }
+  { MSBuild.CliArguments.Create() with
+      ConsoleLogParameters = []
+      DistributedLoggers = None
+      DisableInternalBinLog = true }
 
 let withWorkingDirectoryVM dir o =
-  { dotnetOptions o with WorkingDirectory = Path.getFullName dir
-                         Verbosity = Some DotNet.Verbosity.Minimal }
+  { dotnetOptions o with
+      WorkingDirectory = Path.getFullName dir
+      Verbosity = Some DotNet.Verbosity.Minimal }
 
 let withWorkingDirectoryOnly dir o =
   { dotnetOptions o with WorkingDirectory = Path.getFullName dir }
@@ -82,12 +84,14 @@ let currentBranch =
       "."
       |> Path.getFullName
       |> Information.getBranchName
-    else env1
-  else env
+    else
+      env1
+  else
+    env
 
 let package project =
-  if currentBranch.StartsWith("release/", StringComparison.Ordinal) then
-     currentBranch = "release/" + project
+  if currentBranch.StartsWith("release/", StringComparison.Ordinal)
+  then currentBranch = "release/" + project
   else true
 
 let toolPackages =
@@ -151,27 +155,29 @@ _Target "SetVersion" (fun _ ->
 
   let ci =
     if String.IsNullOrWhiteSpace appveyor then
-      if String.IsNullOrWhiteSpace travis then String.Empty
+      if String.IsNullOrWhiteSpace travis
+      then String.Empty
       else version.Replace("{build}", travis + "-travis")
-    else appveyor
+    else
+      appveyor
 
   let (v, majmin, y) = Actions.LocalVersion ci version
   Version := v
-  let copy = sprintf "© 2010-%d by Steve Gilham <SteveGilham@users.noreply.github.com>" y
+  let copy =
+    sprintf "© 2010-%d by Steve Gilham <SteveGilham@users.noreply.github.com>" y
   Copyright := "Copyright " + copy
   Directory.ensure "./_Generated"
   Actions.InternalsVisibleTo(!Version)
   let v' = !Version
   [ "./_Generated/AssemblyVersion.fs"; "./_Generated/AssemblyVersion.cs" ]
-  |> List.iter
-       (fun file ->
-       AssemblyInfoFile.create file [ AssemblyInfo.Product "AltCode.Fake"
-                                      AssemblyInfo.Version(majmin + ".0.0")
-                                      AssemblyInfo.FileVersion v'
-                                      AssemblyInfo.Company "Steve Gilham"
-                                      AssemblyInfo.Trademark ""
-                                      AssemblyInfo.Copyright copy ]
-         (Some AssemblyInfoFileConfig.Default))
+  |> List.iter (fun file ->
+       AssemblyInfoFile.create file
+         [ AssemblyInfo.Product "AltCode.Fake"
+           AssemblyInfo.Version(majmin + ".0.0")
+           AssemblyInfo.FileVersion v'
+           AssemblyInfo.Company "Steve Gilham"
+           AssemblyInfo.Trademark ""
+           AssemblyInfo.Copyright copy ] (Some AssemblyInfoFileConfig.Default))
   let hack = """namespace AltCover
 module SolutionRoot =
   let location = """ + "\"\"\"" + (Path.getFullName ".") + "\"\"\""
@@ -179,8 +185,7 @@ module SolutionRoot =
 
   // Update the file only if it would change
   let old =
-    if File.Exists(path) then File.ReadAllText(path)
-    else String.Empty
+    if File.Exists(path) then File.ReadAllText(path) else String.Empty
   if not (old.Equals(hack)) then File.WriteAllText(path, hack))
 
 // Basic compilation
@@ -192,13 +197,14 @@ _Target "BuildRelease" (fun _ ->
     DotNet.restore (fun o -> o.WithCommon(withWorkingDirectoryVM ".")) "AltCode.Fake.sln"
     "AltCode.Fake.sln"
     |> MSBuild.build (fun p ->
-         { p with Verbosity = Some MSBuildVerbosity.Normal
-                  ConsoleLogParameters = []
-                  DistributedLoggers = None
-                  DisableInternalBinLog = true
-                  Properties =
-                    [ "Configuration", "Release"
-                      "DebugSymbols", "True" ] })
+         { p with
+             Verbosity = Some MSBuildVerbosity.Normal
+             ConsoleLogParameters = []
+             DistributedLoggers = None
+             DisableInternalBinLog = true
+             Properties =
+               [ "Configuration", "Release"
+                 "DebugSymbols", "True" ] })
   with x ->
     printfn "%A" x
     reraise())
@@ -206,74 +212,88 @@ _Target "BuildDebug" (fun _ ->
   DotNet.restore (fun o -> o.WithCommon(withWorkingDirectoryVM ".")) "AltCode.Fake.sln"
   "AltCode.Fake.sln"
   |> MSBuild.build (fun p ->
-       { p with Verbosity = Some MSBuildVerbosity.Normal
-                ConsoleLogParameters = []
-                DistributedLoggers = None
-                DisableInternalBinLog = true
-                Properties =
-                  [ "Configuration", "Debug"
-                    "DebugSymbols", "True" ] }))
+       { p with
+           Verbosity = Some MSBuildVerbosity.Normal
+           ConsoleLogParameters = []
+           DistributedLoggers = None
+           DisableInternalBinLog = true
+           Properties =
+             [ "Configuration", "Debug"
+               "DebugSymbols", "True" ] }))
 
 // Code Analysis
 
 _Target "Analysis" ignore
 
 _Target "Lint" (fun _ ->
-  let failOnIssuesFound (issuesFound: bool) =
+  let failOnIssuesFound (issuesFound : bool) =
     Assert.That(issuesFound, Is.False, "Lint issues were found")
   let options =
-    { Lint.OptionalLintParameters.Default with Configuration = FromFile (Path.getFullName "./fsharplint.json")
-    //Configuration.SettingsFileName
-    }
+    { Lint.OptionalLintParameters.Default with
+        Configuration = FromFile(Path.getFullName "./fsharplint.json") }
 
   !!"**/*.fsproj"
   |> Seq.collect (fun n -> !!(Path.GetDirectoryName n @@ "*.fs"))
   |> Seq.distinct
   |> Seq.map (fun f ->
-        match Lint.lintFile options f with
-        | Lint.LintResult.Failure x -> failwithf "%A" x
-        | Lint.LintResult.Success w ->
-          w
-          |> Seq.filter (fun x ->
-              match x.Details.SuggestedFix with
-              | Some l -> match l.Force() with
-                          | Some fix -> fix.FromText <> "AltCover_Fake" // special case
-                          | _ -> false
-              | _ -> false))
+       match Lint.lintFile options f with
+       | Lint.LintResult.Failure x -> failwithf "%A" x
+       | Lint.LintResult.Success w ->
+           w
+           |> Seq.filter (fun x ->
+                match x.Details.SuggestedFix with
+                | Some l ->
+                    match l.Force() with
+                    | Some fix -> fix.FromText <> "AltCover_Fake" // special case
+                    | _ -> false
+                | _ -> false))
   |> Seq.concat
   |> Seq.fold (fun _ x ->
-        printfn "Info: %A\r\n Range: %A\r\n Fix: %A\r\n====" x.Details.Message x.Details.Range x.Details.SuggestedFix
-        true) false
+       printfn "Info: %A\r\n Range: %A\r\n Fix: %A\r\n====" x.Details.Message
+         x.Details.Range x.Details.SuggestedFix
+       true) false
   |> failOnIssuesFound)
 
 _Target "Gendarme" (fun _ -> // Needs debug because release is compiled --standalone which contaminates everything
+
   Directory.ensure "./_Reports"
 
   let baseRules = Path.getFullName "./Build/rules-fake.xml"
+
   let rules =
-    if Environment.isWindows then baseRules
+    if Environment.isWindows then
+      baseRules
     else
       // Gendarme mono doesn't into .pdb files
-      let lines = baseRules
-                  |> File.ReadAllLines
-                  |> Seq.map (fun l -> l.Replace ("AvoidSwitchStatementsRule", "AvoidSwitchStatementsRule | AvoidLongMethodsRule"))
-      let fixup = Path.getFullName  "./_Generated/rules-fake.xml"
+      let lines =
+        baseRules
+        |> File.ReadAllLines
+        |> Seq.map
+             (fun l ->
+               l.Replace
+                 ("AvoidSwitchStatementsRule",
+                  "AvoidSwitchStatementsRule | AvoidLongMethodsRule"))
+
+      let fixup = Path.getFullName "./_Generated/rules-fake.xml"
       File.WriteAllLines(fixup, lines)
       fixup
 
   [ (rules,
      [ "_Binaries/AltCode.Fake.DotNet.Gendarme/Debug+AnyCPU/AltCode.Fake.DotNet.Gendarme.dll" ]) ]
   |> Seq.iter (fun (ruleset, files) ->
-       Gendarme.run { Gendarme.Params.Create() with WorkingDirectory = "."
-                                                    Severity = Gendarme.Severity.All
-                                                    Confidence = Gendarme.Confidence.All
-                                                    Configuration = ruleset
-                                                    Console = true
-                                                    Log = "./_Reports/gendarme.html"
-                                                    LogKind = Gendarme.LogKind.Html
-                                                    Targets = files }))
+       Gendarme.run
+         { Gendarme.Params.Create() with
+             WorkingDirectory = "."
+             Severity = Gendarme.Severity.All
+             Confidence = Gendarme.Confidence.All
+             Configuration = ruleset
+             Console = true
+             Log = "./_Reports/gendarme.html"
+             LogKind = Gendarme.LogKind.Html
+             Targets = files }))
 
 _Target "FxCop" (fun _ -> // Needs debug because release is compiled --standalone which contaminates everything
+
   Directory.ensure "./_Reports"
   [ ([ "_Binaries/AltCode.Fake.DotNet.Gendarme/Debug+AnyCPU/AltCode.Fake.DotNet.Gendarme.dll" ],
      [],
@@ -284,55 +304,54 @@ _Target "FxCop" (fun _ -> // Needs debug because release is compiled --standalon
        "-Microsoft.Usage#CA2208" ]) ]
   |> Seq.iter (fun (files, types, ruleset) ->
        files
-       |> FxCop.run { FxCop.Params.Create() with WorkingDirectory = "."
-                                                 UseGAC = true
-                                                 Verbose = false
-                                                 ReportFileName =
-                                                   "_Reports/FxCopReport.xml"
-                                                 Types = types
-                                                 Rules = ruleset
-                                                 FailOnError = FxCop.ErrorLevel.Warning
-                                                 IgnoreGeneratedCode = true }))
+       |> FxCop.run
+            { FxCop.Params.Create() with
+                WorkingDirectory = "."
+                UseGAC = true
+                Verbose = false
+                ReportFileName = "_Reports/FxCopReport.xml"
+                Types = types
+                Rules = ruleset
+                FailOnError = FxCop.ErrorLevel.Warning
+                IgnoreGeneratedCode = true }))
 
 // Unit Test
 
 _Target "UnitTest" (fun _ ->
   let numbers = (@"_Reports/_Unit*/Summary.xml") |> uncovered
   let omitted = numbers |> List.sum
-  if omitted > 1
-  then omitted |> (sprintf "%d uncovered lines -- coverage too low") |> Assert.Fail)
+  if omitted > 1 then
+    omitted
+    |> (sprintf "%d uncovered lines -- coverage too low")
+    |> Assert.Fail)
 
 _Target "BuildForUnitTestDotNet" (fun _ ->
   !!(@"./*Tests/*.tests.core.fsproj")
   |> Seq.iter
-       (DotNet.build
-          (fun p ->
-          { p.WithCommon dotnetOptions with Configuration =
-                                              DotNet.BuildConfiguration.Debug }
-          |> withMSBuildParams)))
+       (DotNet.build (fun p ->
+         { p.WithCommon dotnetOptions with Configuration = DotNet.BuildConfiguration.Debug }
+         |> withMSBuildParams)))
 
 _Target "UnitTestDotNet" (fun _ ->
   Directory.ensure "./_Reports"
   try
     !!(@"./*Tests/*.fsproj")
-    |> Seq.iter (DotNet.test (fun p ->
-                   { p.WithCommon dotnetOptions with Configuration =
-                                                       DotNet.BuildConfiguration.Debug
-                                                     NoBuild = true }
-                   |> withCLIArgs))
+    |> Seq.iter
+         (DotNet.test (fun p ->
+           { p.WithCommon dotnetOptions with
+               Configuration = DotNet.BuildConfiguration.Debug
+               NoBuild = true }
+           |> withCLIArgs))
   with x ->
     printfn "%A" x
     reraise())
 
-_Target "BuildForAltCover"
-  (fun _ ->
+_Target "BuildForAltCover" (fun _ ->
   !!(@"./*Tests/*.tests.core.fsproj")
   |> Seq.iter
-       (DotNet.build
-          (fun p ->
-          { p.WithCommon dotnetOptions with Configuration =
-                                              DotNet.BuildConfiguration.Debug }
-          |> withMSBuildParams)))
+       (DotNet.build (fun p ->
+         { p.WithCommon dotnetOptions with Configuration = DotNet.BuildConfiguration.Debug }
+         |> withMSBuildParams)))
 
 _Target "UnitTestDotNetWithAltCover" (fun _ ->
   let reports = Path.getFullName "./_Reports"
@@ -352,8 +371,7 @@ _Target "UnitTestDotNetWithAltCover" (fun _ ->
            |> Path.GetDirectoryName
 
          let altReport = reports @@ ("UnitTestWithAltCoverCoreRunner." + tname + ".xml")
-         let altReport2 =
-           reports @@ ("UnitTestWithAltCoverCoreRunner." + tname + ".xml")
+         let altReport2 = reports @@ ("UnitTestWithAltCoverCoreRunner." + tname + ".xml")
 
          let collect = AltCover.CollectParams.Primitive(Primitive.CollectParams.Create()) // FSApi
 
@@ -385,8 +403,7 @@ _Target "UnitTestDotNetWithAltCover" (fun _ ->
          try
            DotNet.test (fun to' ->
              { to'.WithCommon(setBaseOptions).WithAltCoverParameters prepare collect
-                 ForceTrue with
-                 MSBuildParams = cliArguments }) test
+                 ForceTrue with MSBuildParams = cliArguments }) test
          with x -> printfn "%A" x
          // reraise()) // while fixing
 
@@ -427,57 +444,59 @@ _Target "Packaging" (fun _ ->
     |> Seq.toList
 
   let publishWhat = (Path.getFullName "./_Publish.vsWhat").Length
+
   let whatFiles where =
     (!!"./_Publish.vsWhat/**/*.*")
-    |> Seq.map
-         (fun x ->
-           (x, Some(where + Path.GetDirectoryName(x).Substring(publishWhat).Replace("\\", "/")), None))
+    |> Seq.map (fun x ->
+         (x,
+          Some(where + Path.GetDirectoryName(x).Substring(publishWhat).Replace("\\", "/")),
+          None))
     |> Seq.toList
 
   let whatPack =
-    [
-      (Path.getFullName "./LICENS*", Some "", None)
+    [ (Path.getFullName "./LICENS*", Some "", None)
       (Path.getFullName "./Build/AltCode.VsWhat_128.*g", Some "", None)
       (packable, Some "", None) ]
 
   [ (List.concat [ gendarmeFiles; gendarmeNetcoreFiles ], "_Packaging.Gendarme",
      "./_Generated/altcode.fake.dotnet.gendarme.nuspec", "AltCode.Fake.DotNet.Gendarme",
-     "A helper task for running Mono.Gendarme from FAKE ( >= 5.18.1 )",
-     "Gendarme",
-        [ // make these explicit, as this package implies an opt-in
-        ("Fake.Core.Environment", "5.18.1")
-        ("Fake.DotNet.Cli", "5.18.1")
-        ("FSharp.Core", "4.7")
-        ("System.Collections.Immutable", "1.6.0")
-      ])
-    (List.concat [ whatFiles "tools/netcoreapp2.1/any"; whatPack], "_Packaging.VsWhat",
-     "./_Generated/altcode.vswhat.nuspec", "AltCode.VsWhat",
-     "A tool to list Visual Studio instances and their installed packages",
-     "VsWhat", []) ]
-  |> List.filter (fun (_,_,_,_,_,what, _) -> package what)
+     "A helper task for running Mono.Gendarme from FAKE ( >= 5.18.1 )", "Gendarme",
+     [ // make these explicit, as this package implies an opt-in
+       ("Fake.Core.Environment", "5.18.1")
+       ("Fake.DotNet.Cli", "5.18.1")
+       ("FSharp.Core", "4.7")
+       ("System.Collections.Immutable", "1.6.0") ])
+    (List.concat
+      [ whatFiles "tools/netcoreapp2.1/any"
+        whatPack ], "_Packaging.VsWhat", "./_Generated/altcode.vswhat.nuspec",
+     "AltCode.VsWhat",
+     "A tool to list Visual Studio instances and their installed packages", "VsWhat", []) ]
+  |> List.filter (fun (_, _, _, _, _, what, _) -> package what)
   |> List.iter (fun (files, output, nuspec, project, description, what, dependencies) ->
        let outputPath = "./" + output
        let workingDir = "./_Binaries/" + output
        Directory.ensure workingDir
        Directory.ensure outputPath
        NuGet (fun p ->
-         { p with Authors = [ "Steve Gilham" ]
-                  Project = project
-                  Description = description
-                  OutputPath = outputPath
-                  WorkingDir = workingDir
-                  Files = files
-                  Dependencies = dependencies
-                  Version = !Version
-                  Copyright = (!Copyright).Replace("©", "(c)")
-                  Publish = false
-                  ReleaseNotes = Path.getFullName ("ReleaseNotes." + what + ".md") |> File.ReadAllText
-                  ToolPath =
-                  if Environment.isWindows then
-                    ("./packages/" + (packageVersion "NuGet.CommandLine")
-                     + "/tools/NuGet.exe") |> Path.getFullName
-                  else
-                    "/usr/bin/nuget" }) nuspec))
+         { p with
+             Authors = [ "Steve Gilham" ]
+             Project = project
+             Description = description
+             OutputPath = outputPath
+             WorkingDir = workingDir
+             Files = files
+             Dependencies = dependencies
+             Version = !Version
+             Copyright = (!Copyright).Replace("©", "(c)")
+             Publish = false
+             ReleaseNotes =
+               Path.getFullName ("ReleaseNotes." + what + ".md") |> File.ReadAllText
+             ToolPath =
+               if Environment.isWindows then
+                 ("./packages/" + (packageVersion "NuGet.CommandLine")
+                  + "/tools/NuGet.exe") |> Path.getFullName
+               else
+                 "/usr/bin/nuget" }) nuspec))
 
 _Target "PrepareFrameworkBuild" (fun _ -> ())
 
@@ -485,17 +504,17 @@ _Target "PrepareDotNetBuild" (fun _ ->
   let publish = Path.getFullName "./_Publish"
 
   DotNet.publish (fun options ->
-    { options with OutputPath = Some(publish + ".vsWhat")
-                   Configuration = DotNet.BuildConfiguration.Release
-                   Framework = Some "netcoreapp2.1" })
+    { options with
+        OutputPath = Some(publish + ".vsWhat")
+        Configuration = DotNet.BuildConfiguration.Release
+        Framework = Some "netcoreapp2.1" })
     (Path.getFullName "./AltCode.VsWhat/AltCode.VsWhat.fsproj")
 
   [ (String.Empty, "./_Generated/altcode.fake.dotnet.gendarme.nuspec",
-     "AltCode.Fake.DotNet.Gendarme (FAKE task helper)", None,
-     Some "FAKE build Gendarme")
+     "AltCode.Fake.DotNet.Gendarme (FAKE task helper)", None, Some "FAKE build Gendarme")
     ("DotnetTool", "./_Generated/altcode.vswhat.nuspec",
-     "AltCode.VsWhat (Visual Studio package listing tool)", Some "Build/AltCode.VsWhat_128.png",
-     Some "Visual Studio") ]
+     "AltCode.VsWhat (Visual Studio package listing tool)",
+     Some "Build/AltCode.VsWhat_128.png", Some "Visual Studio") ]
   |> List.iter (fun (ptype, path, caption, icon, tags) ->
        let x s = XName.Get(s, "http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd")
        let dotnetNupkg = XDocument.Load "./Build/AltCode.Fake.nuspec"
@@ -512,20 +531,20 @@ _Target "PrepareDotNetBuild" (fun _ ->
        match icon with
        | None -> ()
        | Some logo ->
-         let tag = dotnetNupkg.Descendants(x "iconUrl") |> Seq.head
-         let text = String.Concat(tag.Nodes()).Replace("Build/AltCode.Fake_128.png", logo)
-         tag.Value <- text
-         let tag2 = dotnetNupkg.Descendants(x "icon") |> Seq.head
-         tag2.Value <- logo |> Path.GetFileName
+           let tag = dotnetNupkg.Descendants(x "iconUrl") |> Seq.head
+           let text =
+             String.Concat(tag.Nodes()).Replace("Build/AltCode.Fake_128.png", logo)
+           tag.Value <- text
+           let tag2 = dotnetNupkg.Descendants(x "icon") |> Seq.head
+           tag2.Value <- logo |> Path.GetFileName
        match tags with
        | None -> ()
        | Some line ->
-         let tagnode = dotnetNupkg.Descendants(x "tags") |> Seq.head
-         tagnode.Value <- line
+           let tagnode = dotnetNupkg.Descendants(x "tags") |> Seq.head
+           tagnode.Value <- line
        dotnetNupkg.Save path))
 
-_Target "PrepareReadMe"
-  (fun _ ->
+_Target "PrepareReadMe" (fun _ ->
   Actions.PrepareReadMe
     ((!Copyright).Replace("©", "&#xa9;").Replace("<", "&lt;").Replace(">", "&gt;")))
 
@@ -547,7 +566,7 @@ _Target "AltCodeVsWhatGlobalIntegration" (fun _ ->
       "tool" ("list -g ") "Checked"
     set <- true
 
-    CreateProcess.fromRawCommand "altcode-vswhat" [ ]
+    CreateProcess.fromRawCommand "altcode-vswhat" []
     |> CreateProcess.withWorkingDirectory working
     |> Proc.run
     |> (Actions.AssertResult "altcode.vswhat")
@@ -568,13 +587,14 @@ _Target "BulkReport" (fun _ ->
   printfn "Overall coverage reporting"
   Directory.ensure "./_Reports/_BulkReport"
   !!"./_Reports/*.xml"
-  |> Seq.filter
-       (fun f -> not <| f.EndsWith("Report.xml", StringComparison.OrdinalIgnoreCase))
+  |> Seq.filter (fun f ->
+       not <| f.EndsWith("Report.xml", StringComparison.OrdinalIgnoreCase))
   |> Seq.toList
   |> ReportGenerator.generateReports (fun p ->
-       { p with ToolType = ToolType.CreateLocalTool()
-                ReportTypes = [ ReportGenerator.ReportType.Html ]
-                TargetDir = "_Reports/_BulkReport" }))
+       { p with
+           ToolType = ToolType.CreateLocalTool()
+           ReportTypes = [ ReportGenerator.ReportType.Html ]
+           TargetDir = "_Reports/_BulkReport" }))
 _Target "All" ignore
 
 let resetColours _ =

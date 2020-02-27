@@ -84,9 +84,10 @@ type Params =
     FailBuildOnDefect : bool }
   /// ILMerge default parameters. Tries to automatically locate ilmerge.exe in a subfolder.
   static member Create() =
-    { ToolPath = match (ProcessUtils.tryFindLocalTool "PATH" "gendarme.exe" ["."]) with
-                 | Some path -> path
-                 | _ -> "gendarme"
+    { ToolPath =
+        match (ProcessUtils.tryFindLocalTool "PATH" "gendarme.exe" [ "." ]) with
+        | Some path -> path
+        | _ -> "gendarme"
       ToolType = Fake.DotNet.ToolType.CreateFullFramework()
       WorkingDirectory = String.Empty
       Configuration = String.Empty
@@ -112,22 +113,22 @@ type Params =
 /// Builds the arguments for the Gendarme task
 /// [omit]
 [<System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA1308",
-                                                  Justification = "Lower-casing is safe here")>]
+                                                  Justification =
+                                                    "Lower-casing is safe here")>]
 let internal composeCommandLine parameters =
   let Item a x =
-    if x |> String.IsNullOrWhiteSpace then []
-    else [ a; x ]
+    if x |> String.IsNullOrWhiteSpace then [] else [ a; x ]
 
   let ItemList a x =
-    if x |> isNull then []
+    if x |> isNull then
+      []
     else
       x
       |> Seq.collect (fun i -> [ a; i ])
       |> Seq.toList
 
   let Flag a predicate =
-    if predicate then [ a ]
-    else []
+    if predicate then [ a ] else []
 
   [ Item "--config" parameters.Configuration
     Item "--set" parameters.RuleSet
@@ -136,8 +137,8 @@ let internal composeCommandLine parameters =
      | Xml -> Item "--xml"
      | _ -> Item "--html") parameters.Log
     ItemList "--ignore" parameters.Ignore
-    (if parameters.Limit > 0uy then
-       Item "--limit" <| parameters.Limit.ToString(CultureInfo.InvariantCulture)
+    (if parameters.Limit > 0uy
+     then Item "--limit" <| parameters.Limit.ToString(CultureInfo.InvariantCulture)
      else [])
     Flag "--console" parameters.Console
     Flag "--quiet" parameters.Quiet
@@ -150,10 +151,11 @@ let internal composeCommandLine parameters =
     <| (sprintf "%A" parameters.Confidence).ToLowerInvariant().Replace(" plus", "+")
       .Replace(" minus", "-").Replace(" neutral", String.Empty)
     (if parameters.Verbosity > 0uy then
-       { 1..int parameters.Verbosity }
-       |> Seq.map (fun _ -> "--v")
-       |> Seq.toList
-     else [])
+      { 1 .. int parameters.Verbosity }
+      |> Seq.map (fun _ -> "--v")
+      |> Seq.toList
+     else
+       [])
 
     ((ItemList String.Empty parameters.Targets)
      |> List.filter (String.isNullOrWhiteSpace >> not)) ]
@@ -162,12 +164,13 @@ let internal composeCommandLine parameters =
 let internal withWorkingDirectory parameters c =
   c
   |> if String.IsNullOrWhiteSpace parameters.WorkingDirectory
-      then id
-      else CreateProcess.withWorkingDirectory parameters.WorkingDirectory
+     then id
+     else CreateProcess.withWorkingDirectory parameters.WorkingDirectory
 
 let internal createProcess args parameters =
   CreateProcess.fromCommand (RawCommand(parameters.ToolPath, args |> Arguments.OfArgs))
-  |> CreateProcess.withToolType (parameters.ToolType.WithDefaultToolCommandName "gendarme")
+  |> CreateProcess.withToolType
+       (parameters.ToolType.WithDefaultToolCommandName "gendarme")
   |> withWorkingDirectory parameters
 
 /// Uses Gendarme to analyse .NET assemblies.
@@ -176,13 +179,15 @@ let internal createProcess args parameters =
 let run parameters =
   use __ = Trace.traceTask "Gendarme" String.Empty
   let args = (composeCommandLine parameters)
-  let command = createProcess args parameters
-                |> if parameters.FailBuildOnDefect
-                   then CreateProcess.ensureExitCode
-                   else id
-                |> fun command ->
-                   Trace.trace command.CommandLine
-                   command
 
-  command |> Proc.run |> ignore
+  let command =
+    createProcess args parameters
+    |> if parameters.FailBuildOnDefect then CreateProcess.ensureExitCode else id
+    |> fun command ->
+      Trace.trace command.CommandLine
+      command
+
+  command
+  |> Proc.run
+  |> ignore
   __.MarkSuccess()
