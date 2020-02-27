@@ -3,6 +3,8 @@ RESTRICTION: == netstandard2.0
 NUGET
   remote: https://api.nuget.org/v3/index.json
     altcover.api (6.7.750)
+    BlackFox.CommandLine (1.0)
+      FSharp.Core (>= 4.2.3)
     BlackFox.VsWhere (1.0)
       FSharp.Core (>= 4.2.3)
     coveralls.io (1.4.2)
