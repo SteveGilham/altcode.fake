@@ -3,11 +3,11 @@ FAKE helper code that I've written as a side-effect of other projects
 
 ## What's in the box?
 
-For FAKE >= 5.9.3 or later for .net framework and .net core
+For FAKE >= 5.18.1 or later for .net framework and .net core
 
 * [`AltCode.Fake.DotNet.Gendarme` ![Nuget](https://buildstats.info/nuget/AltCode.Fake.DotNet.Gendarme)](http://nuget.org/packages/altcode.fake.dotnet.gendarme), a gendarme helper along the lines of the FxCop task `Fake.DotNet.FxCop`
 
-Can be used with the most recent [homebrew release from my fork](https://www.nuget.org/packages/altcode.gendarme/) to analyze netcore/netstandard builds, even though this homebrew Gendarme is still a classic Framework/Mono tool built with the pre-Roslyn compiler (VS2013).  
+Can be used with the most recent [homebrew release from my fork](https://www.nuget.org/packages/altcode.gendarme/) to analyze netcore/netstandard builds.  
 
 DotNet global tools
 
@@ -35,19 +35,19 @@ See the [Wiki page](https://github.com/SteveGilham/altcode.fake/wiki) for detail
 
 It is assumed that the following are available
 
-.net core SDK 2.1.402 or later (`dotnet`) -- try https://www.microsoft.com/net/download  
+.net core SDK 3.1.100 or later (`dotnet`) -- try https://www.microsoft.com/net/download  
 
 #### Windows
 
-You will need Visual Studio VS2017 (Community Edition) v15.9.latest with F# language support (or just the associated build tools and your editor of choice).
+You will need Visual Studio VS2019 (Community Edition) latest with F# language support (or just the associated build tools and your editor of choice).
 
 #### *nix
 
-It is assumed that `mono` (version 5.14.x) and `dotnet` are on the `PATH` already, and everything is built from the command line, with your favourite editor used for coding.
+It is assumed that the latest `mono`, and `dotnet` are on the `PATH` already, and everything is built from the command line, with your favourite editor used for coding.
 
 ### Bootstrapping
 
-Start by setting up `dotnet fake` with `dotnet restore dotnet-fake.fsproj`
+Start by setting up `dotnet fake` with `dotnet tool restore`
 Then `dotnet fake run ./Build/setup.fsx` to do the rest of the set-up.
 
 ### Normal builds
