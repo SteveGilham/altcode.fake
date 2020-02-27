@@ -182,7 +182,12 @@ let run parameters =
                    Trace.trace command.CommandLine
                    command
 
-  let run = command |> Proc.run
-  if 0 <> run.ExitCode && parameters.FailBuildOnDefect
-  then failwithf "Gendarme '%s' failed." command.CommandLine
+  let mutable exitCode = -1
+  try
+    let result = command |> Proc.run
+    exitCode <- result.ExitCode
+  with
+  | _ -> ()
+  if 0 <> exitCode && parameters.FailBuildOnDefect
+  then failwithf "Gendarme command '%s' failed." command.CommandLine
   __.MarkSuccess()
