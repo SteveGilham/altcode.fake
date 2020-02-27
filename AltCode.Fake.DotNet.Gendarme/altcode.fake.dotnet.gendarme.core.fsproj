@@ -36,15 +36,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="FAKE.Core.Process" Version="5.9.3" />
-    <PackageReference Include="FAKE.DotNet.Cli" Version="5.9.3" />
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-beta-63127-02" Condition="'$(OS)' == 'Windows_NT'">
+    <PackageReference Include="FAKE.Core.Process" Version="5.19.1" />
+    <PackageReference Include="FAKE.DotNet.Cli" Version="5.19.1" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" Condition="'$(OS)' == 'Windows_NT'">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Update="FSharp.Core" Version="4.3.4" />
+    <PackageReference Update="FSharp.Core" Version="4.7.0" />
   </ItemGroup>
 </Project>

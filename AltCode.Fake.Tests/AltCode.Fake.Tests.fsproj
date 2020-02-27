@@ -32,14 +32,14 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="AltCover.API" Version="4.0.655" />
-    <PackageReference Include="Expecto" Version="7.0.0" />
-    <PackageReference Include="Expecto.FsCheck" Version="7.0.0" />
-    <PackageReference Include="Expecto.VisualStudio.TestAdapter" Version="9.0.0" />
-    <PackageReference Include="FsCheck" Version="2.13.0" />
-    <PackageReference Include="FSharp.Core" Version="4.3.4" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.8.0" />
-    <PackageReference Include="YoloDev.Expecto.TestSdk" Version="0.5.0" />
+    <PackageReference Include="AltCover.API" Version="6.7.750" />
+    <PackageReference Include="Expecto" Version="8.13.1" />
+    <PackageReference Include="Expecto.FsCheck" Version="8.13.1" />
+    <PackageReference Include="Expecto.VisualStudio.TestAdapter" Version="10.0.2" />
+    <PackageReference Include="FsCheck" Version="2.14.0" />
+    <PackageReference Include="FSharp.Core" Version="4.7.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.5.0" />
+    <PackageReference Include="YoloDev.Expecto.TestSdk" Version="0.8.0" />
   </ItemGroup>
 
   <ItemGroup>
