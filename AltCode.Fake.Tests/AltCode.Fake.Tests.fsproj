@@ -1,8 +1,8 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <IsPackable>false</IsPackable>
     <GenerateProgramFile>false</GenerateProgramFile>
     <SolutionDir Condition="'$(SolutionDir)' == ''">$(ProjectDir)../</SolutionDir>
   </PropertyGroup>
@@ -23,7 +23,7 @@
     <WarningLevel>5</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <WarningsAsErrors />
-    <NoWarn>52</NoWarn>
+    <NoWarn>52</NoWarn>  
   </PropertyGroup>
 
   <ItemGroup>
@@ -32,7 +32,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="AltCover.API" Version="6.7.750" />
+    <PackageReference Include="altcover" Version="6.7.750" />
     <PackageReference Include="Expecto" Version="8.13.1" />
     <PackageReference Include="Expecto.FsCheck" Version="8.13.1" />
     <PackageReference Include="Expecto.VisualStudio.TestAdapter" Version="10.0.2" />
@@ -45,4 +45,5 @@
   <ItemGroup>
     <ProjectReference Include="..\AltCode.Fake.DotNet.Gendarme\altcode.fake.dotnet.gendarme.core.fsproj" />
   </ItemGroup>
+
 </Project>

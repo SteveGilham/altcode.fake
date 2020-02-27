@@ -96,6 +96,13 @@
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Build\dotnet-cli.csproj">
+      <Name>dotnet-cli</Name>
+      <Project>{02a6b76a-7762-4637-a14f-5fbebc9c574a}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+  </ItemGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
