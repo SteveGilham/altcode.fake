@@ -13,7 +13,7 @@ let serializingObject = Object()
 let testCases =
   [ testCase "Test that default arguments are processed as expected" <| fun _ ->
       let p = Gendarme.Params.Create()
-      let args = Gendarme.getArguments p
+      let args = Gendarme.composeCommandLine p
       Expect.isTrue (p.Console) "A field should have non-default value for a bool"
       Expect.equal args
         [ "--console"; "--severity"; "medium+"; "--confidence"; "normal+" ]
@@ -38,7 +38,7 @@ let testCases =
                                         Ignore = ignore
                                         Targets = targets }
 
-      let args = Gendarme.getArguments p
+      let args = Gendarme.composeCommandLine p
       Expect.equal args ([ "--config"
                            config
                            "--set"
@@ -66,13 +66,13 @@ let testCases =
              { Gendarme.Params.Create() with Log = log
                                              LogKind = kind }
 
-           let args = Gendarme.getArguments p
+           let args = Gendarme.composeCommandLine p
            Expect.equal args
              [ name; log; "--console"; "--severity"; "medium+"; "--confidence"; "normal+" ]
              ("The log kind should be " + name))
     testCase "Test that limit arguments are processed as expected" <| fun _ ->
       let p = { Gendarme.Params.Create() with Limit = uint8 (23 + DateTime.Now.Second) }
-      let args = Gendarme.getArguments p
+      let args = Gendarme.composeCommandLine p
       Expect.equal args [ "--limit"
                           (sprintf "%A" p.Limit).Replace("uy", String.Empty)
                           "--console"
@@ -83,20 +83,20 @@ let testCases =
 
     testCase "Test that console may be switched off" <| fun _ ->
       let p = { Gendarme.Params.Create() with Console = false }
-      let args = Gendarme.getArguments p
+      let args = Gendarme.composeCommandLine p
       Expect.equal args [ "--severity"; "medium+"; "--confidence"; "normal+" ]
         "The console should be gone"
 
     testCase "Test that output may be hushed" <| fun _ ->
       let p = { Gendarme.Params.Create() with Quiet = true }
-      let args = Gendarme.getArguments p
+      let args = Gendarme.composeCommandLine p
       Expect.equal args
         [ "--console"; "--quiet"; "--severity"; "medium+"; "--confidence"; "normal+" ]
         "The output should be quieted"
 
     testProperty "Test that verbosity may be set" <| fun (x : uint8) ->
       let p = { Gendarme.Params.Create() with Verbosity = x }
-      let args = Gendarme.getArguments p
+      let args = Gendarme.composeCommandLine p
       Expect.equal args
         ([ "--console"; "--severity"; "medium+"; "--confidence"; "normal+" ]
          @ (Seq.initInfinite (fun _ -> "--v")
@@ -123,7 +123,7 @@ let testCases =
       |> List.iter
            (fun (s, m) ->
            let p = { Gendarme.Params.Create() with Severity = s }
-           let args = Gendarme.getArguments p
+           let args = Gendarme.composeCommandLine p
            Expect.equal args [ "--console"; "--severity"; m; "--confidence"; "normal+" ]
              ("The severity should be " + m))
 
@@ -144,7 +144,7 @@ let testCases =
       |> List.iter
            (fun (c, m) ->
            let p = { Gendarme.Params.Create() with Confidence = c }
-           let args = Gendarme.getArguments p
+           let args = Gendarme.composeCommandLine p
            Expect.equal args [ "--console"; "--severity"; "medium+"; "--confidence"; m ]
              ("The severity should be " + m))
 
@@ -152,7 +152,7 @@ let testCases =
       let here = Assembly.GetExecutingAssembly().Location |> Path.GetDirectoryName
       let fake = Path.Combine(here, "gendarme.exe")
       let p = Gendarme.Params.Create()
-      let args = Gendarme.getArguments p
+      let args = Gendarme.composeCommandLine p
       let proc = Gendarme.createProcess args p
       let info =
         proc.GetType()
@@ -167,7 +167,7 @@ let testCases =
     testCase "Test that tool path can be set" <| fun _ ->
       let fake = Guid.NewGuid().ToString()
       let p = { Gendarme.Params.Create() with ToolPath = fake }
-      let args = Gendarme.getArguments p
+      let args = Gendarme.composeCommandLine p
       let proc = Gendarme.createProcess args p
       Expect.equal proc.CommandLine
         (fake + " --console --severity medium+ --confidence normal+")
@@ -176,7 +176,7 @@ let testCases =
     testCase "Test that working directory is processed as expected" <| fun _ ->
       let fake = Guid.NewGuid().ToString()
       let p = { Gendarme.Params.Create() with WorkingDirectory = fake }
-      let args = Gendarme.getArguments p
+      let args = Gendarme.composeCommandLine p
       let proc = Gendarme.createProcess args p
       let info =
         proc.GetType()
@@ -225,7 +225,7 @@ let testCases =
                                         Ignore = null
                                         Targets = null }
 
-      let args = Gendarme.getArguments p
+      let args = Gendarme.composeCommandLine p
       Expect.equal args
         [ "--console"; "--severity"; "medium+"; "--confidence"; "normal+" ]
         "The defaults should be simple" ]

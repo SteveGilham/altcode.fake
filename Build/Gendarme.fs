@@ -1,4 +1,4 @@
-/// Contains task a task which allows to merge .NET assemblies with [ILMerge](http://research.microsoft.com/en-us/people/mbarnett/ilmerge.aspx).
+/// Contains a task which allows static analysis with Gendarme.
 [<RequireQualifiedAccess>]
 module AltCode.Fake.DotNet.Gendarme
 
@@ -84,7 +84,9 @@ type Params =
     FailBuildOnDefect : bool }
   /// ILMerge default parameters. Tries to automatically locate ilmerge.exe in a subfolder.
   static member Create() =
-    { ToolPath = (ProcessUtils.tryFindLocalTool "PATH" "gendarme.exe" ["."]) |> Option.get
+    { ToolPath = match (ProcessUtils.tryFindLocalTool "PATH" "gendarme.exe" ["."]) with
+                 | Some path -> path
+                 | _ -> "gendarme"
       ToolType = Fake.DotNet.ToolType.CreateFullFramework()
       WorkingDirectory = String.Empty
       Configuration = String.Empty
@@ -157,16 +159,16 @@ let internal composeCommandLine parameters =
      |> List.filter (String.isNullOrWhiteSpace >> not)) ]
   |> List.concat
 
-let internal createProcess args parameters =
-  CreateProcess.fromRawCommand parameters.ToolPath args
-  |> if String.IsNullOrWhiteSpace parameters.WorkingDirectory then id
-     else CreateProcess.withWorkingDirectory parameters.WorkingDirectory
-
 let internal withWorkingDirectory parameters c =
   c
   |> if String.IsNullOrWhiteSpace parameters.WorkingDirectory
       then id
       else CreateProcess.withWorkingDirectory parameters.WorkingDirectory
+
+let internal createProcess args parameters =
+  CreateProcess.fromCommand (RawCommand(parameters.ToolPath, args |> Arguments.OfArgs))
+  |> CreateProcess.withToolType (parameters.ToolType.WithDefaultToolCommandName "gendarme")
+  |> withWorkingDirectory parameters
 
 /// Uses Gendarme to analyse .NET assemblies.
 /// ## Parameters
@@ -174,11 +176,9 @@ let internal withWorkingDirectory parameters c =
 let run parameters =
   use __ = Trace.traceTask "Gendarme" String.Empty
   let args = (composeCommandLine parameters)
-  let command =  CreateProcess.fromCommand (RawCommand(parameters.ToolPath, args |> Arguments.OfArgs))
-                 |> CreateProcess.withToolType (parameters.ToolType.WithDefaultToolCommandName "gendarme")
-                 |> withWorkingDirectory parameters
-                 |> CreateProcess.ensureExitCode
-                 |> fun command ->
+  let command = createProcess args parameters
+                |> CreateProcess.ensureExitCode
+                |> fun command ->
                    Trace.trace command.CommandLine
                    command
 

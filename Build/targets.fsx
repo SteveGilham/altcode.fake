@@ -7,7 +7,8 @@ open System.Xml.Linq
 
 open Actions
 open AltCode.Fake.DotNet
-open AltCover
+open AltCover_Fake.DotNet.DotNet
+open AltCover_Fake.DotNet.Testing
 
 open Fake.Core
 open Fake.Core.TargetOperators
@@ -33,6 +34,15 @@ let consoleBefore = (Console.ForegroundColor, Console.BackgroundColor)
 let programFiles = Environment.environVar "ProgramFiles"
 let programFiles86 = Environment.environVar "ProgramFiles(x86)"
 let dotnetPath = "dotnet" |> Fake.Core.ProcessUtils.tryFindFileOnPath
+
+let AltCoverFilter(p : Primitive.PrepareParams) =
+  { p with
+      //MethodFilter = "WaitForExitCustom" :: (p.MethodFilter |> Seq.toList)
+      AssemblyExcludeFilter =
+        @"NUnit3\." :: (@"Tests\." :: (p.AssemblyExcludeFilter |> Seq.toList))
+      AssemblyFilter = "FSharp" :: @"Test\.Rules" :: (p.AssemblyFilter |> Seq.toList)
+      LocalSource = true
+      TypeFilter = [ @"System\."; "Microsoft" ] @ (p.TypeFilter |> Seq.toList) }
 
 let dotnetOptions (o : DotNet.Options) =
   match dotnetPath with
@@ -79,6 +89,36 @@ let package project =
   if currentBranch.StartsWith("release/", StringComparison.Ordinal) then
      currentBranch = "release/" + project
   else true
+
+let misses = ref 0
+
+let uncovered (path : string) =
+  misses := 0
+  !!path
+  |> Seq.collect (fun f ->
+       let xml = XDocument.Load f
+       xml.Descendants(XName.Get("Uncoveredlines"))
+       |> Seq.filter (fun x ->
+            match String.IsNullOrWhiteSpace x.Value with
+            | false -> true
+            | _ ->
+                sprintf "No coverage from '%s'" f |> Trace.traceImportant
+                misses := 1 + !misses
+                false)
+       |> Seq.map (fun e ->
+            let coverage = e.Value
+            match Int32.TryParse coverage with
+            | (false, _) ->
+                printfn "%A" xml
+                Assert.Fail("Could not parse uncovered line value '" + coverage + "'")
+                0
+            | (_, numeric) ->
+                printfn "%s : %A"
+                  (f
+                   |> Path.GetDirectoryName
+                   |> Path.GetFileName) numeric
+                numeric))
+  |> Seq.toList
 
 let _Target s f =
   Target.description s
@@ -300,76 +340,74 @@ _Target "BuildForAltCoverApi"
           |> withMSBuildParams)))
 
 _Target "UnitTestDotNetWithAltCoverApi" (fun _ ->
-  Directory.ensure "./_Reports"
-  let p0 =
-    { PrepareParams.Create() with AssemblyExcludeFilter = [ "Tests" ]
-                                  TypeFilter = [ """^Microsoft\.""" ] }
+  let reports = Path.getFullName "./_Reports"
+  Directory.ensure reports
+  let report = "./_Reports/_UnitTestWithAltCoverCoreRunner"
+  Directory.ensure report
 
-  let c0 = CollectParams.Create()
+  let coverage =
+    !!(@"gendarme/**/Tests.*.csproj")
+    |> Seq.fold (fun l test ->
+         printfn "%A" test
+         let tname = test |> Path.GetFileNameWithoutExtension
 
-  let setBaseOptions here (o : DotNet.Options) =
-    { o with WorkingDirectory = Path.getFullName here
-             Verbosity = Some DotNet.Verbosity.Minimal }
+         let testDirectory =
+           test
+           |> Path.getFullName
+           |> Path.GetDirectoryName
 
-  let cliArguments =
-    { MSBuild.CliArguments.Create() with ConsoleLogParameters = []
-                                         DistributedLoggers = None
-                                         DisableInternalBinLog = true }
+         let altReport = reports @@ ("UnitTestWithAltCoverCoreRunner." + tname + ".xml")
+         let altReport2 =
+           reports @@ ("UnitTestWithAltCoverCoreRunner." + tname + ".netcoreapp2.1.xml")
 
-  try
-    let (xml, total) =
-      !!(@"./*Tests/*.fsproj")
-      |> Seq.zip [ p0 ]
-      |> Seq.fold (fun (l, c) (p, f) ->
-           let here = Path.GetDirectoryName f
-           let p' = { p with XmlReport = here @@ "coverage.xml" }
-           try
-             f
-             |> DotNet.test
-                  (fun to' ->
-                  { to'.WithCommon(setBaseOptions here).WithParameters p' c0 with MSBuildParams =
-                                                                                    cliArguments
-                                                                                  Configuration =
-                                                                                    DotNet.BuildConfiguration.Debug
-                                                                                  Framework =
-                                                                                    Some
-                                                                                      "netcoreapp2.1"
-                                                                                  NoBuild =
-                                                                                    true })
-           with x -> eprintf "%A" x
-           let file = here @@ "coverage.xml"
+         let collect = AltCover.CollectParams.Primitive(Primitive.CollectParams.Create()) // FSApi
 
-           let cover =
-             file
-             |> File.ReadAllLines
-             |> Seq.skipWhile (fun l -> l.StartsWith("    <Module") |> not)
-             |> Seq.takeWhile (fun l -> l <> "  </Modules>")
-             |> Seq.toList
-           (file :: l, c @ cover))
-           ([],
-            [ """<?xml version="1.0" encoding="utf-8" standalone="yes"?>""";
-              """<CoverageSession xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">""";
-              """  <Summary numSequencePoints="39" visitedSequencePoints="39" numBranchPoints="32" visitedBranchPoints="24" sequenceCoverage="100" branchCoverage="75" maxCyclomaticComplexity="5" minCyclomaticComplexity="1" visitedClasses="13" numClasses="13" visitedMethods="15" numMethods="15" minCrapScore="1" maxCrapScore="5" />""";
-              """  <Modules>""" ])
-    ReportGenerator.generateReports (fun p ->
-      { p with ExePath = Tools.findToolInSubPath "ReportGenerator.exe" "."
-               ReportTypes =
-                 [ ReportGenerator.ReportType.Html; ReportGenerator.ReportType.XmlSummary ]
-               TargetDir = "_Reports/_UnitTestWithAltCoverApi" }) xml
-    if not <| String.IsNullOrWhiteSpace(Environment.environVar "APPVEYOR_BUILD_NUMBER") then
-      let full = total @ [ "  </Modules>"; "</CoverageSession>" ]
-      let coverage = Path.getFullName "./_Reports/coveralls.xml"
-      File.WriteAllLines(coverage, full)
-      Actions.Run
-        (Tools.findToolInSubPath "coveralls.net.exe" nugetCache, "_Reports",
-         [ "--opencover"; coverage ]) "Coveralls upload failed"
-  with x ->
-    printfn "%A" x
-    reraise())
+         let prepare =
+           AltCover.PrepareParams.Primitive // FSApi
+             ({ Primitive.PrepareParams.Create() with
+                  XmlReport = altReport
+                  Single = true }
+              |> AltCoverFilter)
 
-_Target "UnitTestWithOpenCover" (fun _ -> ())
+         let ForceTrue = DotNet.CLIArgs.Force true
+         //printfn "Test arguments : '%s'" (DotNet.ToTestArguments prepare collect ForceTrue)
 
-// Hybrid (Self) Tests
+         let t =
+           DotNet.TestOptions.Create().WithAltCoverParameters prepare collect ForceTrue
+         printfn "WithAltCoverParameters returned '%A'" t.Common.CustomParams
+
+         let setBaseOptions (o : DotNet.Options) =
+           { o with
+               WorkingDirectory = Path.getFullName testDirectory
+               Verbosity = Some DotNet.Verbosity.Minimal }
+
+         let cliArguments =
+           { MSBuild.CliArguments.Create() with
+               ConsoleLogParameters = []
+               DistributedLoggers = None
+               DisableInternalBinLog = true }
+
+         try
+           DotNet.test (fun to' ->
+             { to'.WithCommon(setBaseOptions).WithAltCoverParameters prepare collect
+                 ForceTrue with
+                 Framework = Some "netcoreapp2.1"
+                 MSBuildParams = cliArguments }) test
+         with x -> printfn "%A" x
+         // reraise()) // while fixing
+
+         altReport2 :: l) []
+
+  ReportGenerator.generateReports (fun p ->
+    { p with
+        ToolType = ToolType.CreateLocalTool()
+        ReportTypes =
+          [ ReportGenerator.ReportType.Html; ReportGenerator.ReportType.XmlSummary ]
+        TargetDir = report }) coverage
+
+  (report @@ "Summary.xml")
+  |> uncovered
+  |> printfn "%A uncovered lines")
 
 // Pure OperationalTests
 
@@ -571,10 +609,6 @@ Target.activateFinal "ResetConsoleColours"
 ==> "BuildForUnitTestDotNet"
 ==> "UnitTestDotNet"
 ==> "UnitTest"
-
-"Compilation"
-==> "UnitTestWithOpenCover"
-=?> ("UnitTest", Environment.isWindows) // OpenCover Mono support
 
 "UnitTestDotNet"
 ==> "BuildForAltCoverApi"
