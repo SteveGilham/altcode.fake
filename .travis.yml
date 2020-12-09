@@ -1,7 +1,7 @@
 language: csharp
 mono: latest
-dotnet: 2.1.402
-sudo: false
+dist: xenial
+dotnet: 5.0.100
 
 git:
   depth: false
@@ -16,6 +16,6 @@ cache:
 
 script:
   - export PATH="$PATH:/home/travis/.dotnet/tools"
-  - dotnet restore ./dotnet-fake.fsproj
+  - dotnet tool restore
   - dotnet fake run ./Build/setup.fsx
   - dotnet fake run ./Build/build.fsx
