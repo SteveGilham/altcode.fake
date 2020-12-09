@@ -218,9 +218,10 @@ let testCases =
             Targets = [ fake + ".nonesuch" ] }
       Expect.throwsC (fun () -> Gendarme.run args) (fun ex ->
         Expect.equal ex.Message
-          ("Process exit code '1' <> 0. Command Line: " + fake
+          (("Process exit code '1' <> 0. Command Line: " + fake
            + " --console --severity medium+ --confidence normal+ \"" + fake
-           + ".nonesuch\"") ("Message should reflect inputs " + ex.Message))
+           + ".nonesuch\"").Replace ("/usr/bin/mono --debug ", String.Empty))
+               ("Message should reflect inputs " + ex.Message))
 
     testCase "Test that null arguments are processed as expected"
     <| fun _ ->
