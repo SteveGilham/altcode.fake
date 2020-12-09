@@ -69,6 +69,7 @@ let cliArguments =
   { MSBuild.CliArguments.Create() with
       ConsoleLogParameters = []
       DistributedLoggers = None
+      Properties = [("CheckEolTargetFramework", "false")]
       DisableInternalBinLog = true }
 
 let withWorkingDirectoryVM dir o =
@@ -144,6 +145,23 @@ let uncovered (path : string) =
                 numeric))
   |> Seq.toList
 
+let buildWithCLIArguments (o : Fake.DotNet.DotNet.BuildOptions) =
+  { o with MSBuildParams = cliArguments }  
+
+let dotnetBuildRelease proj =
+  DotNet.build (fun p ->
+    { p.WithCommon dotnetOptions with Configuration = DotNet.BuildConfiguration.Release }
+    |> buildWithCLIArguments) (Path.GetFullPath proj)
+
+let dotnetBuildDebug proj =
+  DotNet.build (fun p ->
+    { p.WithCommon dotnetOptions with Configuration = DotNet.BuildConfiguration.Debug }
+    |> buildWithCLIArguments) (Path.GetFullPath proj)
+
+let commitHash = Information.getCurrentSHA1 (".")
+let infoV = Information.showName "." commitHash
+printfn "Build at %A" infoV
+
 let _Target s f =
   Target.description s
   Target.create s f
@@ -184,6 +202,7 @@ _Target "SetVersion" (fun _ ->
            AssemblyInfo.FileVersion v'
            AssemblyInfo.Company "Steve Gilham"
            AssemblyInfo.Trademark ""
+           AssemblyInfo.InformationalVersion(infoV)
            AssemblyInfo.Copyright copy ] (Some AssemblyInfoFileConfig.Default))
   let hack = """namespace AltCover
 module SolutionRoot =
@@ -203,30 +222,14 @@ _Target "BuildRelease" (fun _ ->
   try
     DotNet.restore (fun o -> o.WithCommon(withWorkingDirectoryVM ".")) "AltCode.Fake.sln"
     "AltCode.Fake.sln"
-    |> MSBuild.build (fun p ->
-         { p with
-             Verbosity = Some MSBuildVerbosity.Normal
-             ConsoleLogParameters = []
-             DistributedLoggers = None
-             DisableInternalBinLog = true
-             Properties =
-               [ "Configuration", "Release"
-                 "DebugSymbols", "True" ] })
+    |> dotnetBuildRelease
   with x ->
     printfn "%A" x
     reraise())
 _Target "BuildDebug" (fun _ ->
   DotNet.restore (fun o -> o.WithCommon(withWorkingDirectoryVM ".")) "AltCode.Fake.sln"
   "AltCode.Fake.sln"
-  |> MSBuild.build (fun p ->
-       { p with
-           Verbosity = Some MSBuildVerbosity.Normal
-           ConsoleLogParameters = []
-           DistributedLoggers = None
-           DisableInternalBinLog = true
-           Properties =
-             [ "Configuration", "Debug"
-               "DebugSymbols", "True" ] }))
+  |> dotnetBuildDebug )
 
 // Code Analysis
 
