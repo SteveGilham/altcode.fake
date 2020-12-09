@@ -3,6 +3,7 @@ module AltCode.Fake.DotNet.Gendarme
 open System
 open System.IO
 open System.Reflection
+open System.Runtime.InteropServices
 open AltCode.Fake.DotNet
 open Fake.IO
 open Expecto
@@ -211,16 +212,22 @@ let testCases =
     <| fun _ ->
       let here = Assembly.GetExecutingAssembly().Location |> Path.GetDirectoryName
       let fake = Path.Combine(here, "AltCode.Nuget.Placeholder.exe")
+      let prefix = if RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+                   then String.Empty
+                   else "/usr/bin/mono --debug "
+      let quote = if RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+                  then "\""
+                  else String.Empty
 
       let args =
         { Gendarme.Params.Create() with
             ToolPath = fake
             Targets = [ fake + ".nonesuch" ] }
       Expect.throwsC (fun () -> Gendarme.run args) (fun ex ->
-        Expect.equal (ex.Message.Replace ("/usr/bin/mono --debug ", String.Empty))
-          ("Process exit code '1' <> 0. Command Line: " + fake
-           + " --console --severity medium+ --confidence normal+ \"" + fake
-           + ".nonesuch\"")
+        Expect.equal ex.Message
+          ("Process exit code '1' <> 0. Command Line: " + prefix + fake
+           + " --console --severity medium+ --confidence normal+ " + quote
+           + fake + ".nonesuch" + quote)
                ("Message should reflect inputs " + ex.Message))
 
     testCase "Test that null arguments are processed as expected"
