@@ -35,7 +35,7 @@ See the [Wiki page](https://github.com/SteveGilham/altcode.fake/wiki) for detail
 
 It is assumed that the following are available
 
-.net core SDK 3.1.100 or later (`dotnet`) -- try https://www.microsoft.com/net/download  
+.net core SDK 5.0.100 or later (`dotnet`) -- try https://www.microsoft.com/net/download  
 
 #### Windows
 
