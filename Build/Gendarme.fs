@@ -45,7 +45,7 @@ type LogKind =
   | Html
 
 /// Parameter type for Gendarme
-[<NoComparison; NoEquality>]
+[<NoComparison; NoEquality; AutoSerializable(false)>]
 type Params =
   { /// Path to gendarme.exe
     ToolPath : string
@@ -116,10 +116,10 @@ type Params =
                                                   Justification =
                                                     "Lower-casing is safe here")>]
 let internal composeCommandLine parameters =
-  let Item a x =
+  let item a x =
     if x |> String.IsNullOrWhiteSpace then [] else [ a; x ]
 
-  let ItemList a x =
+  let itemList a x =
     if x |> isNull then
       []
     else
@@ -127,27 +127,27 @@ let internal composeCommandLine parameters =
       |> Seq.collect (fun i -> [ a; i ])
       |> Seq.toList
 
-  let Flag a predicate =
+  let flag a predicate =
     if predicate then [ a ] else []
 
-  [ Item "--config" parameters.Configuration
-    Item "--set" parameters.RuleSet
+  [ item "--config" parameters.Configuration
+    item "--set" parameters.RuleSet
     (match parameters.LogKind with
-     | Text -> Item "--log"
-     | Xml -> Item "--xml"
-     | _ -> Item "--html") parameters.Log
-    ItemList "--ignore" parameters.Ignore
+     | Text -> item "--log"
+     | Xml -> item "--xml"
+     | _ -> item "--html") parameters.Log
+    itemList "--ignore" parameters.Ignore
     (if parameters.Limit > 0uy
-     then Item "--limit" <| parameters.Limit.ToString(CultureInfo.InvariantCulture)
+     then item "--limit" <| parameters.Limit.ToString(CultureInfo.InvariantCulture)
      else [])
-    Flag "--console" parameters.Console
-    Flag "--quiet" parameters.Quiet
+    flag "--console" parameters.Console
+    flag "--quiet" parameters.Quiet
 
-    Item "--severity"
+    item "--severity"
     <| (sprintf "%A" parameters.Severity).ToLowerInvariant().Replace(" plus", "+")
       .Replace(" minus", "-").Replace(" neutral", String.Empty)
 
-    Item "--confidence"
+    item "--confidence"
     <| (sprintf "%A" parameters.Confidence).ToLowerInvariant().Replace(" plus", "+")
       .Replace(" minus", "-").Replace(" neutral", String.Empty)
     (if parameters.Verbosity > 0uy then
@@ -157,7 +157,7 @@ let internal composeCommandLine parameters =
      else
        [])
 
-    ((ItemList String.Empty parameters.Targets)
+    ((itemList String.Empty parameters.Targets)
      |> List.filter (String.isNullOrWhiteSpace >> not)) ]
   |> List.concat
 
@@ -176,6 +176,9 @@ let internal createProcess args parameters =
 /// Uses Gendarme to analyse .NET assemblies.
 /// ## Parameters
 ///  - `parameters` - A Gendarme.Params value with your required settings.
+[<SuppressMessage("Gendarme.Rules.Naming",
+                    "UseCorrectCasingRule",
+                    Justification = "Fake.build style")>]
 let run parameters =
   use __ = Trace.traceTask "Gendarme" String.Empty
   let args = (composeCommandLine parameters)

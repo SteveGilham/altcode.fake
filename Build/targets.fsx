@@ -7,8 +7,8 @@ open System.Xml.Linq
 
 open Actions
 open AltCode.Fake.DotNet
-open AltCover_Fake.DotNet.DotNet
-open AltCover_Fake.DotNet.Testing
+open AltCoverFake.DotNet.DotNet
+open AltCoverFake.DotNet.Testing
 
 open Fake.Core
 open Fake.Core.TargetOperators
@@ -35,7 +35,7 @@ let programFiles = Environment.environVar "ProgramFiles"
 let programFiles86 = Environment.environVar "ProgramFiles(x86)"
 let dotnetPath = "dotnet" |> Fake.Core.ProcessUtils.tryFindFileOnPath
 
-let AltCoverFilter(p : Primitive.PrepareParams) =
+let AltCoverFilter(p : Primitive.PrepareOptions) =
   { p with
       //MethodFilter = "WaitForExitCustom" :: (p.MethodFilter |> Seq.toList)
       AssemblyExcludeFilter =
@@ -103,7 +103,7 @@ let package project =
 
 let toolPackages =
   let xml =
-    "./Build/dotnet-cli.csproj"
+    "./Build/NuGet.csproj"
     |> Path.getFullName
     |> XDocument.Load
   xml.Descendants(XName.Get("PackageReference"))
@@ -242,7 +242,7 @@ _Target "Lint" (fun _ ->
   !!"**/*.fsproj"
   |> Seq.collect (fun n -> !!(Path.GetDirectoryName n @@ "*.fs"))
   |> Seq.distinct
-  |> Seq.map (fun f ->
+  |> Seq.collect (fun f ->
        match Lint.lintFile options f with
        | Lint.LintResult.Failure x -> failwithf "%A" x
        | Lint.LintResult.Success w ->
@@ -254,7 +254,6 @@ _Target "Lint" (fun _ ->
                     | Some fix -> fix.FromText <> "AltCover_Fake" // special case
                     | _ -> false
                 | _ -> false))
-  |> Seq.concat
   |> Seq.fold (fun _ x ->
        printfn "Info: %A\r\n Range: %A\r\n Fix: %A\r\n====" x.Details.Message
          x.Details.Range x.Details.SuggestedFix
@@ -286,7 +285,7 @@ _Target "Gendarme" (fun _ -> // Needs debug because release is compiled --standa
       fixup
 
   [ (rules,
-     [ "_Binaries/AltCode.Fake.DotNet.Gendarme/Debug+AnyCPU/AltCode.Fake.DotNet.Gendarme.dll" ]) ]
+     [ "_Binaries/AltCode.Fake.DotNet.Gendarme/Debug+AnyCPU/net462/AltCode.Fake.DotNet.Gendarme.dll" ]) ]
   |> Seq.iter (fun (ruleset, files) ->
        Gendarme.run
          { Gendarme.Params.Create() with
@@ -297,12 +296,14 @@ _Target "Gendarme" (fun _ -> // Needs debug because release is compiled --standa
              Console = true
              Log = "./_Reports/gendarme.html"
              LogKind = Gendarme.LogKind.Html
-             Targets = files }))
+             Targets = files
+             ToolType = ToolType.CreateLocalTool()
+             FailBuildOnDefect = true }))
 
 _Target "FxCop" (fun _ -> // Needs debug because release is compiled --standalone which contaminates everything
 
   Directory.ensure "./_Reports"
-  [ ([ "_Binaries/AltCode.Fake.DotNet.Gendarme/Debug+AnyCPU/AltCode.Fake.DotNet.Gendarme.dll" ],
+  [ ([ "_Binaries/AltCode.Fake.DotNet.Gendarme/Debug+AnyCPU/net462/AltCode.Fake.DotNet.Gendarme.dll" ],
      [],
      [
        "-Microsoft.Design#CA1006"; "-Microsoft.Design#CA1011"; "-Microsoft.Design#CA1020";
@@ -381,20 +382,20 @@ _Target "UnitTestDotNetWithAltCover" (fun _ ->
          let altReport = reports @@ ("UnitTestWithAltCoverCoreRunner." + tname + ".xml")
          let altReport2 = reports @@ ("UnitTestWithAltCoverCoreRunner." + tname + ".xml")
 
-         let collect = AltCover.CollectParams.Primitive(Primitive.CollectParams.Create()) // FSApi
+         let collect = AltCover.CollectOptions.Primitive(Primitive.CollectOptions.Create()) // FSApi
 
          let prepare =
-           AltCover.PrepareParams.Primitive // FSApi
-             ({ Primitive.PrepareParams.Create() with
+           AltCover.PrepareOptions.Primitive // FSApi
+             ({ Primitive.PrepareOptions.Create() with
                   XmlReport = altReport
-                  Single = true }
+                  SingleVisit = true }
               |> AltCoverFilter)
 
-         let ForceTrue = DotNet.CLIArgs.Force true
-         //printfn "Test arguments : '%s'" (DotNet.ToTestArguments prepare collect ForceTrue)
+         let forceTrue = DotNet.CLIOptions.Force true
+         //printfn "Test arguments : '%s'" (DotNet.ToTestArguments prepare collect forceTrue)
 
          let t =
-           DotNet.TestOptions.Create().WithAltCoverParameters prepare collect ForceTrue
+           DotNet.TestOptions.Create().WithAltCoverOptions prepare collect forceTrue
          printfn "WithAltCoverParameters returned '%A'" t.Common.CustomParams
 
          let setBaseOptions (o : DotNet.Options) =
@@ -410,8 +411,8 @@ _Target "UnitTestDotNetWithAltCover" (fun _ ->
 
          try
            DotNet.test (fun to' ->
-             { to'.WithCommon(setBaseOptions).WithAltCoverParameters prepare collect
-                 ForceTrue with MSBuildParams = cliArguments }) test
+             { to'.WithCommon(setBaseOptions).WithAltCoverOptions prepare collect
+                 forceTrue with MSBuildParams = cliArguments }) test
          with x -> printfn "%A" x
          // reraise()) // while fixing
 
@@ -436,7 +437,7 @@ _Target "OperationalTest" ignore
 
 _Target "Packaging" (fun _ ->
   let gendarmeDir =
-    Path.getFullName "_Binaries/AltCode.Fake.DotNet.Gendarme/Release+AnyCPU"
+    Path.getFullName "_Binaries/AltCode.Fake.DotNet.Gendarme/Release+AnyCPU/net462"
   let packable = Path.getFullName "./_Binaries/README.html"
 
   let gendarmeFiles =
@@ -506,7 +507,7 @@ _Target "Packaging" (fun _ ->
                else
                  "/usr/bin/nuget" }) nuspec))
 
-_Target "PrepareFrameworkBuild" (fun _ -> ())
+_Target "PrepareFrameworkBuild" ignore
 
 _Target "PrepareDotNetBuild" (fun _ ->
   let publish = Path.getFullName "./_Publish"

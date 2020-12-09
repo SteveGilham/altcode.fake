@@ -1,11 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     <IsPackable>false</IsPackable>
     <GenerateProgramFile>false</GenerateProgramFile>
     <SolutionDir Condition="'$(SolutionDir)' == ''">$(ProjectDir)../</SolutionDir>
-  </PropertyGroup>
+    <RollForward>Major</RollForward>
+    <CheckEolTargetFramework>false</CheckEolTargetFramework>  </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)'=='Debug'">
     <DefineConstants>TRACE;DEBUG;CODE_ANALYSIS;$(GlobalDefineConstants)</DefineConstants>
@@ -32,18 +33,18 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="altcover" Version="6.7.750" />
-    <PackageReference Include="Expecto" Version="8.13.1" />
-    <PackageReference Include="Expecto.FsCheck" Version="8.13.1" />
+    <PackageReference Include="altcover" Version="7.2.801" />
+    <PackageReference Include="Expecto" Version="9.0.2" />
+    <PackageReference Include="Expecto.FsCheck" Version="9.0.2" />
     <PackageReference Include="Expecto.VisualStudio.TestAdapter" Version="10.0.2" />
-    <PackageReference Include="FsCheck" Version="2.14.0" />
-    <PackageReference Include="FSharp.Core" Version="4.7.0" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.5.0" />
-    <PackageReference Include="YoloDev.Expecto.TestSdk" Version="0.8.0" />
+    <PackageReference Include="FsCheck" Version="2.14.3" />
+    <PackageReference Include="FSharp.Core" Version="5.0.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.8.3" />
+    <PackageReference Include="YoloDev.Expecto.TestSdk" Version="0.9.2" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\AltCode.Fake.DotNet.Gendarme\altcode.fake.dotnet.gendarme.core.fsproj" />
+    <ProjectReference Include="..\AltCode.Fake.DotNet.Gendarme\AltCode.Fake.DotNet.Gendarme.fsproj" />
     <ProjectReference Include="..\AltCode.Nuget.Placeholder\AltCode.Nuget.Placeholder.fsproj" />
   </ItemGroup>
 </Project>
