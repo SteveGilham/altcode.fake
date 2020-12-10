@@ -195,7 +195,7 @@ _Target "SetVersion" (fun _ ->
   printfn " => %A" (v, majmin, y)
   Version := v
   let copy =
-    sprintf "© 2010-%d by Steve Gilham <SteveGilham@users.noreply.github.com>" y
+    sprintf "Â© 2010-%d by Steve Gilham <SteveGilham@users.noreply.github.com>" y
   Copyright := "Copyright " + copy
   Directory.ensure "./_Generated"
   Actions.InternalsVisibleTo(!Version)
@@ -543,7 +543,7 @@ _Target "Packaging" (fun _ ->
              Files = files
              Dependencies = dependencies
              Version = !Version
-             Copyright = (!Copyright).Replace("©", "(c)")
+             Copyright = (!Copyright).Replace("Â©", "(c)")
              Publish = false
              ReleaseNotes =
                Path.getFullName ("ReleaseNotes." + what + ".md") |> File.ReadAllText
@@ -602,7 +602,7 @@ _Target "PrepareDotNetBuild" (fun _ ->
 
 _Target "PrepareReadMe" (fun _ ->
   Actions.PrepareReadMe
-    ((!Copyright).Replace("©", "&#xa9;").Replace("<", "&lt;").Replace(">", "&gt;")))
+    ((!Copyright).Replace("Â©", "&#xa9;").Replace("<", "&lt;").Replace(">", "&gt;")))
 
 // Post-packaging deployment touch test
 
