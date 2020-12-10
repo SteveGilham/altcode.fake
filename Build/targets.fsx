@@ -168,7 +168,11 @@ _Target "Clean" (fun _ ->
 _Target "SetVersion" (fun _ ->
   let appveyor = Environment.environVar "APPVEYOR_BUILD_VERSION"
   let github = Environment.environVar  "GITHUB_RUN_NUMBER"
-  let version = Actions.GetVersionFromYaml()
+  let now = DateTimeOffset.UtcNow
+  let version = if currentBranch.Contains "VsWhat"
+                then sprintf "%d.%d.%d.{build}" (now.Year-2000) now.Month now.Day
+                else Actions.GetVersionFromYaml()
+  printfn "Raw version %s" version
 
   let ci =
     if String.IsNullOrWhiteSpace appveyor then
@@ -176,9 +180,10 @@ _Target "SetVersion" (fun _ ->
       then String.Empty
       else version.Replace("{build}", github + "-github")
     else
-      appveyor
+      version.Replace("{build}", appveyor)
 
   let (v, majmin, y) = Actions.LocalVersion ci version
+  printfn " => %A" (v, majmin, y)
   Version := v
   let copy =
     sprintf "© 2010-%d by Steve Gilham <SteveGilham@users.noreply.github.com>" y
