@@ -32,6 +32,10 @@ jobs:
       with:
           name: nupkgs
           path: _Packagin*/*.nupkg
+    - uses: actions/upload-artifact@v2
+      with:
+          name: reportwin
+          path: _Reports
   linux:
     runs-on: ubuntu-latest
     steps:
@@ -45,3 +49,7 @@ jobs:
       run: dotnet fake run ./Build/setup.fsx
     - name: Build
       run: dotnet fake run ./Build/build.fsx  
+    - uses: actions/upload-artifact@v2
+      with:
+          name: reportnix
+          path: _Reports
