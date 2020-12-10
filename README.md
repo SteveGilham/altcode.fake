@@ -3,7 +3,7 @@ FAKE helper code that I've written as a side-effect of other projects
 
 ## What's in the box?
 
-For FAKE >= 5.18.1 or later for .net framework and .net core
+For FAKE >= 5.19.1 or later for .net framework and .net core
 
 * [`AltCode.Fake.DotNet.Gendarme` ![Nuget](https://buildstats.info/nuget/AltCode.Fake.DotNet.Gendarme)](http://nuget.org/packages/altcode.fake.dotnet.gendarme), a gendarme helper along the lines of the FxCop task `Fake.DotNet.FxCop`
 
