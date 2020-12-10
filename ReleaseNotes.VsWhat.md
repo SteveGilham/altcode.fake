@@ -1,5 +1,5 @@
 # 20.12.10.26
-* Use WsWhere 1.1.0 release
+* Use VsWhere 1.1.0 release
 * Support for .net5.0 (actually all runtimes > 2.1)
 
 # 18.11.20.18
