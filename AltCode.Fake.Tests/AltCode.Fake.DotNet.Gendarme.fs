@@ -3,6 +3,7 @@ module AltCode.Fake.DotNet.Gendarme
 open System
 open System.IO
 open System.Reflection
+open System.Runtime.InteropServices
 open AltCode.Fake.DotNet
 open Fake.IO
 open Expecto
@@ -171,7 +172,9 @@ let testCases =
     testCase "Test that tool path can be set"
     <| fun _ ->
       let fake = Guid.NewGuid().ToString()
-      let p = { Gendarme.Params.Create() with ToolPath = fake }
+      let p = { Gendarme.Params.Create() with
+                  ToolPath = fake
+                  ToolType = Fake.DotNet.ToolType.CreateFullFramework().WithDefaultToolCommandName fake }
       let args = Gendarme.composeCommandLine p
       let proc = Gendarme.createProcess args p
       Expect.equal proc.CommandLine
@@ -193,6 +196,7 @@ let testCases =
       let args =
         { Gendarme.Params.Create() with
             ToolPath = fake
+            ToolType = Fake.DotNet.ToolType.CreateFullFramework().WithDefaultToolCommandName fake
             Targets = [ fake ] }
       Expect.equal (Gendarme.run args) () "Should be silent"
 
@@ -203,6 +207,7 @@ let testCases =
       let args =
         { Gendarme.Params.Create() with
             ToolPath = fake
+            ToolType = Fake.DotNet.ToolType.CreateFullFramework().WithDefaultToolCommandName fake
             Targets = [ fake + ".nonesuch" ]
             FailBuildOnDefect = false }
       Expect.equal (Gendarme.run args) () "Should be silent"
@@ -211,16 +216,24 @@ let testCases =
     <| fun _ ->
       let here = Assembly.GetExecutingAssembly().Location |> Path.GetDirectoryName
       let fake = Path.Combine(here, "AltCode.Nuget.Placeholder.exe")
+      let prefix = if RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+                   then String.Empty
+                   else "/usr/bin/mono --debug "
+      let quote = if RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+                  then "\""
+                  else String.Empty
 
       let args =
         { Gendarme.Params.Create() with
             ToolPath = fake
+            ToolType = Fake.DotNet.ToolType.CreateFullFramework().WithDefaultToolCommandName fake
             Targets = [ fake + ".nonesuch" ] }
       Expect.throwsC (fun () -> Gendarme.run args) (fun ex ->
         Expect.equal ex.Message
-          ("Process exit code '1' <> 0. Command Line: " + fake
-           + " --console --severity medium+ --confidence normal+ \"" + fake
-           + ".nonesuch\"") ("Message should reflect inputs " + ex.Message))
+          ("Process exit code '1' <> 0. Command Line: " + prefix + fake
+           + " --console --severity medium+ --confidence normal+ " + quote
+           + fake + ".nonesuch" + quote)
+               ("Message should reflect inputs " + ex.Message))
 
     testCase "Test that null arguments are processed as expected"
     <| fun _ ->

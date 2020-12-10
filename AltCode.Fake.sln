@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29806.167
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "altcode.fake.dotnet.gendarme.core", "AltCode.Fake.DotNet.Gendarme\altcode.fake.dotnet.gendarme.core.fsproj", "{4A0C7CBE-713F-46FA-95D8-EAF2AD073DFB}"
-EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "AltCode.Fake.DotNet.Gendarme", "AltCode.Fake.DotNet.Gendarme\AltCode.Fake.DotNet.Gendarme.fsproj", "{17662DB6-7BB1-4ECE-BF37-D6D439762CFD}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BuildItems", "BuildItems", "{A5FBA39A-4F35-48DE-9332-9C8B805F034E}"
@@ -15,16 +13,20 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BuildItems", "BuildItems", 
 		appveyor.yml = appveyor.yml
 		Build\build.fsx = Build\build.fsx
 		README.md = README.md
+		ReleaseNotes.Gendarme.md = ReleaseNotes.Gendarme.md
+		ReleaseNotes.VsWhat.md = ReleaseNotes.VsWhat.md
 		Build\rules-fake.xml = Build\rules-fake.xml
 		Build\setup.fsx = Build\setup.fsx
 		Build\targets.fsx = Build\targets.fsx
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "dotnet-cli", "Build\dotnet-cli.csproj", "{02A6B76A-7762-4637-A14F-5FBEBC9C574A}"
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "AltCode.VsWhat", "AltCode.VsWhat\AltCode.VsWhat.fsproj", "{2DA60580-0A84-460A-AE2C-4A7718BF08C7}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NuGet", "Build\NuGet.csproj", "{02A6B76A-7762-4637-A14F-5FBEBC9C574A}"
 EndProject
 Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "AltCode.Fake.Tests", "AltCode.Fake.Tests\AltCode.Fake.Tests.fsproj", "{48EB7F76-32EA-4015-A835-6DFE6F5A24F0}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "AltCode.Nuget.Placeholder", "AltCode.Nuget.Placeholder\AltCode.Nuget.Placeholder.fsproj", "{F87AFAFF-29FA-41A5-AFC1-26DB73FA64F9}"
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "AltCode.Nuget.Placeholder", "AltCode.Nuget.Placeholder\AltCode.Nuget.Placeholder.fsproj", "{F87AFAFF-29FA-41A5-AFC1-26DB73FA64F9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -32,14 +34,14 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{4A0C7CBE-713F-46FA-95D8-EAF2AD073DFB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4A0C7CBE-713F-46FA-95D8-EAF2AD073DFB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4A0C7CBE-713F-46FA-95D8-EAF2AD073DFB}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4A0C7CBE-713F-46FA-95D8-EAF2AD073DFB}.Release|Any CPU.Build.0 = Release|Any CPU
 		{17662DB6-7BB1-4ECE-BF37-D6D439762CFD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{17662DB6-7BB1-4ECE-BF37-D6D439762CFD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{17662DB6-7BB1-4ECE-BF37-D6D439762CFD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{17662DB6-7BB1-4ECE-BF37-D6D439762CFD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2DA60580-0A84-460A-AE2C-4A7718BF08C7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2DA60580-0A84-460A-AE2C-4A7718BF08C7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2DA60580-0A84-460A-AE2C-4A7718BF08C7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2DA60580-0A84-460A-AE2C-4A7718BF08C7}.Release|Any CPU.Build.0 = Release|Any CPU
 		{02A6B76A-7762-4637-A14F-5FBEBC9C574A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{02A6B76A-7762-4637-A14F-5FBEBC9C574A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{02A6B76A-7762-4637-A14F-5FBEBC9C574A}.Release|Any CPU.ActiveCfg = Release|Any CPU

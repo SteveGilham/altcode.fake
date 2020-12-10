@@ -18,8 +18,8 @@ DotNet global tools
 
 
 | | | |
-| --- | --- | --- | 
-| **Build** | <sup>AppVeyor</sup> [![Build status](https://img.shields.io/appveyor/ci/SteveGilham/altcode-fake/master.svg)](https://ci.appveyor.com/project/SteveGilham/altcode-fake) ![Build history](https://buildstats.info/appveyor/chart/SteveGilham/altcode-fake?branch=master) | <sup>Travis</sup> [![Build status](https://travis-ci.com/SteveGilham/altcode.fake.svg?branch=master)](https://travis-ci.com/SteveGilham/altcode.fake#) [![Build history](https://buildstats.info/travisci/chart/SteveGilham/altcode.fake?branch=master)](https://travis-ci.com/SteveGilham/altcode.fake/builds)|
+| --- | --- | --- |
+| **Build**  | <sup>GitHub</sup> [![Build status](https://github.com/SteveGilham/altcode.fake/workflows/CI/badge.svg)](https://github.com/SteveGilham/altcover/altcode.fake?query=workflow%3ACI)[![Build history](https://buildstats.info/github/chart/SteveGilham/altcode.fake?branch=master)](https://github.com/SteveGilham/altcode.fake/actions?query=workflow%3ACI)| <sup>AppVeyor</sup> [![Build status](https://img.shields.io/appveyor/ci/SteveGilham/altcode-fake/master.svg)](https://ci.appveyor.com/project/SteveGilham/altcode-fake) ![Build history](https://buildstats.info/appveyor/chart/SteveGilham/altcode-fake?branch=master) |
 | **Unit Test coverage** | <sup>Coveralls</sup> [![Coverage Status](https://coveralls.io/repos/github/SteveGilham/altcode.fake/badge.svg?branch=master)](https://coveralls.io/github/SteveGilham/altcode.fake?branch=master) |
 
 ## Usage
@@ -35,7 +35,7 @@ See the [Wiki page](https://github.com/SteveGilham/altcode.fake/wiki) for detail
 
 It is assumed that the following are available
 
-.net core SDK 3.1.100 or later (`dotnet`) -- try https://www.microsoft.com/net/download  
+.net core SDK 5.0.100 or later (`dotnet`) -- try https://www.microsoft.com/net/download  
 
 #### Windows
 
@@ -60,5 +60,4 @@ Use `dotnet fake run ./Build/build.fsx --target <targetname>` to run to a specif
 ## Thanks to
 
 * [AppVeyor](https://ci.appveyor.com/project/SteveGilham/altcode-fake) for allowing free build CI services for Open Source projects
-* [travis-ci](https://travis-ci.com/SteveGilham/altcode.fake) for allowing free build CI services for Open Source projects
 * [Coveralls](https://coveralls.io/r/SteveGilham/altcode.fake) for allowing free services for Open Source projects
