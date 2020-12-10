@@ -172,7 +172,9 @@ let testCases =
     testCase "Test that tool path can be set"
     <| fun _ ->
       let fake = Guid.NewGuid().ToString()
-      let p = { Gendarme.Params.Create() with ToolPath = fake }
+      let p = { Gendarme.Params.Create() with
+                  ToolPath = fake
+                  ToolType = Fake.DotNet.ToolType.CreateFullFramework().WithDefaultToolCommandName fake }
       let args = Gendarme.composeCommandLine p
       let proc = Gendarme.createProcess args p
       Expect.equal proc.CommandLine
@@ -194,6 +196,7 @@ let testCases =
       let args =
         { Gendarme.Params.Create() with
             ToolPath = fake
+            ToolType = Fake.DotNet.ToolType.CreateFullFramework().WithDefaultToolCommandName fake
             Targets = [ fake ] }
       Expect.equal (Gendarme.run args) () "Should be silent"
 
@@ -204,6 +207,7 @@ let testCases =
       let args =
         { Gendarme.Params.Create() with
             ToolPath = fake
+            ToolType = Fake.DotNet.ToolType.CreateFullFramework().WithDefaultToolCommandName fake
             Targets = [ fake + ".nonesuch" ]
             FailBuildOnDefect = false }
       Expect.equal (Gendarme.run args) () "Should be silent"
@@ -222,6 +226,7 @@ let testCases =
       let args =
         { Gendarme.Params.Create() with
             ToolPath = fake
+            ToolType = Fake.DotNet.ToolType.CreateFullFramework().WithDefaultToolCommandName fake
             Targets = [ fake + ".nonesuch" ] }
       Expect.throwsC (fun () -> Gendarme.run args) (fun ex ->
         Expect.equal ex.Message

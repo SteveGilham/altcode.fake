@@ -37,7 +37,7 @@ type Confidence =
   | High of Grade
   | Total of Grade
 
-/// Option type to configure ILMerge's target output.
+/// Option type to configure Gendarme's target output.
 [<NoComparison>]
 type LogKind =
   | Text
@@ -49,7 +49,7 @@ type LogKind =
 type Params =
   { /// Path to gendarme.exe
     ToolPath : string
-    /// Define the tool through FAKE 5.18 ToolType -- if set, overrides
+    /// Define the tool through FAKE 5.18 ToolType
     ToolType : Fake.DotNet.ToolType
     /// Working Directory
     WorkingDirectory : string
@@ -82,13 +82,10 @@ type Params =
     /// Fail the build if a defect is reported
     /// Default is true
     FailBuildOnDefect : bool }
-  /// ILMerge default parameters. Tries to automatically locate ilmerge.exe in a subfolder.
+  /// Default parameters.
   static member Create() =
-    { ToolPath =
-        match (ProcessUtils.tryFindLocalTool "PATH" "gendarme.exe" [ "." ]) with
-        | Some path -> path
-        | _ -> "gendarme"
-      ToolType = Fake.DotNet.ToolType.CreateFullFramework()
+    { ToolPath = "gendarme"
+      ToolType = Fake.DotNet.ToolType.CreateGlobalTool().WithDefaultToolCommandName("gendarme")
       WorkingDirectory = String.Empty
       Configuration = String.Empty
       RuleSet = String.Empty
@@ -170,7 +167,7 @@ let internal withWorkingDirectory parameters c =
 let internal createProcess args parameters =
   CreateProcess.fromCommand (RawCommand(parameters.ToolPath, args |> Arguments.OfArgs))
   |> CreateProcess.withToolType
-       (parameters.ToolType.WithDefaultToolCommandName "gendarme")
+       (parameters.ToolType.WithDefaultToolCommandName parameters.ToolPath)
   |> withWorkingDirectory parameters
 
 /// Uses Gendarme to analyse .NET assemblies.
