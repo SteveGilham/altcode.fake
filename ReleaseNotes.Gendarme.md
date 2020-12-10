@@ -1,6 +1,6 @@
 # 5.19.1.27
 * [Dependency change] Uses Fake >= 5.19.1 rather than >= 5.18.1
-* [API change] The Fake`ToolType` of the `Params` object defaults to `GlobalTool` : see https://www.nuget.org/packages/altcode.gendarme-tool
+* [API change] The Fake`ToolType` of the `Params` object defaults to `GlobalTool` with tool name `gendarme` : see https://www.nuget.org/packages/altcode.gendarme-tool for your global tool.
 
 # 5.18.1.24
 * [Dependency change] Uses Fake >= 5.18.1 rather than >= 5.9.3
