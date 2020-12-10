@@ -1,4 +1,4 @@
-/// Contains task a task which allows to merge .NET assemblies with [ILMerge](http://research.microsoft.com/en-us/people/mbarnett/ilmerge.aspx).
+/// Contains a task which allows static analysis with Gendarme.
 [<RequireQualifiedAccess>]
 module AltCode.Fake.DotNet.Gendarme
 
@@ -37,18 +37,20 @@ type Confidence =
   | High of Grade
   | Total of Grade
 
-/// Option type to configure ILMerge's target output.
+/// Option type to configure Gendarme's target output.
 [<NoComparison>]
 type LogKind =
   | Text
   | Xml
   | Html
 
-/// Parameter type for ILMerge
-[<NoComparison>]
+/// Parameter type for Gendarme
+[<NoComparison; NoEquality; AutoSerializable(false)>]
 type Params =
   { /// Path to gendarme.exe
     ToolPath : string
+    /// Define the tool through FAKE 5.18 ToolType
+    ToolType : Fake.DotNet.ToolType
     /// Working Directory
     WorkingDirectory : string
     /// Specify the rule sets and rule settings. Default is 'rules.xml'.
@@ -80,9 +82,10 @@ type Params =
     /// Fail the build if a defect is reported
     /// Default is true
     FailBuildOnDefect : bool }
-  /// ILMerge default parameters. Tries to automatically locate ilmerge.exe in a subfolder.
+  /// Default parameters.
   static member Create() =
-    { ToolPath = Tools.findToolInSubPath "gendarme.exe" <| Shell.pwd()
+    { ToolPath = "gendarme"
+      ToolType = Fake.DotNet.ToolType.CreateGlobalTool().WithDefaultToolCommandName("gendarme")
       WorkingDirectory = String.Empty
       Configuration = String.Empty
       RuleSet = String.Empty
@@ -107,70 +110,83 @@ type Params =
 /// Builds the arguments for the Gendarme task
 /// [omit]
 [<System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA1308",
-                                                  Justification = "Lower-casing is safe here")>]
-let internal getArguments parameters =
-  let Item a x =
-    if x |> String.IsNullOrWhiteSpace then []
-    else [ a; x ]
+                                                  Justification =
+                                                    "Lower-casing is safe here")>]
+let internal composeCommandLine parameters =
+  let item a x =
+    if x |> String.IsNullOrWhiteSpace then [] else [ a; x ]
 
-  let ItemList a x =
-    if x |> isNull then []
+  let itemList a x =
+    if x |> isNull then
+      []
     else
       x
       |> Seq.collect (fun i -> [ a; i ])
       |> Seq.toList
 
-  let Flag a predicate =
-    if predicate then [ a ]
-    else []
+  let flag a predicate =
+    if predicate then [ a ] else []
 
-  [ Item "--config" parameters.Configuration
-    Item "--set" parameters.RuleSet
+  [ item "--config" parameters.Configuration
+    item "--set" parameters.RuleSet
     (match parameters.LogKind with
-     | Text -> Item "--log"
-     | Xml -> Item "--xml"
-     | _ -> Item "--html") parameters.Log
-    ItemList "--ignore" parameters.Ignore
-    (if parameters.Limit > 0uy then
-       Item "--limit" <| parameters.Limit.ToString(CultureInfo.InvariantCulture)
+     | Text -> item "--log"
+     | Xml -> item "--xml"
+     | _ -> item "--html") parameters.Log
+    itemList "--ignore" parameters.Ignore
+    (if parameters.Limit > 0uy
+     then item "--limit" <| parameters.Limit.ToString(CultureInfo.InvariantCulture)
      else [])
-    Flag "--console" parameters.Console
-    Flag "--quiet" parameters.Quiet
+    flag "--console" parameters.Console
+    flag "--quiet" parameters.Quiet
 
-    Item "--severity"
+    item "--severity"
     <| (sprintf "%A" parameters.Severity).ToLowerInvariant().Replace(" plus", "+")
       .Replace(" minus", "-").Replace(" neutral", String.Empty)
 
-    Item "--confidence"
+    item "--confidence"
     <| (sprintf "%A" parameters.Confidence).ToLowerInvariant().Replace(" plus", "+")
       .Replace(" minus", "-").Replace(" neutral", String.Empty)
     (if parameters.Verbosity > 0uy then
-       { 1..int parameters.Verbosity }
-       |> Seq.map (fun _ -> "--v")
-       |> Seq.toList
-     else [])
+      { 1 .. int parameters.Verbosity }
+      |> Seq.map (fun _ -> "--v")
+      |> Seq.toList
+     else
+       [])
 
-    ((ItemList String.Empty parameters.Targets)
+    ((itemList String.Empty parameters.Targets)
      |> List.filter (String.isNullOrWhiteSpace >> not)) ]
   |> List.concat
 
-let internal createProcess args parameters =
-  CreateProcess.fromRawCommand parameters.ToolPath args
-  |> if String.IsNullOrWhiteSpace parameters.WorkingDirectory then id
+let internal withWorkingDirectory parameters c =
+  c
+  |> if String.IsNullOrWhiteSpace parameters.WorkingDirectory
+     then id
      else CreateProcess.withWorkingDirectory parameters.WorkingDirectory
 
-/// Uses ILMerge to merge .NET assemblies.
+let internal createProcess args parameters =
+  CreateProcess.fromCommand (RawCommand(parameters.ToolPath, args |> Arguments.OfArgs))
+  |> CreateProcess.withToolType parameters.ToolType
+  |> withWorkingDirectory parameters
+
+/// Uses Gendarme to analyse .NET assemblies.
 /// ## Parameters
-///
 ///  - `parameters` - A Gendarme.Params value with your required settings.
+[<SuppressMessage("Gendarme.Rules.Naming",
+                    "UseCorrectCasingRule",
+                    Justification = "Fake.build style")>]
 let run parameters =
   use __ = Trace.traceTask "Gendarme" String.Empty
-  let args = getArguments parameters
+  let args = (composeCommandLine parameters)
 
-  let run =
+  let command =
     createProcess args parameters
-    |> CreateProcess.withFramework
-    |> Proc.run
-  if 0 <> run.ExitCode && parameters.FailBuildOnDefect then
-    failwithf "Gendarme %s failed." (String.separated " " args)
+    |> if parameters.FailBuildOnDefect then CreateProcess.ensureExitCode else id
+    |> fun command ->
+      Trace.trace command.CommandLine
+      command
+
+  command
+  |> Proc.run
+  |> ignore
   __.MarkSuccess()

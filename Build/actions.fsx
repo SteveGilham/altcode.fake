@@ -21,9 +21,9 @@ module Actions =
         |> Seq.filter (fun n ->
              match n.Name with
              | "obj" ->
-               Path.Combine(n.FullName, "dotnet-fake.fsproj.nuget.g.props")
-               |> File.Exists
-               |> not
+                 Path.Combine(n.FullName, "dotnet-fake.fsproj.nuget.g.props")
+                 |> File.Exists
+                 |> not
              | _ -> true)
         |> Seq.filter (fun n ->
              "packages"
@@ -57,7 +57,8 @@ module Actions =
     and Clean' x depth =
       printfn "looping after %A" x
       System.Threading.Thread.Sleep(500)
-      if depth < 10 then Clean1(depth + 1)
+      if depth < 10
+      then Clean1(depth + 1)
       else Assert.Fail "Could not clean all the files"
 
     Clean1 0
@@ -80,8 +81,7 @@ open System.Runtime.CompilerServices
 #endif
 do ()"""
   let prefix =
-    [| 0x00uy; 0x24uy; 0x00uy; 0x00uy; 0x04uy; 0x80uy; 0x00uy; 0x00uy; 0x94uy; 0x00uy;
-       0x00uy; 0x00uy |]
+    [| 0x00uy; 0x24uy; 0x00uy; 0x00uy; 0x04uy; 0x80uy; 0x00uy; 0x00uy; 0x94uy; 0x00uy; 0x00uy; 0x00uy |]
 
   let GetPublicKey(stream : Stream) =
     // see https://social.msdn.microsoft.com/Forums/vstudio/en-US/d9ef264e-1a74-4f48-b93f-3e2c7902f660/determine-contents-of-a-strong-name-key-file-snk?forum=netfxbcl
@@ -115,8 +115,7 @@ do ()"""
 
     // Update the file only if it would change
     let old =
-      if File.Exists(path) then File.ReadAllText(path)
-      else String.Empty
+      if File.Exists(path) then File.ReadAllText(path) else String.Empty
     if not (old.Equals(file)) then File.WriteAllText(path, file)
 
   let GetVersionFromYaml() =
@@ -138,8 +137,8 @@ do ()"""
     let majmin = String.Join(".", version.Split('.') |> Seq.take 2)
 
     let result =
-      if String.IsNullOrWhiteSpace appveyor then
-        sprintf "%s.%d.%d" majmin diff.Days revision
+      if String.IsNullOrWhiteSpace appveyor
+      then sprintf "%s.%d.%d" majmin diff.Days revision
       else appveyor
     printfn "Build version : %s" version
     (result, majmin, now.Year)
@@ -150,13 +149,13 @@ do ()"""
     match result.Errors |> Seq.toList with
     | [] -> ()
     | errors ->
-      try
-        Console.ForegroundColor <- ConsoleColor.Black
-        Console.BackgroundColor <- ConsoleColor.White
-        String.Join(Environment.NewLine, errors) |> printfn "ERR : %s"
-      finally
-        Console.ForegroundColor <- fst save
-        Console.BackgroundColor <- snd save
+        try
+          Console.ForegroundColor <- ConsoleColor.Black
+          Console.BackgroundColor <- ConsoleColor.White
+          String.Join(Environment.NewLine, errors) |> printfn "ERR : %s"
+        finally
+          Console.ForegroundColor <- fst save
+          Console.BackgroundColor <- snd save
     Assert.That(result.ExitCode, Is.EqualTo 0, msg)
 
   let AssertResult (msg : string) (result : Fake.Core.ProcessResult<'a>) =
@@ -208,13 +207,12 @@ a:hover {color: #ecc;}
       |> Seq.map (fun x ->
            match x.Name.LocalName with
            | "h2" ->
-             keep
-             := (List.tryFind (fun e -> e = String.Concat(x.Nodes())) eliminate)
-                |> Option.isNone
+               keep
+               := (List.tryFind (fun e -> e = String.Concat(x.Nodes())) eliminate)
+                  |> Option.isNone
            | "footer" -> keep := true
            | _ -> ()
-           if !keep then None
-           else Some x)
+           if !keep then None else Some x)
       |> Seq.toList
     kill
     |> Seq.iter (fun q ->

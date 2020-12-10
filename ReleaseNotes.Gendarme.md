@@ -1,3 +1,12 @@
+# 5.19.1.xx
+* [Dependency change] Uses Fake >= 5.19.1 rather than >= 5.18.1
+* [API change] The Fake`ToolType` of the `Params` object defaults to `GlobalTool` : see https://www.nuget.org/packages/altcode.gendarme-tool
+
+# 5.18.1.24
+* [Dependency change] Uses Fake >= 5.18.1 rather than >= 5.9.3
+* [API change] Update to add a Fake `ToolType` to the `Params` object.  If you use the `Create` method, this should be transparent to you, as it defaults to `FullFramework`.
+* [API change] In `Params.Create`, use the updated Fake Process APIs to look for Gendarme, which means it will look in PATH first, then locally, and default the `ToolPath` to just plain `gendarme` if nothing is found.
+
 # 5.9.3.10
 * [BUGFIX] As "--limit 0" means "report nothing" not "report all", make zero limit emit nothing to the command line
 * [Enhancement] `FailBuildOnDefect` parameter, default `true`, to determine if defect detection will fail the build.
