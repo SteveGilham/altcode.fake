@@ -1,5 +1,5 @@
-# 5.18.1.xx
-* [Semi-breaking] Update to add a (Fake 5.18.1 and later) `ToolType` to the `Params` object.  If you use the `Create` method, this should be transparent to you, as it defaults to `FullFramework`.
+# 5.19.1.xx
+* [Breaking] Update to add a Fake`ToolType` to the `Params` object.  It defaults to `GlobalTool`.  Requires Fake >= 5.19.1 as well
 
 # 5.9.3.10
 * [BUGFIX] As "--limit 0" means "report nothing" not "report all", make zero limit emit nothing to the command line
