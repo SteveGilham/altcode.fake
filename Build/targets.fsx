@@ -85,9 +85,13 @@ let withMSBuildParams (o : Fake.DotNet.DotNet.BuildOptions) =
   { o with MSBuildParams = cliArguments }
 
 let currentBranch =
-  "."
-  |> Path.getFullName
-  |> Information.getBranchName
+  let env = Environment.environVar "APPVEYOR_REPO_BRANCH"
+  if env |> String.IsNullOrWhiteSpace
+  then
+    "."
+    |> Path.getFullName
+    |> Information.getBranchName
+  else env
 
 let packageGendarme =
   if currentBranch.Contains "VsWhat"
