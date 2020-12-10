@@ -166,8 +166,7 @@ let internal withWorkingDirectory parameters c =
 
 let internal createProcess args parameters =
   CreateProcess.fromCommand (RawCommand(parameters.ToolPath, args |> Arguments.OfArgs))
-  |> CreateProcess.withToolType
-       (parameters.ToolType.WithDefaultToolCommandName parameters.ToolPath)
+  |> CreateProcess.withToolType parameters.ToolType
   |> withWorkingDirectory parameters
 
 /// Uses Gendarme to analyse .NET assemblies.
