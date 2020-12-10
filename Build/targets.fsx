@@ -85,17 +85,9 @@ let withMSBuildParams (o : Fake.DotNet.DotNet.BuildOptions) =
   { o with MSBuildParams = cliArguments }
 
 let currentBranch =
-  let env = Environment.environVar "APPVEYOR_REPO_BRANCH"
-  if env |> String.IsNullOrWhiteSpace then
-    let env1 = Environment.environVar "TRAVIS_BRANCH"
-    if env1 |> String.IsNullOrWhiteSpace then
-      "."
-      |> Path.getFullName
-      |> Information.getBranchName
-    else
-      env1
-  else
-    env
+  "."
+  |> Path.getFullName
+  |> Information.getBranchName
 
 let package project =
   if currentBranch.StartsWith("release/", StringComparison.Ordinal)
@@ -175,14 +167,14 @@ _Target "Clean" (fun _ ->
 
 _Target "SetVersion" (fun _ ->
   let appveyor = Environment.environVar "APPVEYOR_BUILD_VERSION"
-  let travis = Environment.environVar "TRAVIS_BUILD_NUMBER"
+  let github = Environment.environVar  "GITHUB_RUN_NUMBER"
   let version = Actions.GetVersionFromYaml()
 
   let ci =
     if String.IsNullOrWhiteSpace appveyor then
-      if String.IsNullOrWhiteSpace travis
+      if String.IsNullOrWhiteSpace github
       then String.Empty
-      else version.Replace("{build}", travis + "-travis")
+      else version.Replace("{build}", github + "-github")
     else
       appveyor
 
@@ -426,7 +418,7 @@ _Target "UnitTestDotNetWithAltCover" (fun _ ->
         ReportTypes =
           [ ReportGenerator.ReportType.Html; ReportGenerator.ReportType.XmlSummary ]
         TargetDir = report }) coverage
-        
+
   let reportLines = coverage |> List.map File.ReadAllLines
 
   let top =
@@ -462,7 +454,7 @@ _Target "UnitTestDotNetWithAltCover" (fun _ ->
     let coveralls =
       ("./packages/" + (packageVersion "coveralls.io") + "/tools/coveralls.net.exe")
       |> Path.getFullName
-    
+
     Actions.Run
       (coveralls, "_Reports",
          [ "--opencover"; coverage; "--debug" ]) "Coveralls upload failed"
