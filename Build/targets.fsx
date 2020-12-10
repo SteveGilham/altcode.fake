@@ -195,7 +195,7 @@ _Target "SetVersion" (fun _ ->
   printfn " => %A" (v, majmin, y)
   Version := v
   let copy =
-    sprintf "Â© 2010-%d by Steve Gilham <SteveGilham@users.noreply.github.com>" y
+    sprintf "© 2010-%d by Steve Gilham <SteveGilham@users.noreply.github.com>" y
   Copyright := "Copyright " + copy
   Directory.ensure "./_Generated"
   Actions.InternalsVisibleTo(!Version)
@@ -517,10 +517,10 @@ _Target "Packaging" (fun _ ->
 
   [ (List.concat [ gendarmeFiles; gendarmeNetcoreFiles ], packageGendarme,
      "./_Generated/altcode.fake.dotnet.gendarme.nuspec", "AltCode.Fake.DotNet.Gendarme",
-     "A helper task for running Mono.Gendarme from FAKE ( >= 5.18.1 )", "Gendarme",
+     "A helper task for running Mono.Gendarme from FAKE ( >= 5.19.1 )", "Gendarme",
      [ // make these explicit, as this package implies an opt-in
-       ("Fake.Core.Environment", "5.18.1")
-       ("Fake.DotNet.Cli", "5.18.1")
+       ("Fake.Core.Environment", "5.19.1")
+       ("Fake.DotNet.Cli", "5.19.1")
        ("FSharp.Core", "4.7")
        ("System.Collections.Immutable", "1.6.0") ])
     (List.concat
@@ -543,7 +543,7 @@ _Target "Packaging" (fun _ ->
              Files = files
              Dependencies = dependencies
              Version = !Version
-             Copyright = (!Copyright).Replace("Â©", "(c)")
+             Copyright = (!Copyright).Replace("©", "(c)")
              Publish = false
              ReleaseNotes =
                Path.getFullName ("ReleaseNotes." + what + ".md") |> File.ReadAllText
@@ -602,7 +602,7 @@ _Target "PrepareDotNetBuild" (fun _ ->
 
 _Target "PrepareReadMe" (fun _ ->
   Actions.PrepareReadMe
-    ((!Copyright).Replace("Â©", "&#xa9;").Replace("<", "&lt;").Replace(">", "&gt;")))
+    ((!Copyright).Replace("©", "&#xa9;").Replace("<", "&lt;").Replace(">", "&gt;")))
 
 // Post-packaging deployment touch test
 
