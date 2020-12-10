@@ -178,7 +178,7 @@ _Target "SetVersion" (fun _ ->
       then String.Empty
       else version.Replace("{build}", github + "-github")
     else
-      appveyor
+      version.Replace("{build}", appveyor)
 
   let (v, majmin, y) = Actions.LocalVersion ci version
   printfn " => %A" (v, majmin, y)
