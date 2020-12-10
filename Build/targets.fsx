@@ -166,7 +166,7 @@ _Target "Clean" (fun _ ->
   Actions.Clean())
 
 _Target "SetVersion" (fun _ ->
-  let appveyor = Environment.environVar "APPVEYOR_BUILD_NUMBER"
+  let appveyor = Environment.environVar "APPVEYOR_BUILD_VERSION"
   let github = Environment.environVar  "GITHUB_RUN_NUMBER"
   let now = DateTimeOffset.UtcNow
   let version = sprintf "%d.%d.%d.{build}" (now.Year-2000) now.Month now.Day
