@@ -13,6 +13,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BuildItems", "BuildItems", 
 		appveyor.yml = appveyor.yml
 		Build\build.fsx = Build\build.fsx
 		README.md = README.md
+		ReleaseNotes.Gendarme.md = ReleaseNotes.Gendarme.md
+		ReleaseNotes.VsWhat.md = ReleaseNotes.VsWhat.md
 		Build\rules-fake.xml = Build\rules-fake.xml
 		Build\setup.fsx = Build\setup.fsx
 		Build\targets.fsx = Build\targets.fsx
@@ -24,7 +26,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NuGet", "Build\NuGet.csproj
 EndProject
 Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "AltCode.Fake.Tests", "AltCode.Fake.Tests\AltCode.Fake.Tests.fsproj", "{48EB7F76-32EA-4015-A835-6DFE6F5A24F0}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "AltCode.Nuget.Placeholder", "AltCode.Nuget.Placeholder\AltCode.Nuget.Placeholder.fsproj", "{F87AFAFF-29FA-41A5-AFC1-26DB73FA64F9}"
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "AltCode.Nuget.Placeholder", "AltCode.Nuget.Placeholder\AltCode.Nuget.Placeholder.fsproj", "{F87AFAFF-29FA-41A5-AFC1-26DB73FA64F9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
