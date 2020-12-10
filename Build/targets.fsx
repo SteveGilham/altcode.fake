@@ -485,12 +485,12 @@ _Target "OperationalTest" ignore
 
 _Target "Packaging" (fun _ ->
   let gendarmeDir =
-    Path.getFullName "_Binaries/AltCode.Fake.DotNet.Gendarme/Release+AnyCPU/net462"
+    Path.getFullName "_Binaries/AltCode.Fake.DotNet.Gendarme/Release+AnyCPU"
   let packable = Path.getFullName "./_Binaries/README.html"
 
   let gendarmeFiles =
-    [ (gendarmeDir @@ "AltCode.Fake.DotNet.Gendarme.dll", Some "lib/net462", None)
-      (gendarmeDir @@ "AltCode.Fake.DotNet.Gendarme.pdb", Some "lib/net462", None)
+    [ (gendarmeDir @@ "net462/AltCode.Fake.DotNet.Gendarme.dll", Some "lib/net462", None)
+      (gendarmeDir @@ "net462/AltCode.Fake.DotNet.Gendarme.pdb", Some "lib/net462", None)
       (Path.getFullName "./LICENS*", Some "", None)
       (Path.getFullName "./Build/AltCode.Fake_128.*g", Some "", None)
       (packable, Some "", None) ]
