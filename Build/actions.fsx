@@ -140,6 +140,7 @@ do ()"""
       if String.IsNullOrWhiteSpace civersion
       then sprintf "%s.%d.%d" majmin diff.Days revision
       else civersion
+    printfn "CI version : %s" civersion
     printfn "Build version : %s" version
     (result, majmin, now.Year)
 
