@@ -128,7 +128,7 @@ do ()"""
     let mapping = ystream.Documents.[0].RootNode :?> YamlMappingNode
     string mapping.Children.[YamlScalarNode("version")]
 
-  let LocalVersion appveyor (version : string) =
+  let LocalVersion civersion (version : string) =
     let now = DateTimeOffset.UtcNow
     let epoch = DateTimeOffset(2000, 1, 1, 0, 0, 0, TimeSpan(int64 0))
     let diff = now.Subtract(epoch)
@@ -137,9 +137,9 @@ do ()"""
     let majmin = String.Join(".", version.Split('.') |> Seq.take 2)
 
     let result =
-      if String.IsNullOrWhiteSpace appveyor
+      if String.IsNullOrWhiteSpace civersion
       then sprintf "%s.%d.%d" majmin diff.Days revision
-      else appveyor
+      else civersion
     printfn "Build version : %s" version
     (result, majmin, now.Year)
 

@@ -169,7 +169,9 @@ _Target "SetVersion" (fun _ ->
   let appveyor = Environment.environVar "APPVEYOR_BUILD_VERSION"
   let github = Environment.environVar  "GITHUB_RUN_NUMBER"
   let now = DateTimeOffset.UtcNow
-  let version = sprintf "%d.%d.%d.{build}" (now.Year-2000) now.Month now.Day
+  let version = if currentBranch.Contains "VsWhat"
+                then sprintf "%d.%d.%d.{build}" (now.Year-2000) now.Month now.Day
+                else Actions.GetVersionFromYaml()
   printfn "Raw version %s" version
 
   let ci =
