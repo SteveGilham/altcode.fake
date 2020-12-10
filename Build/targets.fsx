@@ -383,7 +383,6 @@ _Target "UnitTestDotNetWithAltCover" (fun _ ->
            |> Path.GetDirectoryName
 
          let altReport = reports @@ ("UnitTestWithAltCoverCoreRunner." + tname + ".xml")
-         let altReport2 = reports @@ ("UnitTestWithAltCoverCoreRunner." + tname + ".xml")
 
          let collect = AltCover.CollectOptions.Primitive(Primitive.CollectOptions.Create()) // FSApi
 
@@ -419,7 +418,7 @@ _Target "UnitTestDotNetWithAltCover" (fun _ ->
          with x -> printfn "%A" x
          // reraise()) // while fixing
 
-         altReport2 :: l) []
+         altReport :: l) []
 
   ReportGenerator.generateReports (fun p ->
     { p with
@@ -427,6 +426,46 @@ _Target "UnitTestDotNetWithAltCover" (fun _ ->
         ReportTypes =
           [ ReportGenerator.ReportType.Html; ReportGenerator.ReportType.XmlSummary ]
         TargetDir = report }) coverage
+        
+  let reportLines = coverage |> List.map File.ReadAllLines
+
+  let top =
+    reportLines
+    |> List.head
+    |> Seq.takeWhile (fun l -> l.StartsWith("    <Module") |> not)
+  let tail =
+    reportLines
+    |> List.head
+    |> Seq.skipWhile (fun l -> l <> "  </Modules>")
+  let core =
+    reportLines
+    |> List.map (fun f ->
+         f
+         |> Seq.skipWhile (fun l -> l.StartsWith("    <Module") |> not)
+         |> Seq.takeWhile (fun l -> l <> "  </Modules>"))
+
+  let coverage = reports @@ "CombinedTestWithAltCoverRunner.coveralls"
+  File.WriteAllLines
+    (coverage,
+     Seq.concat
+       [ top
+         Seq.concat core
+         tail ]
+     |> Seq.toArray)
+
+  if Environment.isWindows &&
+     "COVERALLS_REPO_TOKEN"
+     |> Environment.environVar
+     |> String.IsNullOrWhiteSpace
+     |> not
+  then
+    let coveralls =
+      ("./packages/" + (packageVersion "coveralls.io") + "/tools/coveralls.net.exe")
+      |> Path.getFullName
+    
+    Actions.Run
+      (coveralls, "_Reports",
+         [ "--opencover"; coverage; "--debug" ]) "Coveralls upload failed"
 
   (report @@ "Summary.xml")
   |> uncovered
