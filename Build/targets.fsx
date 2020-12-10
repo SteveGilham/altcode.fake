@@ -89,10 +89,15 @@ let currentBranch =
   |> Path.getFullName
   |> Information.getBranchName
 
-let package project =
-  if currentBranch.StartsWith("release/", StringComparison.Ordinal)
-  then currentBranch = "release/" + project
-  else true
+let packageGendarme =
+  if currentBranch.Contains "VsWhat"
+  then "_ProForma.Gendarme"
+  else "_Packaging.Gendarme"
+  
+let packageVsWhat =
+  if currentBranch.Contains "Gendarme"
+  then "_ProForma.VsWhat"
+  else "_Packaging.VsWhat"
 
 let toolPackages =
   let xml =
@@ -506,7 +511,7 @@ _Target "Packaging" (fun _ ->
       (Path.getFullName "./Build/AltCode.VsWhat_128.*g", Some "", None)
       (packable, Some "", None) ]
 
-  [ (List.concat [ gendarmeFiles; gendarmeNetcoreFiles ], "_Packaging.Gendarme",
+  [ (List.concat [ gendarmeFiles; gendarmeNetcoreFiles ], packageGendarme,
      "./_Generated/altcode.fake.dotnet.gendarme.nuspec", "AltCode.Fake.DotNet.Gendarme",
      "A helper task for running Mono.Gendarme from FAKE ( >= 5.18.1 )", "Gendarme",
      [ // make these explicit, as this package implies an opt-in
@@ -516,10 +521,9 @@ _Target "Packaging" (fun _ ->
        ("System.Collections.Immutable", "1.6.0") ])
     (List.concat
       [ whatFiles "tools/netcoreapp2.1/any"
-        whatPack ], "_Packaging.VsWhat", "./_Generated/altcode.vswhat.nuspec",
+        whatPack ], packageVsWhat, "./_Generated/altcode.vswhat.nuspec",
      "AltCode.VsWhat",
      "A tool to list Visual Studio instances and their installed packages", "VsWhat", []) ]
-  |> List.filter (fun (_, _, _, _, _, what, _) -> package what)
   |> List.iter (fun (files, output, nuspec, project, description, what, dependencies) ->
        let outputPath = "./" + output
        let workingDir = "./_Binaries/" + output
@@ -608,7 +612,7 @@ _Target "AltCodeVsWhatGlobalIntegration" (fun _ ->
     Actions.RunDotnet (fun o' -> { dotnetOptions o' with WorkingDirectory = working })
       "tool"
       ("install -g altcode.vswhat --add-source "
-       + (Path.getFullName "./_Packaging.VsWhat") + " --version " + !Version) "Installed"
+       + (Path.getFullName packageVsWhat) + " --version " + !Version) "Installed"
 
     Actions.RunDotnet (fun o' -> { dotnetOptions o' with WorkingDirectory = working })
       "tool" ("list -g ") "Checked"
