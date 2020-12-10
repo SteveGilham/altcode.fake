@@ -1,6 +1,6 @@
-# 20.12.xx.xx
+# 20.12.10.26
 * Use WsWhere 1.1.0 release
-* Sipport for .net5.0 (actually all runtimes > 2.1)
+* Support for .net5.0 (actually all runtimes > 2.1)
 
 # 18.11.20.18
 * Use WsWhere 1.0.0 release
