@@ -7,7 +7,6 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "AltCode.Fake.DotNet.Gendarm
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BuildItems", "BuildItems", "{A5FBA39A-4F35-48DE-9332-9C8B805F034E}"
 	ProjectSection(SolutionItems) = preProject
-		.travis.yml = .travis.yml
 		Build\actions.fsx = Build\actions.fsx
 		Build\AltCode.Fake.nuspec = Build\AltCode.Fake.nuspec
 		appveyor.yml = appveyor.yml
