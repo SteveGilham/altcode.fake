@@ -23,8 +23,8 @@ open Fake.IO.Globbing
 open Fake.IO.Globbing.Operators
 open Fake.Tools.Git
 
-open FSharpLint.Application
-open FSharpLint.Framework
+//open FSharpLint.Application
+//open FSharpLint.Framework
 
 open NUnit.Framework
 
@@ -97,7 +97,7 @@ let packageGendarme =
   if currentBranch.Contains "VsWhat"
   then "_ProForma.Gendarme"
   else "_Packaging.Gendarme"
-  
+
 let packageVsWhat =
   if currentBranch.Contains "Gendarme"
   then "_ProForma.VsWhat"
@@ -242,32 +242,61 @@ _Target "BuildDebug" (fun _ ->
 _Target "Analysis" ignore
 
 _Target "Lint" (fun _ ->
-  let failOnIssuesFound (issuesFound : bool) =
-    Assert.That(issuesFound, Is.False, "Lint issues were found")
-  let options =
-    { Lint.OptionalLintParameters.Default with
-        Configuration = FromFile(Path.getFullName "./fsharplint.json") }
+      let cfg = Path.getFullName "./fsharplint.json"
 
-  !!"**/*.fsproj"
-  |> Seq.collect (fun n -> !!(Path.GetDirectoryName n @@ "*.fs"))
-  |> Seq.distinct
-  |> Seq.collect (fun f ->
-       match Lint.lintFile options f with
-       | Lint.LintResult.Failure x -> failwithf "%A" x
-       | Lint.LintResult.Success w ->
-           w
-           |> Seq.filter (fun x ->
-                match x.Details.SuggestedFix with
-                | Some l ->
-                    match l.Force() with
-                    | Some fix -> fix.FromText <> "AltCover_Fake" // special case
-                    | _ -> false
-                | _ -> false))
-  |> Seq.fold (fun _ x ->
-       printfn "Info: %A\r\n Range: %A\r\n Fix: %A\r\n====" x.Details.Message
-         x.Details.Range x.Details.SuggestedFix
-       true) false
-  |> failOnIssuesFound)
+      let doLint f =
+        CreateProcess.fromRawCommand "dotnet" ["fsharplint"; "lint";  "-l"; cfg ; f]
+        |> CreateProcess.ensureExitCodeWithMessage "Lint issues were found"
+        |> Proc.run
+      let doLintAsync f = async { return (doLint f).ExitCode }
+
+      let throttle x = Async.Parallel (x, System.Environment.ProcessorCount)
+      let demo = Path.getFullName "./Demo"
+      let regress = Path.getFullName "./RegressionTesting"
+      let sample = Path.getFullName "./Samples"
+
+      let failOnIssuesFound (issuesFound: bool) =
+        Assert.That(issuesFound, Is.False, "Lint issues were found")
+
+      [ !! "./**/*.fsproj"
+        |> Seq.sortBy (Path.GetFileName)
+        |> Seq.filter (fun f -> ((f.Contains demo) ||
+                                 (f.Contains regress) ||
+                                 (f.Contains sample)) |> not)
+        !! "./Build/*.fsx" |> Seq.map Path.GetFullPath ]
+      |> Seq.concat
+      |> Seq.map doLintAsync
+      |> throttle
+      |> Async.RunSynchronously
+      |> Seq.exists (fun x -> x <> 0)
+      |> failOnIssuesFound
+      )
+  //let failOnIssuesFound (issuesFound : bool) =
+  //  Assert.That(issuesFound, Is.False, "Lint issues were found")
+  //let options =
+  //  { Lint.OptionalLintParameters.Default with
+  //      Configuration = FromFile(Path.getFullName "./fsharplint.json") }
+
+  //!!"**/*.fsproj"
+  //|> Seq.collect (fun n -> !!(Path.GetDirectoryName n @@ "*.fs"))
+  //|> Seq.distinct
+  //|> Seq.collect (fun f ->
+  //     match Lint.lintFile options f with
+  //     | Lint.LintResult.Failure x -> failwithf "%A" x
+  //     | Lint.LintResult.Success w ->
+  //         w
+  //         |> Seq.filter (fun x ->
+  //              match x.Details.SuggestedFix with
+  //              | Some l ->
+  //                  match l.Force() with
+  //                  | Some fix -> fix.FromText <> "AltCover_Fake" // special case
+  //                  | _ -> false
+  //              | _ -> false))
+  //|> Seq.fold (fun _ x ->
+  //     printfn "Info: %A\r\n Range: %A\r\n Fix: %A\r\n====" x.Details.Message
+  //       x.Details.Range x.Details.SuggestedFix
+  //     true) false
+  //|> failOnIssuesFound)
 
 _Target "Gendarme" (fun _ -> // Needs debug because release is compiled --standalone which contaminates everything
 
@@ -395,7 +424,7 @@ _Target "UnitTestDotNetWithAltCover" (fun _ ->
          let prepare =
            AltCover.PrepareOptions.Primitive // FSApi
              ({ Primitive.PrepareOptions.Create() with
-                  XmlReport = altReport
+                  Report = altReport
                   SingleVisit = true }
               |> AltCoverFilter)
 

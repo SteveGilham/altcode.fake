@@ -20,7 +20,7 @@
     <NoWarn>52</NoWarn>
     <MSBuildWarningsAsMessages>NU1702</MSBuildWarningsAsMessages>
   </PropertyGroup>
-  
+
   <PropertyGroup Condition="'$(Configuration)'=='Release'">
     <DefineConstants>TRACE;$(GlobalDefineConstants)</DefineConstants>
     <OtherFlags>--keyfile:$(SolutionDir)Build\Infrastructure.snk</OtherFlags>
@@ -32,14 +32,18 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="altcover" Version="7.2.801" />
+    <PackageReference Include="altcover" Version="8.2.821" />
     <PackageReference Include="Expecto" Version="9.0.2" />
     <PackageReference Include="Expecto.FsCheck" Version="9.0.2" />
     <PackageReference Include="Expecto.VisualStudio.TestAdapter" Version="10.0.2" />
-    <PackageReference Include="FsCheck" Version="2.14.3" />
-    <PackageReference Include="FSharp.Core" Version="5.0.0" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.8.3" />
-    <PackageReference Include="YoloDev.Expecto.TestSdk" Version="0.9.2" />
+    <PackageReference Include="FsCheck" Version="2.15.3" />
+    <PackageReference Include="FSharp.Core" Version="5.0.2" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.10.0" />
+    <PackageReference Include="YoloDev.Expecto.TestSdk" Version="0.12.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Update="FSharp.Core" Version="5.0.2" />
   </ItemGroup>
 
   <ItemGroup>
