@@ -3,15 +3,16 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29806.167
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "AltCode.Fake.DotNet.Gendarme", "AltCode.Fake.DotNet.Gendarme\AltCode.Fake.DotNet.Gendarme.fsproj", "{17662DB6-7BB1-4ECE-BF37-D6D439762CFD}"
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "AltCode.Fake.DotNet.Gendarme", "AltCode.Fake.DotNet.Gendarme\AltCode.Fake.DotNet.Gendarme.fsproj", "{17662DB6-7BB1-4ECE-BF37-D6D439762CFD}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BuildItems", "BuildItems", "{A5FBA39A-4F35-48DE-9332-9C8B805F034E}"
 	ProjectSection(SolutionItems) = preProject
-		.travis.yml = .travis.yml
 		Build\actions.fsx = Build\actions.fsx
 		Build\AltCode.Fake.nuspec = Build\AltCode.Fake.nuspec
 		appveyor.yml = appveyor.yml
 		Build\build.fsx = Build\build.fsx
+		.config\dotnet-tools.json = .config\dotnet-tools.json
+		.github\workflows\main.yml = .github\workflows\main.yml
 		README.md = README.md
 		ReleaseNotes.Gendarme.md = ReleaseNotes.Gendarme.md
 		ReleaseNotes.VsWhat.md = ReleaseNotes.VsWhat.md
