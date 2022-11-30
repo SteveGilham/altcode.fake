@@ -1,9 +1,9 @@
 version: 5.19.1.{build}-pre
 branches:
   except:
-  - /develop.*/
+  - /*/
 skip_tags: true
-image: Visual Studio 2019
+image: Visual Studio 2022
 clone_depth: 2
 environment:
   COVERALLS_REPO_TOKEN:
@@ -15,7 +15,7 @@ nuget:
   disable_publish_on_pr: true
 install:
   # SDK version fix
-  - cinst dotnet-sdk --version 5.0.302
+  - cinst dotnet-sdk --version 7.0.100
 build_script:
 - ps: >-
     $ErrorActionPreference = 'Continue'
