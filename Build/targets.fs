@@ -359,31 +359,16 @@ module Targets =
 
       Directory.ensure "./_Reports"
 
-      let baseRules =
+      let rules =
         Path.getFullName "./Build/rules-fake.xml"
 
-      let rules =
-        if Environment.isWindows then
-          baseRules
-        else
-          // Gendarme mono doesn't into .pdb files
-          let lines =
-            baseRules
-            |> File.ReadAllLines
-            |> Seq.map (fun l ->
-              l.Replace(
-                "AvoidSwitchStatementsRule",
-                "AvoidSwitchStatementsRule | AvoidLongMethodsRule"
-              ))
-
-          let fixup =
-            Path.getFullName "./_Generated/rules-fake.xml"
-
-          File.WriteAllLines(fixup, lines)
-          fixup
 
       [ (rules,
-         [ "_Binaries/AltCode.Fake.DotNet.Gendarme/Debug+AnyCPU/net462/AltCode.Fake.DotNet.Gendarme.dll" ]) ]
+         [ "_Binaries/AltCode.Fake.DotNet.Gendarme/Debug+AnyCPU/net472/AltCode.Fake.DotNet.Gendarme.dll" ]) 
+        (Path.getFullName "./Build/build-rules.xml",
+            [ "$Binaries/Build/Debug+AnyCPU/net7.0/Build.dll"
+              "$Binaries/Setup/Debug+AnyCPU/net7.0/Setup.dll" ]
+        ) ]
       |> Seq.iter (fun (ruleset, files) ->
         Gendarme.run
           { Gendarme.Params.Create() with
@@ -403,7 +388,7 @@ module Targets =
 
       Directory.ensure "./_Reports"
 
-      [ ([ "_Binaries/AltCode.Fake.DotNet.Gendarme/Debug+AnyCPU/net462/AltCode.Fake.DotNet.Gendarme.dll" ],
+      [ ([ "_Binaries/AltCode.Fake.DotNet.Gendarme/Debug+AnyCPU/net472/AltCode.Fake.DotNet.Gendarme.dll" ],
          [],
          [ "-Microsoft.Design#CA1006"
            "-Microsoft.Design#CA1011"
@@ -627,12 +612,12 @@ module Targets =
 
       let gendarmeFiles =
         [ (gendarmeDir
-           @@ "net462/AltCode.Fake.DotNet.Gendarme.dll",
-           Some "lib/net462",
+           @@ "net472/AltCode.Fake.DotNet.Gendarme.dll",
+           Some "lib/net472",
            None)
           (gendarmeDir
-           @@ "net462/AltCode.Fake.DotNet.Gendarme.pdb",
-           Some "lib/net462",
+           @@ "net472/AltCode.Fake.DotNet.Gendarme.pdb",
+           Some "lib/net472",
            None)
           (Path.getFullName "./LICENS*", Some "", None)
           (Path.getFullName "./Build/AltCode.Fake_128.*g", Some "", None)

@@ -1,7 +1,7 @@
 version: 5.19.1.{build}-pre
 branches:
-  except:
-  - /*/
+  only:
+  - /nonesuch
 skip_tags: true
 image: Visual Studio 2022
 clone_depth: 2

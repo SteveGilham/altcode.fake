@@ -159,7 +159,7 @@ do ()"""
   let GetVersionFromYaml () =
     use yaml =
       new FileStream(
-        "appveyor.yml",
+        "./.github/workflows/main.yml",
         FileMode.Open,
         FileAccess.ReadWrite,
         FileShare.None,
