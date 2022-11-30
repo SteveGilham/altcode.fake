@@ -124,7 +124,7 @@ do ()"""
     Array.append prefix buffer
 
   let InternalsVisibleTo version =
-    let stream =
+    use stream =
       new System.IO.FileStream(
         "./Build/Infrastructure.snk",
         System.IO.FileMode.Open,

@@ -364,11 +364,10 @@ module Targets =
 
 
       [ (rules,
-         [ "_Binaries/AltCode.Fake.DotNet.Gendarme/Debug+AnyCPU/net472/AltCode.Fake.DotNet.Gendarme.dll" ]) 
+         [ "_Binaries/AltCode.Fake.DotNet.Gendarme/Debug+AnyCPU/netstandard2.0/AltCode.Fake.DotNet.Gendarme.dll" ])
         (Path.getFullName "./Build/build-rules.xml",
-            [ "$Binaries/Build/Debug+AnyCPU/net7.0/Build.dll"
-              "$Binaries/Setup/Debug+AnyCPU/net7.0/Setup.dll" ]
-        ) ]
+         [ "$Binaries/Build/Debug+AnyCPU/net7.0/Build.dll"
+           "$Binaries/Setup/Debug+AnyCPU/net7.0/Setup.dll" ]) ]
       |> Seq.iter (fun (ruleset, files) ->
         Gendarme.run
           { Gendarme.Params.Create() with
@@ -388,7 +387,7 @@ module Targets =
 
       Directory.ensure "./_Reports"
 
-      [ ([ "_Binaries/AltCode.Fake.DotNet.Gendarme/Debug+AnyCPU/net472/AltCode.Fake.DotNet.Gendarme.dll" ],
+      [ ([ "_Binaries/AltCode.Fake.DotNet.Gendarme/Debug+AnyCPU/netstandard2.0/AltCode.Fake.DotNet.Gendarme.dll" ],
          [],
          [ "-Microsoft.Design#CA1006"
            "-Microsoft.Design#CA1011"
@@ -611,15 +610,7 @@ module Targets =
         Path.getFullName "./_Binaries/README.html"
 
       let gendarmeFiles =
-        [ (gendarmeDir
-           @@ "net472/AltCode.Fake.DotNet.Gendarme.dll",
-           Some "lib/net472",
-           None)
-          (gendarmeDir
-           @@ "net472/AltCode.Fake.DotNet.Gendarme.pdb",
-           Some "lib/net472",
-           None)
-          (Path.getFullName "./LICENS*", Some "", None)
+        [ (Path.getFullName "./LICENS*", Some "", None)
           (Path.getFullName "./Build/AltCode.Fake_128.*g", Some "", None)
           (packable, Some "", None) ]
 

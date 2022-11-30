@@ -121,6 +121,9 @@ type Params =
                                                   "CA1308",
                                                   Justification =
                                                     "Lower-casing is safe here")>]
+[<System.Diagnostics.CodeAnalysis.SuppressMessage("Gendarme.Rules.Globalization",
+                                                  "PreferStringComparisonOverrideRule",
+                                                  Justification = "Not at netstandard2.0")>]
 let internal composeCommandLine parameters =
   let item a x =
     if x |> String.IsNullOrWhiteSpace then
