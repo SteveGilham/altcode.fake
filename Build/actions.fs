@@ -1,18 +1,21 @@
-open System
-open System.IO
-open System.Reflection
-open System.Xml
-open System.Xml.Linq
-open Fake.Core
-open Fake.DotNet
-open Fake.IO.FileSystemOperators
-open Fake.IO
-open Fake.IO.Globbing.Operators
-open HeyRed.MarkdownSharp
-open NUnit.Framework
-open YamlDotNet.RepresentationModel
+namespace AltCode.Fake
 
 module Actions =
+
+  open System
+  open System.IO
+  open System.Reflection
+  open System.Xml
+  open System.Xml.Linq
+  open Fake.Core
+  open Fake.DotNet
+  open Fake.IO.FileSystemOperators
+  open Fake.IO
+  open Fake.IO.Globbing.Operators
+  open HeyRed.MarkdownSharp
+  open NUnit.Framework
+  open YamlDotNet.RepresentationModel
+
   let Clean() =
     let rec clean1 depth =
       try

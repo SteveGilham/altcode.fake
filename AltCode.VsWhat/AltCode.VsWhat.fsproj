@@ -42,15 +42,12 @@
   <ItemGroup />
 
   <ItemGroup>
-    <PackageReference Include="BlackFox.VsWhere" Version="1.1.0" />
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" Condition="'$(OS)' == 'Windows_NT'">
+    <PackageReference Include="BlackFox.VsWhere" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Condition="'$(OS)' == 'Windows_NT'">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Update="FSharp.Core" Version="5.0.2" />
+    <PackageReference Include="FSharp.Core" />
   </ItemGroup>
 
 </Project>
