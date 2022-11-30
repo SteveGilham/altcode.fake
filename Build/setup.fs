@@ -17,16 +17,21 @@ module Setup =
   ()
 
   // Really bootstrap
-  let dotnetPath = "dotnet" |> Fake.Core.ProcessUtils.tryFindFileOnPath
-  let dotnetOptions (o : DotNet.Options) =
+  let dotnetPath =
+    "dotnet"
+    |> Fake.Core.ProcessUtils.tryFindFileOnPath
+
+  let dotnetOptions (o: DotNet.Options) =
     match dotnetPath with
     | Some f -> { o with DotNetCliPath = f }
     | None -> o
 
-  DotNet.restore (fun o ->
-    { o with
-        Packages = [ "./packages" ]
-        Common = dotnetOptions o.Common }) "./Build/NuGet.csproj"
+  DotNet.restore
+    (fun o ->
+      { o with
+          Packages = [ "./packages" ]
+          Common = dotnetOptions o.Common })
+    "./Build/NuGet.csproj"
 
   [<EntryPoint>]
   let private main _ = 0

@@ -47,45 +47,53 @@ type LogKind =
 /// Parameter type for Gendarme
 [<NoComparison; NoEquality; AutoSerializable(false)>]
 type Params =
-  { /// Path to gendarme.exe
-    ToolPath : string
+  {
+    /// Path to gendarme.exe
+    ToolPath: string
     /// Define the tool through FAKE 5.18 ToolType
-    ToolType : Fake.DotNet.ToolType
+    ToolType: Fake.DotNet.ToolType
     /// Working Directory
-    WorkingDirectory : string
+    WorkingDirectory: string
     /// Specify the rule sets and rule settings. Default is 'rules.xml'.
-    Configuration : string
+    Configuration: string
     /// Specify a rule set from configfile. Default is 'default'.
-    RuleSet : string
+    RuleSet: string
     /// Save the report to the specified file.
-    Log : string
+    Log: string
     /// Report type.
-    LogKind : LogKind
+    LogKind: LogKind
     /// Do not report defects listed in the specified file.
-    Ignore : string seq
+    Ignore: string seq
     /// Stop reporting after this many defects are found.
-    Limit : uint8
+    Limit: uint8
     /// True -> Show defects on the console even if Log is specified
-    Console : bool
+    Console: bool
     /// True -> Used to disable progress and other information which is normally written to stdout.
-    Quiet : bool
+    Quiet: bool
     /// When present and > 0 additional progress information is written to stdout
-    Verbosity : uint8
+    Verbosity: uint8
     /// Specify the assemblies to verify.
-    Targets : string seq
+    Targets: string seq
     /// Filter defects for the specified severity levels.
     /// Default is 'medium+'
-    Severity : Severity
+    Severity: Severity
     /// Filter defects for the specified confidence levels.
     /// Default is 'normal+'
-    Confidence : Confidence
+    Confidence: Confidence
     /// Fail the build if a defect is reported
     /// Default is true
-    FailBuildOnDefect : bool }
+    FailBuildOnDefect: bool
+  }
+
   /// Default parameters.
   static member Create() =
     { ToolPath = "gendarme"
-      ToolType = Fake.DotNet.ToolType.CreateGlobalTool().WithDefaultToolCommandName("gendarme")
+      ToolType =
+        Fake
+          .DotNet
+          .ToolType
+          .CreateGlobalTool()
+          .WithDefaultToolCommandName("gendarme")
       WorkingDirectory = String.Empty
       Configuration = String.Empty
       RuleSet = String.Empty
@@ -109,48 +117,58 @@ type Params =
 
 /// Builds the arguments for the Gendarme task
 /// [omit]
-[<System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA1308",
+[<System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization",
+                                                  "CA1308",
                                                   Justification =
                                                     "Lower-casing is safe here")>]
 let internal composeCommandLine parameters =
   let item a x =
-    if x |> String.IsNullOrWhiteSpace then [] else [ a; x ]
+    if x |> String.IsNullOrWhiteSpace then
+      []
+    else
+      [ a; x ]
 
   let itemList a x =
     if x |> isNull then
       []
     else
-      x
-      |> Seq.collect (fun i -> [ a; i ])
-      |> Seq.toList
+      x |> Seq.collect (fun i -> [ a; i ]) |> Seq.toList
 
-  let flag a predicate =
-    if predicate then [ a ] else []
+  let flag a predicate = if predicate then [ a ] else []
 
   [ item "--config" parameters.Configuration
     item "--set" parameters.RuleSet
     (match parameters.LogKind with
      | Text -> item "--log"
      | Xml -> item "--xml"
-     | _ -> item "--html") parameters.Log
+     | _ -> item "--html")
+      parameters.Log
     itemList "--ignore" parameters.Ignore
-    (if parameters.Limit > 0uy
-     then item "--limit" <| parameters.Limit.ToString(CultureInfo.InvariantCulture)
-     else [])
+    (if parameters.Limit > 0uy then
+       item "--limit"
+       <| parameters.Limit.ToString(CultureInfo.InvariantCulture)
+     else
+       [])
     flag "--console" parameters.Console
     flag "--quiet" parameters.Quiet
 
     item "--severity"
-    <| (sprintf "%A" parameters.Severity).ToLowerInvariant().Replace(" plus", "+")
-      .Replace(" minus", "-").Replace(" neutral", String.Empty)
+    <| (sprintf "%A" parameters.Severity)
+      .ToLowerInvariant()
+      .Replace(" plus", "+")
+      .Replace(" minus", "-")
+      .Replace(" neutral", String.Empty)
 
     item "--confidence"
-    <| (sprintf "%A" parameters.Confidence).ToLowerInvariant().Replace(" plus", "+")
-      .Replace(" minus", "-").Replace(" neutral", String.Empty)
+    <| (sprintf "%A" parameters.Confidence)
+      .ToLowerInvariant()
+      .Replace(" plus", "+")
+      .Replace(" minus", "-")
+      .Replace(" neutral", String.Empty)
     (if parameters.Verbosity > 0uy then
-      { 1 .. int parameters.Verbosity }
-      |> Seq.map (fun _ -> "--v")
-      |> Seq.toList
+       { 1 .. int parameters.Verbosity }
+       |> Seq.map (fun _ -> "--v")
+       |> Seq.toList
      else
        [])
 
@@ -160,9 +178,10 @@ let internal composeCommandLine parameters =
 
 let internal withWorkingDirectory parameters c =
   c
-  |> if String.IsNullOrWhiteSpace parameters.WorkingDirectory
-     then id
-     else CreateProcess.withWorkingDirectory parameters.WorkingDirectory
+  |> if String.IsNullOrWhiteSpace parameters.WorkingDirectory then
+       id
+     else
+       CreateProcess.withWorkingDirectory parameters.WorkingDirectory
 
 let internal createProcess args parameters =
   CreateProcess.fromCommand (RawCommand(parameters.ToolPath, args |> Arguments.OfArgs))
@@ -173,20 +192,23 @@ let internal createProcess args parameters =
 /// ## Parameters
 ///  - `parameters` - A Gendarme.Params value with your required settings.
 [<SuppressMessage("Gendarme.Rules.Naming",
-                    "UseCorrectCasingRule",
-                    Justification = "Fake.build style")>]
+                  "UseCorrectCasingRule",
+                  Justification = "Fake.build style")>]
 let run parameters =
-  use __ = Trace.traceTask "Gendarme" String.Empty
+  use __ =
+    Trace.traceTask "Gendarme" String.Empty
+
   let args = (composeCommandLine parameters)
 
   let command =
     createProcess args parameters
-    |> if parameters.FailBuildOnDefect then CreateProcess.ensureExitCode else id
+    |> if parameters.FailBuildOnDefect then
+         CreateProcess.ensureExitCode
+       else
+         id
     |> fun command ->
-      Trace.trace command.CommandLine
-      command
+         Trace.trace command.CommandLine
+         command
 
-  command
-  |> Proc.run
-  |> ignore
+  command |> Proc.run |> ignore
   __.MarkSuccess()
