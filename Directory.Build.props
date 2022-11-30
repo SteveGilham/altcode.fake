@@ -1,6 +1,7 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Sdk Name="DotNet.ReproducibleBuilds.Isolated" Version="1.1.1" />
   <PropertyGroup>
+    <AltCodeTag Condition="'$(AltCodeTag)' == ''">_</AltCodeTag>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
     <DisableImplicitFSharpCoreReference>true</DisableImplicitFSharpCoreReference>
     <DisableImplicitSystemValueTupleReference>true</DisableImplicitSystemValueTupleReference>
@@ -8,7 +9,7 @@
     <EnsureNETFrameworkReferenceAssembliesProvided>false</EnsureNETFrameworkReferenceAssembliesProvided>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="DotNet.ReproducibleBuilds" PrivateAssets="All"/>
+    <PackageReference Include="DotNet.ReproducibleBuilds" PrivateAssets="All" />
   </ItemGroup>
   <Import Project="$(MSBuildThisFileDirectory)\OutputBuildProps.props" />
 </Project>

@@ -63,3 +63,4 @@ RegressionTesting/issue20/xunit-tests/coverage.xml
 RegressionTesting/issue20/xunit-tests/xunit-tests.csproj
 scratch/
 **/coverage.xml
+$*/
