@@ -5,10 +5,19 @@
     <TargetFramework>net7.0</TargetFramework>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <NoWarn>MSB3243</NoWarn>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <NoWarn>MSB3243</NoWarn>
+  </PropertyGroup>
+
   <ItemGroup>
     <Compile Include="Gendarme.fs" />
     <Compile Include="actions.fs" />
     <Compile Include="targets.fs" />
+    <Compile Include="Build.fs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -29,8 +38,6 @@
     <PackageReference Include="altcover.fake" />
     <PackageReference Include="BlackFox.CommandLine" />
     <PackageReference Include="BlackFox.VsWhere" />
-    <PackageReference Include="coveralls.io" />
-    <PackageReference Include="FSharpLint.Core" />
     <PackageReference Include="Markdown" />
     <PackageReference Include="NUnit" />
     <PackageReference Include="YamlDotNet" />

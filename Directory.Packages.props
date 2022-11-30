@@ -3,8 +3,9 @@
   <ItemGroup>
     <PackageVersion Include="AltCode.Dixon" Version="2022.1.8.13182" />
     <PackageVersion Include="altcode.gendarme" Version="2022.5.17.8260" />
-    <PackageVersion Include="altcover" Version="8.4.840" />
-    <PackageVersion Include="AltCover.Api" Version="8.4.840" />
+    <PackageVersion Include="altcover" Version="8.5.841" />
+    <PackageVersion Include="AltCover.Api" Version="8.5.841" />
+    <PackageVersion Include="AltCover.Fake" Version="8.5.841" />
     <PackageVersion Include="BlackFox.CommandLine" Version="1.0.0" />
     <PackageVersion Include="BlackFox.VsWhere" Version="1.1.0" />
     <PackageVersion Include="CommunityToolkit.Diagnostics" Version="8.0.0" />
@@ -16,12 +17,24 @@
     <PackageVersion Include="Expecto.TestResults" Version="8.13.2" />
     <PackageVersion Include="FAKE.Core.Environment" Version="5.23.0" />
     <PackageVersion Include="FAKE.Core.Process" Version="5.23.0" />
+    <PackageVersion Include="FAKE.Core.Target" Version="5.23.0" />
     <PackageVersion Include="FAKE.Core.Trace" Version="5.23.0" />
+    <PackageVersion Include="FAKE.DotNet.AssemblyInfoFile" Version="5.23.0" />
     <PackageVersion Include="FAKE.DotNet.Cli" Version="5.23.0" />
+    <PackageVersion Include="FAKE.DotNet.FxCop" Version="5.23.0" />
+    <PackageVersion Include="FAKE.DotNet.MSBuild" Version="5.23.0" />
+    <PackageVersion Include="FAKE.DotNet.Nuget" Version="5.23.0" />
+    <PackageVersion Include="FAKE.DotNet.Testing.NUnit" Version="5.23.0" />
+    <PackageVersion Include="FAKE.DotNet.Testing.OpenCover" Version="5.23.0" />
+    <PackageVersion Include="FAKE.DotNet.Testing.XUnit2" Version="5.23.0" />
+    <PackageVersion Include="FAKE.IO.FileSystem" Version="5.23.0" />
+    <PackageVersion Include="FAKE.Tools.Git" Version="5.23.0" />
+    <PackageVersion Include="FAKE.Testing.ReportGenerator" Version="5.23.0" />
     <PackageVersion Include="FsCheck" Version="2.16.5" />
     <PackageVersion Include="FSharp.Core" Version="7.0.0" />
     <PackageVersion Include="FsUnit" Version="5.1.0" />
     <!-- PackageVersion Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" / -->
+    <PackageVersion Include="Markdown" Version="2.2.1" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.4.0" />
     <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="1.1.1" />
     <PackageVersion Include="Microsoft.TestPlatform.ObjectModel" Version="16.0.0" />
@@ -55,6 +68,7 @@
     <PackageVersion Include="xunit.extensibility.execution" Version="2.4.2" />
     <PackageVersion Include="xunit.runner.console" Version="2.4.2" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="2.4.5" />
+    <PackageVersion Include="YamlDotNet" Version="12.0.2" />
     <PackageVersion Include="YoloDev.Expecto.TestSdk" Version="1.0.0" />
   </ItemGroup>
 </Project>
