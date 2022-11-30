@@ -125,13 +125,13 @@ module Targets =
 
   let toolPackages =
     let xml =
-      "./Build/NuGet.csproj"
+      "./Directory.Packages.props"
       |> Path.getFullName
       |> XDocument.Load
 
-    xml.Descendants(XName.Get("PackageReference"))
+    xml.Descendants(XName.Get("PackageVersion"))
     |> Seq.map (fun x ->
-      (x.Attribute(XName.Get("Include")).Value, x.Attribute(XName.Get("version")).Value))
+      (x.Attribute(XName.Get("Include")).Value, x.Attribute(XName.Get("Version")).Value))
     |> Map.ofSeq
 
   let packageVersion (p: string) =
