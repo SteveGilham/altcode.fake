@@ -3,6 +3,7 @@ namespace AltCode.Fake
 module Actions =
 
   open System
+  open System.Collections.Generic
   open System.IO
   open System.Xml.Linq
   open Fake.Core
@@ -174,7 +175,14 @@ do ()"""
     let mapping =
       ystream.Documents.[0].RootNode :?> YamlMappingNode
 
-    string mapping.Children.[YamlScalarNode("version")]
+    let envKey =
+      mapping.Children.Keys
+      |> Seq.find (fun k -> k = YamlScalarNode("env"))
+
+    let envNode =
+      mapping.Children.[envKey] :?> YamlMappingNode
+
+    string envNode.Children.[YamlScalarNode("VERSION")]
 
   let LocalVersion civersion (version: string) =
     let now = DateTimeOffset.UtcNow

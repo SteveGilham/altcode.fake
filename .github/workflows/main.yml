@@ -1,5 +1,4 @@
 name: CI
-version: 5.23.0.{build}-pre
 
 on:
   push:
@@ -11,6 +10,9 @@ on:
   pull_request:
     branches:
     - master
+
+env:
+  VERSION: 5.23.0.{build}-pre
 
 jobs:
   windows:
