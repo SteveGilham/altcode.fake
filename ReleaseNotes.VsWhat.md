@@ -1,3 +1,6 @@
+# 22.12.1.38
+* Support for .net7.0 
+
 # 20.12.10.26
 * Use VsWhere 1.1.0 release
 * Support for .net5.0 (actually all runtimes > 2.1)

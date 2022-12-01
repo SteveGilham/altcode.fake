@@ -1,15 +1,15 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net40</TargetFramework>
+    <TargetFramework>net472</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="NuGet.CommandLine" version="5.8.0">
+    <PackageReference Include="AltCode.Dixon" />
+    <PackageReference Include="NuGet.CommandLine" >
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="coveralls.io" version="1.4.2" />
-    <PackageReference Include="NUnit.ConsoleRunner" version="3.11.1" />
+    <PackageReference Include="NUnit.ConsoleRunner" />
   </ItemGroup>
 </Project>
