@@ -660,6 +660,18 @@ module Targets =
            |> String.IsNullOrWhiteSpace
            |> not
       then
+        let maybe envvar fallback =
+          let x = Environment.environVar envvar
+
+          if String.IsNullOrWhiteSpace x then
+            fallback
+          else
+            x
+
+        let log = Information.shortlog "."
+        let gap = log.IndexOf ' '
+        let commit = log.Substring gap
+
         Actions.Run
           ("dotnet",
            "_Reports",
