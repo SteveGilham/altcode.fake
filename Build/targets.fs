@@ -125,15 +125,9 @@ module Targets =
     { o with MSBuildParams = cliArguments }
 
   let currentBranch =
-    let env =
-      Environment.environVar "APPVEYOR_REPO_BRANCH"
-
-    if env |> String.IsNullOrWhiteSpace then
-      "."
-      |> Path.getFullName
-      |> Information.getBranchName
-    else
-      env
+    "."
+    |> Path.getFullName
+    |> Information.getBranchName
 
   let packageGendarme =
     if currentBranch.Contains "VsWhat" then
@@ -258,9 +252,6 @@ module Targets =
 
   let SetVersion =
     (fun _ ->
-      let appveyor =
-        Environment.environVar "APPVEYOR_BUILD_NUMBER"
-
       let github =
         Environment.environVar "GITHUB_RUN_NUMBER"
 
@@ -275,13 +266,10 @@ module Targets =
       printfn "Raw version %s" version
 
       let ci =
-        if String.IsNullOrWhiteSpace appveyor then
-          if String.IsNullOrWhiteSpace github then
-            String.Empty
-          else
-            version.Replace("{build}", github + "-github")
+        if String.IsNullOrWhiteSpace github then
+          String.Empty
         else
-          version.Replace("{build}", appveyor)
+          version.Replace("{build}", github)
 
       let (v, majmin, y) =
         Actions.LocalVersion ci version
@@ -686,14 +674,13 @@ module Targets =
              "--commitBranch"
              Information.getBranchName (".")
              "--commitAuthor"
-             maybe "APPVEYOR_REPO_COMMIT_AUTHOR" ""
+             maybe "COMMIT_AUTHOR" "" // TODO
              "--commitEmail"
-             maybe "APPVEYOR_REPO_COMMIT_AUTHOR_EMAIL" ""
+             maybe "COMMIT_AUTHOR_EMAIL" "" //
              "--commitMessage"
              commit
              "--jobId"
-             maybe "APPVEYOR_JOB_ID"
-             <| DateTime.UtcNow.ToString("yyMMdd-HHmmss") ])
+             DateTime.UtcNow.ToString("yyMMdd-HHmmss") ])
           "Coveralls upload failed"
 
       (report @@ "Summary.xml")
@@ -944,6 +931,32 @@ module Targets =
             ReportTypes = [ ReportGenerator.ReportType.Html ]
             TargetDir = "_Reports/_BulkReport" }))
 
+  let All =
+    (fun _ ->
+      if
+        Environment.isWindows
+        && currentBranch.StartsWith "release/"
+        && "NUGET_API_TOKEN"
+           |> Environment.environVar
+           |> String.IsNullOrWhiteSpace
+           |> not
+      then
+        (!! "./_Packagin*/*.nupkg")
+        |> Seq.iter (fun f ->
+          printfn "Publishing %A from %A" f currentBranch
+
+          Actions.Run
+            ("dotnet",
+             ".",
+             [ "nuget"
+               "push"
+               f
+               "--api-key"
+               Environment.environVar "NUGET_API_TOKEN"
+               "--source"
+               "https://api.nuget.org/v3/index.json" ])
+            ("NuGet upload failed " + f)))
+
   let resetColours _ =
     Console.ForegroundColor <- consoleBefore |> fst
     Console.BackgroundColor <- consoleBefore |> snd
@@ -976,7 +989,7 @@ module Targets =
     _Target "AltCodeVsWhatGlobalIntegration" AltCodeVsWhatGlobalIntegration
     _Target "Deployment" ignore
     _Target "BulkReport" BulkReport
-    _Target "All" ignore
+    _Target "All" All
 
     // Dependencies
     "Clean" ==> "SetVersion" ==> "Preparation"
