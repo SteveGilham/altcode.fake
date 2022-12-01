@@ -1,29 +1,20 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net7.0</TargetFramework>
     <IsPackable>false</IsPackable>
     <GenerateProgramFile>false</GenerateProgramFile>
     <SolutionDir Condition="'$(SolutionDir)' == ''">$(ProjectDir)../</SolutionDir>
-    <RollForward>Major</RollForward>
-    <CheckEolTargetFramework>false</CheckEolTargetFramework>
-    <OutputPath>$(SolutionDir)_Binaries/$(AssemblyName)/$(Configuration)+$(Platform)/</OutputPath>
-    <IntermediateOutputPath>$(SolutionDir)_Intermediate/$(AssemblyName)/$(Configuration)+$(Platform)/</IntermediateOutputPath>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)'=='Debug'">
     <DefineConstants>TRACE;DEBUG;CODE_ANALYSIS;$(GlobalDefineConstants)</DefineConstants>
-    <OtherFlags>--tailcalls+</OtherFlags>
-    <WarningLevel>5</WarningLevel>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <WarningsAsErrors />
     <NoWarn>52</NoWarn>
     <MSBuildWarningsAsMessages>NU1702</MSBuildWarningsAsMessages>
   </PropertyGroup>
-  
+
   <PropertyGroup Condition="'$(Configuration)'=='Release'">
     <DefineConstants>TRACE;$(GlobalDefineConstants)</DefineConstants>
-    <OtherFlags>--keyfile:$(SolutionDir)Build\Infrastructure.snk</OtherFlags>
   </PropertyGroup>
 
   <ItemGroup>
@@ -32,14 +23,17 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="altcover" Version="7.2.801" />
-    <PackageReference Include="Expecto" Version="9.0.2" />
-    <PackageReference Include="Expecto.FsCheck" Version="9.0.2" />
-    <PackageReference Include="Expecto.VisualStudio.TestAdapter" Version="10.0.2" />
-    <PackageReference Include="FsCheck" Version="2.14.3" />
-    <PackageReference Include="FSharp.Core" Version="5.0.0" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.8.3" />
-    <PackageReference Include="YoloDev.Expecto.TestSdk" Version="0.9.2" />
+    <PackageReference Include="altcover" />
+    <PackageReference Include="Expecto" />
+    <PackageReference Include="Expecto.FsCheck" />
+    <PackageReference Include="FsCheck" />
+    <PackageReference Include="FSharp.Core" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="YoloDev.Expecto.TestSdk" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
 
   <ItemGroup>
