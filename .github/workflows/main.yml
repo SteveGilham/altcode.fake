@@ -13,6 +13,7 @@ on:
 
 env:
   VERSIONTEMPLATE: 5.23.0.{build}-pre
+  DOTNET_ROLL_FORWARD : LatestMajor
 
 jobs:
   windows:
@@ -51,9 +52,9 @@ jobs:
     - name: Tools
       run: dotnet tool restore
     - name: Setup
-      run: dotnet run --project .\Build\Setup.fsproj
+      run: dotnet run --project ./Build/Setup.fsproj
     - name: Build
-      run: dotnet run --project .\Build\Build.fsproj
+      run: dotnet run --project ./Build/Build.fsproj
     - uses: actions/upload-artifact@v2
       with:
           name: reportnix
