@@ -256,12 +256,13 @@ module Targets =
         Environment.environVar "GITHUB_RUN_NUMBER"
 
       let now = DateTimeOffset.UtcNow
+      let trailer = if currentBranch.StartsWith "release/" then String.Empty else "-pre"
 
       let version =
-        if currentBranch.Contains "VsWhat" then
+        (if currentBranch.Contains "VsWhat" then
           sprintf "%d.%d.%d.{build}" (now.Year - 2000) now.Month now.Day
-        else
-          Actions.GetVersionFromYaml()
+         else
+          Actions.GetVersionFromYaml()) + trailer
 
       printfn "Raw version %s" version
 
