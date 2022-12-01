@@ -182,7 +182,7 @@ do ()"""
     let envNode =
       mapping.Children.[envKey] :?> YamlMappingNode
 
-    string envNode.Children.[YamlScalarNode("VERSION")]
+    string envNode.Children.[YamlScalarNode("VERSIONTEMPLATE")]
 
   let LocalVersion civersion (version: string) =
     let now = DateTimeOffset.UtcNow

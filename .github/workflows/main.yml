@@ -12,7 +12,7 @@ on:
     - master
 
 env:
-  VERSION: 5.23.0.{build}-pre
+  VERSIONTEMPLATE: 5.23.0.{build}-pre
 
 jobs:
   windows:
