@@ -61,23 +61,47 @@ module Targets =
     | Some f -> { o with DotNetCliPath = f }
     | None -> o
 
+  let dotnetVersion =
+    DotNet.getVersion (fun o -> o.WithCommon dotnetOptions)
+
+  printfn "Using dotnet version %s" dotnetVersion
+
+  let dotnetInfo =
+    DotNet.exec (fun o -> dotnetOptions (o.WithRedirectOutput true)) "" "--info"
+
+  let dotnetSdkPath =
+    dotnetInfo.Results
+    |> Seq.filter (fun x -> x.IsError |> not)
+    |> Seq.map (fun x -> x.Message)
+    |> Seq.tryFind (fun x -> x.Contains "Base Path:")
+    |> Option.map (fun x -> x.Replace("Base Path:", "").TrimStart())
+
+  let refdir =
+    dotnetSdkPath
+    |> Option.map (fun path -> path @@ "ref")
+
   let nugetCache =
     Path.Combine(
       Environment.GetFolderPath Environment.SpecialFolder.UserProfile,
       ".nuget/packages"
     )
 
-  let fxcop =
+  let (fxcop, dixon) =
     if Environment.isWindows then
-      BlackFox.VsWhere.VsInstances.getAll ()
-      |> Seq.filter (fun i -> System.Version(i.InstallationVersion).Major = 16)
-      |> Seq.map (fun i ->
-        i.InstallationPath
-        @@ "Team Tools/Static Analysis Tools/FxCop/FxCopCmd.exe")
-      |> Seq.filter File.Exists
-      |> Seq.tryHead
+      let expect =
+        "./packages/fxcop/FxCopCmd.exe"
+        |> Path.getFullName
+
+      if File.Exists expect then
+        (Some expect,
+         Some(
+           "./packages/fxcop/DixonCmd.exe"
+           |> Path.getFullName
+         ))
+      else
+        (None, None)
     else
-      None
+      (None, None)
 
   let cliArguments =
     { MSBuild.CliArguments.Create() with
@@ -129,7 +153,8 @@ module Targets =
       |> Path.getFullName
       |> XDocument.Load
 
-    xml.Descendants(XName.Get("PackageVersion"))
+    xml.Descendants()
+    |> Seq.filter (fun x -> x.Attribute(XName.Get("Include")) |> isNull |> not)
     |> Seq.map (fun x ->
       (x.Attribute(XName.Get("Include")).Value, x.Attribute(XName.Get("Version")).Value))
     |> Map.ofSeq
@@ -198,6 +223,25 @@ module Targets =
 
   let infoV =
     Information.showName "." commitHash
+
+  let withTestEnvironment l (o: DotNet.TestOptions) =
+    let before = o.Environment |> Map.toList
+
+    let after =
+      [ l; before ] |> List.concat |> Map.ofList
+
+    o.WithEnvironment after
+
+  let withAltCoverOptions
+    (prepare: Abstract.IPrepareOptions)
+    (collect: Abstract.ICollectOptions)
+    (force: DotNet.ICLIOptions)
+    (o: DotNet.TestOptions)
+    =
+    if dotnetVersion <> "7.0.100" then
+      o.WithAltCoverOptions prepare collect force
+    else
+      withTestEnvironment (DotNet.ToTestPropertiesList prepare collect force) o
 
   printfn "Build at %A" infoV
 
@@ -387,6 +431,21 @@ module Targets =
 
       Directory.ensure "./_Reports"
 
+      let dd =
+        toolPackages
+        |> Map.toSeq
+        |> Seq.map (fun (k, v) -> k.ToLowerInvariant(), v)
+        |> Map.ofSeq
+
+      printfn "%A" dd
+
+      let ddItem x =
+        try
+          dd.Item x
+        with _ ->
+          printfn "Failed to get %A" x
+          reraise ()
+
       [ ([ "_Binaries/AltCode.Fake.DotNet.Gendarme/Debug+AnyCPU/netstandard2.0/AltCode.Fake.DotNet.Gendarme.dll" ],
          [],
          [ "-Microsoft.Design#CA1006"
@@ -405,7 +464,25 @@ module Targets =
         |> FxCop.run
              { FxCop.Params.Create() with
                  WorkingDirectory = "."
-                 ToolPath = Option.get fxcop
+                 ToolPath = Option.get dixon
+                 PlatformDirectory = Option.get refdir
+                 DependencyDirectories =
+                   [ nugetCache
+                     @@ "fake.core.process/"
+                        + (ddItem "fake.core.process")
+                        + "/lib/netstandard2.0"
+                     nugetCache
+                     @@ "fake.core.trace/"
+                        + (ddItem "fake.core.trace")
+                        + "/lib/netstandard2.0"
+                     nugetCache
+                     @@ "fake.dotnet.cli/"
+                        + (ddItem "fake.dotnet.cli")
+                        + "/lib/netstandard2.0"
+                     nugetCache
+                     @@ "fsharp.core/"
+                        + (ddItem "fsharp.core")
+                        + "/lib/netstandard2.0" ]
                  UseGAC = true
                  Verbose = false
                  ReportFileName = "_Reports/FxCopReport.xml"
@@ -506,7 +583,8 @@ module Targets =
                //printfn "Test arguments : '%s'" (DotNet.ToTestArguments prepare collect forceTrue)
 
                let t =
-                 DotNet.TestOptions.Create().WithAltCoverOptions prepare collect forceTrue
+                 DotNet.TestOptions.Create()
+                 |> (withAltCoverOptions prepare collect forceTrue)
 
                printfn "WithAltCoverParameters returned '%A'" t.Common.CustomParams
 
@@ -524,10 +602,9 @@ module Targets =
                try
                  DotNet.test
                    (fun to' ->
-                     { to'.WithCommon(setBaseOptions).WithAltCoverOptions
-                         prepare
-                         collect
-                         forceTrue with MSBuildParams = cliArguments })
+                     { (to'.WithCommon(setBaseOptions)
+                        |> (withAltCoverOptions prepare collect forceTrue)) with
+                         MSBuildParams = cliArguments })
                    test
                with x ->
                  printfn "%A" x
@@ -583,14 +660,28 @@ module Targets =
            |> String.IsNullOrWhiteSpace
            |> not
       then
-        let coveralls =
-          ("./packages/"
-           + (packageVersion "coveralls.io")
-           + "/tools/coveralls.net.exe")
-          |> Path.getFullName
-
         Actions.Run
-          (coveralls, "_Reports", [ "--opencover"; coverage; "--debug" ])
+          ("dotnet",
+           "_Reports",
+           [ "csmacnz.Coveralls"
+             "--opencover"
+             "-i"
+             coverage
+             "--repoToken"
+             Environment.environVar "COVERALLS_REPO_TOKEN"
+             "--commitId"
+             commitHash
+             "--commitBranch"
+             Information.getBranchName (".")
+             "--commitAuthor"
+             maybe "APPVEYOR_REPO_COMMIT_AUTHOR" ""
+             "--commitEmail"
+             maybe "APPVEYOR_REPO_COMMIT_AUTHOR_EMAIL" ""
+             "--commitMessage"
+             commit
+             "--jobId"
+             maybe "APPVEYOR_JOB_ID"
+             <| DateTime.UtcNow.ToString("yyMMdd-HHmmss") ])
           "Coveralls upload failed"
 
       (report @@ "Summary.xml")
