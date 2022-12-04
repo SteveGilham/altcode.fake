@@ -1,3 +1,5 @@
 # Ignore interfaces (documentation annotations)
 *.fsi
 Abstract.fs
+*.AssemblyAttributes.fs
+*/_Generated/*.fs

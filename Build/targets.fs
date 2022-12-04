@@ -240,8 +240,20 @@ module Targets =
   printfn "Build at %A" infoV
 
   let _Target s f =
+    let doTarget s f =
+      let banner x =
+        printfn ""
+        printfn " ****************** %s ******************" s
+        f x
+
+      Target.create s banner
+
     Target.description s
-    Target.create s f
+    doTarget s f
+
+    let s2 = "Replay" + s
+    Target.description s2
+    doTarget s2 f
 
   // Preparation
 
@@ -257,11 +269,18 @@ module Targets =
 
       let now = DateTimeOffset.UtcNow
 
-      let version =
-        if currentBranch.Contains "VsWhat" then
-          sprintf "%d.%d.%d.{build}" (now.Year - 2000) now.Month now.Day
+      let trailer =
+        if currentBranch.StartsWith "release/" then
+          String.Empty
         else
-          Actions.GetVersionFromYaml()
+          "-pre"
+
+      let version =
+        (if currentBranch.Contains "VsWhat" then
+           sprintf "%d.%d.%d.{build}" (now.Year - 2000) now.Month now.Day
+         else
+           Actions.GetVersionFromYaml())
+        + trailer
 
       printfn "Raw version %s" version
 
@@ -696,13 +715,11 @@ module Targets =
       let gendarmeDir =
         Path.getFullName "_Binaries/AltCode.Fake.DotNet.Gendarme/Release+AnyCPU"
 
-      let packable =
-        Path.getFullName "./_Binaries/README.html"
-
       let gendarmeFiles =
         [ (Path.getFullName "./LICENS*", Some "", None)
           (Path.getFullName "./Build/AltCode.Fake_128.*g", Some "", None)
-          (packable, Some "", None) ]
+          (Path.getFullName "./Build/README.Fake.md", Some "", None)
+          (Path.getFullName "./_Binaries/README.Fake.html", Some "", None) ]
 
       let gendarmeNetcoreFiles =
         (!!(gendarmeDir
@@ -730,7 +747,8 @@ module Targets =
       let whatPack =
         [ (Path.getFullName "./LICENS*", Some "", None)
           (Path.getFullName "./Build/AltCode.VsWhat_128.*g", Some "", None)
-          (packable, Some "", None) ]
+          (Path.getFullName "./Build/README.What.md", Some "", None)
+          (Path.getFullName "./_Binaries/README.What.html", Some "", None) ]
 
       [ (List.concat [ gendarmeFiles; gendarmeNetcoreFiles ],
          packageGendarme,
@@ -801,18 +819,23 @@ module Targets =
          "./_Generated/altcode.fake.dotnet.gendarme.nuspec",
          "AltCode.Fake.DotNet.Gendarme (FAKE task helper)",
          None,
-         Some "FAKE build Gendarme")
+         Some "FAKE build Gendarme",
+         "README.Fake.md")
         ("DotnetTool",
          "./_Generated/altcode.vswhat.nuspec",
          "AltCode.VsWhat (Visual Studio package listing tool)",
          Some "Build/AltCode.VsWhat_128.png",
-         Some "Visual Studio") ]
-      |> List.iter (fun (ptype, path, caption, icon, tags) ->
+         Some "Visual Studio",
+         "README.What.md") ]
+      |> List.iter (fun (ptype, path, caption, icon, tags, readme) ->
         let x s =
           XName.Get(s, "http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd")
 
         let dotnetNupkg =
           XDocument.Load "./Build/AltCode.Fake.nuspec"
+
+        dotnetNupkg.Descendants(x "readme")
+        |> Seq.iter (fun hint -> hint.SetValue readme)
 
         let title =
           dotnetNupkg.Descendants(x "title") |> Seq.head
@@ -857,12 +880,16 @@ module Targets =
 
   let PrepareReadMe =
     (fun _ ->
-      Actions.PrepareReadMe(
-        (Copyright.Value)
+      let c =
+        Copyright
+          .Value
           .Replace("©", "&#xa9;")
           .Replace("<", "&lt;")
           .Replace(">", "&gt;")
-      ))
+
+      [ "./Build/README.Fake.md"
+        "./Build/README.What.md" ]
+      |> Seq.iter (Actions.PrepareReadMe c))
 
   // Post-packaging deployment touch test
 
