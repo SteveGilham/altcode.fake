@@ -246,8 +246,8 @@ do ()"""
   let RunDotnet (o: DotNet.Options -> DotNet.Options) cmd args msg =
     DotNet.exec o cmd args |> (HandleResults msg)
 
-  let PrepareReadMe packingCopyright =
-    let readme = Path.getFullName "README.md"
+  let PrepareReadMe packingCopyright file =
+    let readme = Path.getFullName file
     let document = File.ReadAllText readme
     let markdown = Markdown()
 
@@ -312,6 +312,11 @@ a:hover {color: #ecc;}
       | _ -> ())
 
     let packable =
-      Path.getFullName "./_Binaries/README.html"
+      Path.getFullName (
+        file
+          .Replace("Build", "_Binaries")
+          .Replace("md", "html")
+      )
+    printfn "packable %A" packable
 
     xmlform.Save packable

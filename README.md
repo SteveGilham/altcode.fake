@@ -3,7 +3,7 @@ FAKE helper code that I've written as a side-effect of other projects
 
 ## What's in the box?
 
-For FAKE >= 5.19.1 or later for .net framework and .net core
+For FAKE >= 5.23.0 or later for .net core
 
 * [`AltCode.Fake.DotNet.Gendarme` ![Nuget](https://buildstats.info/nuget/AltCode.Fake.DotNet.Gendarme)](http://nuget.org/packages/altcode.fake.dotnet.gendarme), a gendarme helper along the lines of the FxCop task `Fake.DotNet.FxCop`
 
@@ -17,9 +17,9 @@ DotNet global tools
 ## Continuous Integration
 
 
-| | | |
-| --- | --- | --- |
-| **Build**  | <sup>GitHub</sup> [![Build status](https://github.com/SteveGilham/altcode.fake/workflows/CI/badge.svg)](https://github.com/SteveGilham/altcover/altcode.fake?query=workflow%3ACI)[![Build history](https://buildstats.info/github/chart/SteveGilham/altcode.fake?branch=master)](https://github.com/SteveGilham/altcode.fake/actions?query=workflow%3ACI)| <sup>AppVeyor</sup> [![Build status](https://img.shields.io/appveyor/ci/SteveGilham/altcode-fake/master.svg)](https://ci.appveyor.com/project/SteveGilham/altcode-fake) ![Build history](https://buildstats.info/appveyor/chart/SteveGilham/altcode-fake?branch=master) |
+| | |
+| --- | --- |
+| **Build**  | <sup>GitHub</sup> [![Build status](https://github.com/SteveGilham/altcode.fake/workflows/CI/badge.svg)](https://github.com/SteveGilham/altcover/altcode.fake?query=workflow%3ACI)[![Build history](https://buildstats.info/github/chart/SteveGilham/altcode.fake?branch=master)](https://github.com/SteveGilham/altcode.fake/actions?query=workflow%3ACI)|
 | **Unit Test coverage** | <sup>Coveralls</sup> [![Coverage Status](https://coveralls.io/repos/github/SteveGilham/altcode.fake/badge.svg?branch=master)](https://coveralls.io/github/SteveGilham/altcode.fake?branch=master) |
 
 ## Usage
@@ -35,7 +35,7 @@ See the [Wiki page](https://github.com/SteveGilham/altcode.fake/wiki) for detail
 
 It is assumed that the following are available
 
-.net core SDK 5.0.100 or later (`dotnet`) -- try https://www.microsoft.com/net/download  
+.net core SDK 7.0.100 or later (`dotnet`) -- try https://www.microsoft.com/net/download  
 
 #### Windows
 
@@ -47,17 +47,16 @@ It is assumed that the latest `mono`, and `dotnet` are on the `PATH` already, an
 
 ### Bootstrapping
 
-Start by setting up `dotnet fake` with `dotnet tool restore`
-Then `dotnet fake run ./Build/setup.fsx` to do the rest of the set-up.
+Start by setting up `required tools with `dotnet tool restore`
+Then `dotnet run --project ./Build/Setup.fsproj` to do the rest of the set-up.
 
 ### Normal builds
 
-Running `dotnet fake run ./Build/build.fsx` performs a full build/test/package process.
+Running `dotnet run --project ./Build/Build.fsproj` performs a full build/test/package process.
 
-Use `dotnet fake run ./Build/build.fsx --target <targetname>` to run to a specific target.
+Use `dotnet run --project ./Build/Build.fsproj --target <targetname>` to run to a specific target.
 
 
 ## Thanks to
 
-* [AppVeyor](https://ci.appveyor.com/project/SteveGilham/altcode-fake) for allowing free build CI services for Open Source projects
 * [Coveralls](https://coveralls.io/r/SteveGilham/altcode.fake) for allowing free services for Open Source projects
