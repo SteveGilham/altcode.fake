@@ -2,7 +2,7 @@
 * Formal release of .net7.0, Fake ≥ 5.23.0 support
 
 # 5.23.0.39-pre
-* Support for 
+* Support for .net7.0
 * Support only Fake ≥ 5.23.0
 
 # 5.19.1.28
