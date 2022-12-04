@@ -1,3 +1,6 @@
+# 22.12.4.41
+* No functional change since 22.12.1.38; testing new release bundling 
+
 # 22.12.1.38
 * Support for .net7.0 
 
