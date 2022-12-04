@@ -15,6 +15,7 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>@description@</description>
     <releaseNotes>@releaseNotes@</releaseNotes>
+    <readme>Nonesuch.md</readme>
     <copyright>@copyright@</copyright>
     <tags>FAKE build</tags>
     @dependencies@

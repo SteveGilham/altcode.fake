@@ -9,7 +9,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BuildItems", "BuildItems", 
 	ProjectSection(SolutionItems) = preProject
 		Build\actions.fsx = Build\actions.fsx
 		Build\AltCode.Fake.nuspec = Build\AltCode.Fake.nuspec
-		appveyor.yml = appveyor.yml
 		Build\build.fsx = Build\build.fsx
 		Directory.Build.props = Directory.Build.props
 		Directory.Build.targets = Directory.Build.targets
