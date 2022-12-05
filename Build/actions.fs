@@ -56,6 +56,9 @@ module Actions =
           @@ "coverage.opencover.xml")
         |> Seq.iter File.Delete
 
+        !!(@"./**/InternalTrace.*.log")
+        |> Seq.iter File.Delete
+
         let temp = Environment.environVar "TEMP"
 
         if not <| String.IsNullOrWhiteSpace temp then
