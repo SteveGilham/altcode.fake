@@ -2,7 +2,7 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <PackageVersion Include="AltCode.Dixon" Version="2022.1.8.13182" />
-    <PackageVersion Include="altcode.gendarme" Version="2022.5.17.8260" />
+    <PackageVersion Include="altcode.gendarme" Version="2022.12.6.7345" />
     <PackageVersion Include="altcover" Version="8.5.841" />
     <PackageVersion Include="AltCover.Api" Version="8.5.841" />
     <PackageVersion Include="AltCover.Fake" Version="8.5.841" />
