@@ -61,11 +61,6 @@ module Targets =
     | Some f -> { o with DotNetCliPath = f }
     | None -> o
 
-  let dotnetVersion =
-    DotNet.getVersion (fun o -> o.WithCommon dotnetOptions)
-
-  printfn "Using dotnet version %s" dotnetVersion
-
   let dotnetInfo =
     DotNet.exec (fun o -> dotnetOptions (o.WithRedirectOutput true)) "" "--info"
 
@@ -217,25 +212,6 @@ module Targets =
 
   let infoV =
     Information.showName "." commitHash
-
-  let withTestEnvironment l (o: DotNet.TestOptions) =
-    let before = o.Environment |> Map.toList
-
-    let after =
-      [ l; before ] |> List.concat |> Map.ofList
-
-    o.WithEnvironment after
-
-  let withAltCoverOptions
-    (prepare: Abstract.IPrepareOptions)
-    (collect: Abstract.ICollectOptions)
-    (force: DotNet.ICLIOptions)
-    (o: DotNet.TestOptions)
-    =
-    if dotnetVersion <> "7.0.100" then
-      o.WithAltCoverOptions prepare collect force
-    else
-      withTestEnvironment (DotNet.ToTestPropertiesList prepare collect force) o
 
   printfn "Build at %A" infoV
 
@@ -590,8 +566,7 @@ module Targets =
                //printfn "Test arguments : '%s'" (DotNet.ToTestArguments prepare collect forceTrue)
 
                let t =
-                 DotNet.TestOptions.Create()
-                 |> (withAltCoverOptions prepare collect forceTrue)
+                 DotNet.TestOptions.Create().WithAltCoverOptions prepare collect forceTrue
 
                printfn "WithAltCoverParameters returned '%A'" t.Common.CustomParams
 
@@ -609,9 +584,10 @@ module Targets =
                try
                  DotNet.test
                    (fun to' ->
-                     { (to'.WithCommon(setBaseOptions)
-                        |> (withAltCoverOptions prepare collect forceTrue)) with
-                         MSBuildParams = cliArguments })
+                     { (to'.WithCommon(setBaseOptions).WithAltCoverOptions
+                         prepare
+                         collect
+                         forceTrue) with MSBuildParams = cliArguments })
                    test
                with x ->
                  printfn "%A" x
