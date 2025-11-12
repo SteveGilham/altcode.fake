@@ -740,8 +740,8 @@ module Targets =
          []) ]
       |> List.iter
         (fun (files, output, nuspec, project, description, what, dependencies) ->
-          let outputPath = "./" + output
-          let workingDir = "./_Binaries/" + output
+          let outputPath = Path.getFullName("./" + output)
+          let workingDir = Path.getFullName("./_Binaries/" + output)
 
           Directory.ensure workingDir
           printfn "Ensured working dir %A %A" workingDir (Directory.Exists workingDir)
