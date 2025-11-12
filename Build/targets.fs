@@ -350,6 +350,10 @@ module Targets =
 
       let doLint f =
         CreateProcess.fromRawCommand "dotnet" [ "fsharplint"; "lint"; "-l"; cfg; f ]
+        |> CreateProcess.setEnvironmentVariable "DOTNET_ROLL_FORWARD" "Major"
+        |> CreateProcess.setEnvironmentVariable
+          "DOTNET_ROLL_FORWARD_ON_NO_CANDIDATE_FX"
+          "2"
         |> CreateProcess.ensureExitCodeWithMessage "Lint issues were found"
         |> Proc.run
 
@@ -358,28 +362,16 @@ module Targets =
       let throttle x =
         Async.Parallel(x, System.Environment.ProcessorCount)
 
-      let demo = Path.getFullName "./Demo"
-
-      let regress =
-        Path.getFullName "./RegressionTesting"
-
-      let sample = Path.getFullName "./Samples"
-
       let underscore = Path.getFullName "./_"
 
       let failOnIssuesFound (issuesFound: bool) =
         Assert.That(issuesFound, Is.False, "Lint issues were found")
 
-      [ !!"./**/*.fsproj"
-        |> Seq.sortBy (Path.GetFileName)
-        |> Seq.filter (fun f ->
-          ((f.Contains demo)
-           || (f.Contains regress)
-           || (f.Contains underscore)
-           || (f.Contains sample))
-          |> not)
-        !!"./Build/*.fsx" |> Seq.map Path.GetFullPath ]
-      |> Seq.concat
+      !!"./**/*.fs"
+      |> Seq.sortBy (Path.GetFileName)
+      |> Seq.filter (fun f -> ((f.Contains underscore) |> not))
+      //      |> Seq.map (fun f -> printfn "Linting %A" f
+      //                           (doLint f).ExitCode)
       |> Seq.map doLintAsync
       |> throttle
       |> Async.RunSynchronously
@@ -978,7 +970,7 @@ module Targets =
     _Target "BuildRelease" BuildRelease
     _Target "BuildDebug" BuildDebug
     _Target "Analysis" ignore
-    _Target "Lint" ignore // Lint
+    _Target "Lint" Lint
     _Target "Gendarme" Gendarme
     _Target "FxCop" FxCop
     _Target "UnitTest" UnitTest

@@ -171,7 +171,7 @@ do ()"""
       )
 
     use yreader = new StreamReader(yaml)
-    let ystream = new YamlStream()
+    let ystream = YamlStream()
     ystream.Load(yreader)
 
     let mapping =
