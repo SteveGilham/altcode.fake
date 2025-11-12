@@ -742,11 +742,8 @@ module Targets =
         (fun (files, output, nuspec, project, description, what, dependencies) ->
           let outputPath = "./" + output
           let workingDir = "./_Binaries/" + output
-
           Directory.ensure workingDir
-          printfn "Ensured working dir %A %A" workingDir (Directory.Exists workingDir)
           Directory.ensure outputPath
-          printfn "Ensured output path %A %A" outputPath (Directory.Exists outputPath)
 
           NuGet
             (fun p ->
