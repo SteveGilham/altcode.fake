@@ -535,7 +535,7 @@ module Targets =
         !!(@"./**/*.Tests.fsproj")
         |> Seq.fold
           (fun l test ->
-            printfn "%A" test
+            printfn "testing :: %A" test
 
             let tname =
               test |> Path.GetFileNameWithoutExtension
@@ -546,6 +546,11 @@ module Targets =
             let altReport =
               reports
               @@ ("UnitTestWithAltCoverCoreRunner." + tname + ".xml")
+
+            let setBaseOptions (o: DotNet.Options) =
+              { o with
+                  WorkingDirectory = Path.getFullName testDirectory
+                  Verbosity = Some DotNet.Verbosity.Minimal }
 
             let collect =
               AltCover.CollectOptions.Primitive(Primitive.CollectOptions.Create()) // FSApi
@@ -561,29 +566,23 @@ module Targets =
             //printfn "Test arguments : '%s'" (DotNet.ToTestArguments prepare collect forceTrue)
 
             let t =
-              DotNet.TestOptions.Create().WithAltCoverOptions prepare collect forceTrue
+              DotNet.TestOptions.Create().WithCommon(setBaseOptions).WithAltCoverOptions
+                prepare
+                collect
+                forceTrue
 
-            printfn "WithAltCoverParameters returned '%A'" t.Common.CustomParams
-
-            let setBaseOptions (o: DotNet.Options) =
-              { o with
-                  WorkingDirectory = Path.getFullName testDirectory
-                  Verbosity = Some DotNet.Verbosity.Minimal }
-
-            let cliArguments =
-              { MSBuild.CliArguments.Create() with
-                  ConsoleLogParameters = []
-                  DistributedLoggers = None
-                  DisableInternalBinLog = true }
+            printfn "WithAltCoverParameters returned '%A'" t.MSBuildParams.Properties
 
             try
               DotNet.test
                 (fun to' ->
-                  { (to'.WithCommon(setBaseOptions).WithAltCoverOptions
-                      prepare
-                      collect
-                      forceTrue) with
-                      MSBuildParams = cliArguments })
+                  { (to'.WithCommon(setBaseOptions)) with
+                      Framework = Some "net10.0"
+                      MSBuildParams = cliArguments }
+                    .WithAltCoverOptions
+                    prepare
+                    collect
+                    forceTrue)
                 test
             with x ->
               printfn "%A" x
