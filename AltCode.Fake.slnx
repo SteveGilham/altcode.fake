@@ -1,0 +1,29 @@
+<Solution>
+  <Folder Name="/BuildItems/">
+    <File Path=".config/dotnet-tools.json" />
+    <File Path=".github/workflows/main.yml" />
+    <File Path="Build/actions.fs" />
+    <File Path="Build/AltCode.Fake.nuspec" />
+    <File Path="Build/Build.fs" />
+    <File Path="Build/rules-fake.xml" />
+    <File Path="Build/setup.fs" />
+    <File Path="Build/targets.fs" />
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Build.targets" />
+    <File Path="Directory.Packages.props" />
+    <File Path="OutputBuildProps.props" />
+    <File Path="OutputBuildTargets.props" />
+    <File Path="README.md" />
+    <File Path="ReleaseNotes.Gendarme.md" />
+    <File Path="ReleaseNotes.VsWhat.md" />
+    <Project Path="Build/NuGet.csproj">
+      <Build Project="false" />
+    </Project>
+  </Folder>
+  <Project Path="AltCode.Fake.DotNet.Gendarme/AltCode.Fake.DotNet.Gendarme.fsproj" />
+  <Project Path="AltCode.Fake.Tests/AltCode.Fake.Tests.fsproj">
+    <Build Solution="Release|*" Project="false" />
+  </Project>
+  <Project Path="AltCode.Nuget.Placeholder/AltCode.Nuget.Placeholder.fsproj" />
+  <Project Path="AltCode.VsWhat/AltCode.VsWhat.fsproj" />
+</Solution>

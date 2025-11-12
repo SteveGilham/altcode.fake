@@ -1,8 +1,10 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <PropertyGroup>
-    <AltCodeTag>$</AltCodeTag>
-    <OutputType>Exe</OutputType>
-    <TargetFramework>net7.0</TargetFramework>
-  </PropertyGroup>
-  <Import Project="$(MSBuildThisFileDirectory)\..\Directory.Build.props" />
+	<PropertyGroup>
+		<AltCodeTag>$</AltCodeTag>
+		<OutputType>Exe</OutputType>
+		<TargetFramework>net10.0</TargetFramework>
+		<!-- Suppress security warnings about indirect reference 'System.Security.Cryptography.Xml' 4.7.0 -->
+		<NoWarn>$(NoWarn);NU1902</NoWarn>
+	</PropertyGroup>
+	<Import Project="$(MSBuildThisFileDirectory)\..\Directory.Build.props" />
 </Project>

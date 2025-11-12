@@ -18,8 +18,7 @@ module Actions =
   let Clean () =
     let rec clean1 depth =
       try
-        (DirectoryInfo ".")
-          .GetDirectories("*", SearchOption.AllDirectories)
+        (DirectoryInfo ".").GetDirectories("*", SearchOption.AllDirectories)
         |> Seq.filter (fun x ->
           x.Name.StartsWith "_"
           || x.Name = "bin"
@@ -172,7 +171,7 @@ do ()"""
       )
 
     use yreader = new StreamReader(yaml)
-    let ystream = new YamlStream()
+    let ystream = YamlStream()
     ystream.Load(yreader)
 
     let mapping =
@@ -315,11 +314,7 @@ a:hover {color: #ecc;}
       | _ -> ())
 
     let packable =
-      Path.getFullName (
-        file
-          .Replace("Build", "_Binaries")
-          .Replace("md", "html")
-      )
+      Path.getFullName (file.Replace("Build", "_Binaries").Replace("md", "html"))
 
     printfn "packable %A" packable
 

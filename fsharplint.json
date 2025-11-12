@@ -27,7 +27,7 @@
     },
     "conventions": {
         "recursiveAsyncFunction": { "enabled": false },
-        "redundantNewKeyword": { "enabled": false },
+        "redundantNewKeyword": { "enabled": true },
         "nestedStatements": {
             "enabled": false,
             "config": {
@@ -258,10 +258,7 @@
     },
     "typography": {
         "indentation": { 
-            "enabled": false,
-            "config": {
-                "numberOfIndentationSpaces": 4
-            }
+            "enabled": false
         },
         "maxCharactersOnLine": { 
             "enabled": false,
