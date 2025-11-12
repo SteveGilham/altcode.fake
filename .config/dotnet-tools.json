@@ -3,28 +3,46 @@
   "isRoot": true,
   "tools": {
     "dotnet-reportgenerator-globaltool": {
-      "version": "5.1.12",
+      "version": "5.5.0",
       "commands": [
         "reportgenerator"
-      ]
+      ],
+      "rollForward": false
     },
     "altcode.gendarme-tool": {
-      "version": "2022.12.6.7345",
+      "version": "2024.6.28.12460",
       "commands": [
         "gendarme"
-      ]
+      ],
+      "rollForward": false
     },
     "dotnet-fsharplint": {
-      "version": "0.21.3",
+      "version": "0.26.4",
       "commands": [
         "dotnet-fsharplint"
-      ]
+      ],
+      "rollForward": false
     },
     "coveralls.net": {
       "version": "4.0.1",
       "commands": [
         "csmacnz.Coveralls"
-      ]
+      ],
+      "rollForward": false
+    },
+    "xmldocmd": {
+      "version": "2.9.0",
+      "commands": [
+        "xmldocmd"
+      ],
+      "rollForward": false
+    },
+    "nbgv": {
+      "version": "3.9.50",
+      "commands": [
+        "nbgv"
+      ],
+      "rollForward": false
     }
   }
 }

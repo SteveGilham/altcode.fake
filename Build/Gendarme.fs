@@ -89,11 +89,7 @@ type Params =
   static member Create() =
     { ToolPath = "gendarme"
       ToolType =
-        Fake
-          .DotNet
-          .ToolType
-          .CreateGlobalTool()
-          .WithDefaultToolCommandName("gendarme")
+        Fake.DotNet.ToolType.CreateGlobalTool().WithDefaultToolCommandName("gendarme")
       WorkingDirectory = String.Empty
       Configuration = String.Empty
       RuleSet = String.Empty
@@ -169,7 +165,7 @@ let internal composeCommandLine parameters =
       .Replace(" minus", "-")
       .Replace(" neutral", String.Empty)
     (if parameters.Verbosity > 0uy then
-       { 1 .. int parameters.Verbosity }
+       seq { 1 .. int parameters.Verbosity }
        |> Seq.map (fun _ -> "--v")
        |> Seq.toList
      else
@@ -210,8 +206,8 @@ let run parameters =
        else
          id
     |> fun command ->
-         Trace.trace command.CommandLine
-         command
+        Trace.trace command.CommandLine
+        command
 
   command |> Proc.run |> ignore
   __.MarkSuccess()

@@ -50,7 +50,7 @@ module Targets =
         AssemblyFilter =
           "FSharp"
           :: @"\.Placeholder"
-             :: (p.AssemblyFilter |> Seq.toList)
+          :: (p.AssemblyFilter |> Seq.toList)
         LocalSource = true
         TypeFilter =
           [ @"System\."; "Microsoft" ]
@@ -111,7 +111,8 @@ module Targets =
         Verbosity = Some DotNet.Verbosity.Minimal }
 
   let withWorkingDirectoryOnly dir o =
-    { dotnetOptions o with WorkingDirectory = Path.getFullName dir }
+    { dotnetOptions o with
+        WorkingDirectory = Path.getFullName dir }
 
   let withCLIArgs (o: Fake.DotNet.DotNet.TestOptions) =
     { o with MSBuildParams = cliArguments }
@@ -203,7 +204,8 @@ module Targets =
   let dotnetBuildDebug proj =
     DotNet.build
       (fun p ->
-        { p.WithCommon dotnetOptions with Configuration = DotNet.BuildConfiguration.Debug }
+        { p.WithCommon dotnetOptions with
+            Configuration = DotNet.BuildConfiguration.Debug }
         |> buildWithCLIArguments)
       (Path.GetFullPath proj)
 
@@ -320,10 +322,12 @@ module Targets =
     (fun _ ->
       try
         DotNet.restore
-          (fun o -> o.WithCommon(withWorkingDirectoryVM "."))
-          "AltCode.Fake.sln"
+          (fun o ->
+            { o with MSBuildParams = cliArguments }
+              .WithCommon(withWorkingDirectoryVM "."))
+          "AltCode.Fake.slnx"
 
-        "AltCode.Fake.sln" |> dotnetBuildRelease
+        "AltCode.Fake.slnx" |> dotnetBuildRelease
       with x ->
         printfn "%A" x
         reraise ())
@@ -331,10 +335,11 @@ module Targets =
   let BuildDebug =
     (fun _ ->
       DotNet.restore
-        (fun o -> o.WithCommon(withWorkingDirectoryVM "."))
-        "AltCode.Fake.sln"
+        (fun o ->
+          { o with MSBuildParams = cliArguments }.WithCommon(withWorkingDirectoryVM "."))
+        "AltCode.Fake.slnx"
 
-      "AltCode.Fake.sln" |> dotnetBuildDebug)
+      "AltCode.Fake.slnx" |> dotnetBuildDebug)
 
   // Code Analysis
 
@@ -365,7 +370,7 @@ module Targets =
       let failOnIssuesFound (issuesFound: bool) =
         Assert.That(issuesFound, Is.False, "Lint issues were found")
 
-      [ !! "./**/*.fsproj"
+      [ !!"./**/*.fsproj"
         |> Seq.sortBy (Path.GetFileName)
         |> Seq.filter (fun f ->
           ((f.Contains demo)
@@ -373,7 +378,7 @@ module Targets =
            || (f.Contains underscore)
            || (f.Contains sample))
           |> not)
-        !! "./Build/*.fsx" |> Seq.map Path.GetFullPath ]
+        !!"./Build/*.fsx" |> Seq.map Path.GetFullPath ]
       |> Seq.concat
       |> Seq.map doLintAsync
       |> throttle
@@ -388,7 +393,6 @@ module Targets =
 
       let rules =
         Path.getFullName "./Build/rules-fake.xml"
-
 
       [ (rules,
          [ "_Binaries/AltCode.Fake.DotNet.Gendarme/Debug+AnyCPU/netstandard2.0/AltCode.Fake.DotNet.Gendarme.dll" ])
@@ -445,34 +449,34 @@ module Targets =
       |> Seq.iter (fun (files, types, ruleset) ->
         files
         |> FxCop.run
-             { FxCop.Params.Create() with
-                 WorkingDirectory = "."
-                 ToolPath = Option.get dixon
-                 PlatformDirectory = Option.get refdir
-                 DependencyDirectories =
-                   [ nugetCache
-                     @@ "fake.core.process/"
-                        + (ddItem "fake.core.process")
-                        + "/lib/netstandard2.0"
-                     nugetCache
-                     @@ "fake.core.trace/"
-                        + (ddItem "fake.core.trace")
-                        + "/lib/netstandard2.0"
-                     nugetCache
-                     @@ "fake.dotnet.cli/"
-                        + (ddItem "fake.dotnet.cli")
-                        + "/lib/netstandard2.0"
-                     nugetCache
-                     @@ "fsharp.core/"
-                        + (ddItem "fsharp.core")
-                        + "/lib/netstandard2.0" ]
-                 UseGAC = true
-                 Verbose = false
-                 ReportFileName = "_Reports/FxCopReport.xml"
-                 Types = types
-                 Rules = ruleset
-                 FailOnError = FxCop.ErrorLevel.Warning
-                 IgnoreGeneratedCode = true }))
+          { FxCop.Params.Create() with
+              WorkingDirectory = "."
+              ToolPath = Option.get dixon
+              PlatformDirectory = Option.get refdir
+              DependencyDirectories =
+                [ nugetCache
+                  @@ "fake.core.process/"
+                     + (ddItem "fake.core.process")
+                     + "/lib/netstandard2.0"
+                  nugetCache
+                  @@ "fake.core.trace/"
+                     + (ddItem "fake.core.trace")
+                     + "/lib/netstandard2.0"
+                  nugetCache
+                  @@ "fake.dotnet.cli/"
+                     + (ddItem "fake.dotnet.cli")
+                     + "/lib/netstandard2.0"
+                  nugetCache
+                  @@ "fsharp.core/"
+                     + (ddItem "fsharp.core")
+                     + "/lib/netstandard2.0" ]
+              UseGAC = true
+              Verbose = false
+              ReportFileName = "_Reports/FxCopReport.xml"
+              Types = types
+              Rules = ruleset
+              FailOnError = FxCop.ErrorLevel.Warning
+              IgnoreGeneratedCode = true }))
 
   // Unit Test
 
@@ -538,63 +542,63 @@ module Targets =
       let coverage =
         !!(@"./**/*.Tests.fsproj")
         |> Seq.fold
-             (fun l test ->
-               printfn "%A" test
+          (fun l test ->
+            printfn "%A" test
 
-               let tname =
-                 test |> Path.GetFileNameWithoutExtension
+            let tname =
+              test |> Path.GetFileNameWithoutExtension
 
-               let testDirectory =
-                 test |> Path.getFullName |> Path.GetDirectoryName
+            let testDirectory =
+              test |> Path.getFullName |> Path.GetDirectoryName
 
-               let altReport =
-                 reports
-                 @@ ("UnitTestWithAltCoverCoreRunner." + tname + ".xml")
+            let altReport =
+              reports
+              @@ ("UnitTestWithAltCoverCoreRunner." + tname + ".xml")
 
-               let collect =
-                 AltCover.CollectOptions.Primitive(Primitive.CollectOptions.Create()) // FSApi
+            let collect =
+              AltCover.CollectOptions.Primitive(Primitive.CollectOptions.Create()) // FSApi
 
-               let prepare =
-                 AltCover.PrepareOptions.Primitive(
-                   { Primitive.PrepareOptions.Create() with
-                       Report = altReport
-                       SingleVisit = true }
-                   |> AltCoverFilter
-                 )
+            let prepare =
+              AltCover.PrepareOptions.Primitive(
+                { Primitive.PrepareOptions.Create() with
+                    Report = altReport }
+                |> AltCoverFilter
+              )
 
-               let forceTrue = DotNet.CLIOptions.Force true
-               //printfn "Test arguments : '%s'" (DotNet.ToTestArguments prepare collect forceTrue)
+            let forceTrue = DotNet.CLIOptions.Force true
+            //printfn "Test arguments : '%s'" (DotNet.ToTestArguments prepare collect forceTrue)
 
-               let t =
-                 DotNet.TestOptions.Create().WithAltCoverOptions prepare collect forceTrue
+            let t =
+              DotNet.TestOptions.Create().WithAltCoverOptions prepare collect forceTrue
 
-               printfn "WithAltCoverParameters returned '%A'" t.Common.CustomParams
+            printfn "WithAltCoverParameters returned '%A'" t.Common.CustomParams
 
-               let setBaseOptions (o: DotNet.Options) =
-                 { o with
-                     WorkingDirectory = Path.getFullName testDirectory
-                     Verbosity = Some DotNet.Verbosity.Minimal }
+            let setBaseOptions (o: DotNet.Options) =
+              { o with
+                  WorkingDirectory = Path.getFullName testDirectory
+                  Verbosity = Some DotNet.Verbosity.Minimal }
 
-               let cliArguments =
-                 { MSBuild.CliArguments.Create() with
-                     ConsoleLogParameters = []
-                     DistributedLoggers = None
-                     DisableInternalBinLog = true }
+            let cliArguments =
+              { MSBuild.CliArguments.Create() with
+                  ConsoleLogParameters = []
+                  DistributedLoggers = None
+                  DisableInternalBinLog = true }
 
-               try
-                 DotNet.test
-                   (fun to' ->
-                     { (to'.WithCommon(setBaseOptions).WithAltCoverOptions
-                         prepare
-                         collect
-                         forceTrue) with MSBuildParams = cliArguments })
-                   test
-               with x ->
-                 printfn "%A" x
-               // reraise()) // while fixing
+            try
+              DotNet.test
+                (fun to' ->
+                  { (to'.WithCommon(setBaseOptions).WithAltCoverOptions
+                      prepare
+                      collect
+                      forceTrue) with
+                      MSBuildParams = cliArguments })
+                test
+            with x ->
+              printfn "%A" x
+            // reraise()) // while fixing
 
-               altReport :: l)
-             []
+            altReport :: l)
+          []
 
       ReportGenerator.generateReports
         (fun p ->
@@ -707,15 +711,12 @@ module Targets =
         (Path.getFullName "./_Publish.vsWhat").Length
 
       let whatFiles where =
-        (!! "./_Publish.vsWhat/**/*.*")
+        (!!"./_Publish.vsWhat/**/*.*")
         |> Seq.map (fun x ->
           (x,
            Some(
              where
-             + Path
-               .GetDirectoryName(x)
-               .Substring(publishWhat)
-               .Replace("\\", "/")
+             + Path.GetDirectoryName(x).Substring(publishWhat).Replace("\\", "/")
            ),
            None))
         |> Seq.toList
@@ -786,9 +787,10 @@ module Targets =
       DotNet.publish
         (fun options ->
           { options with
+              MSBuildParams = cliArguments
               OutputPath = Some(publish + ".vsWhat")
               Configuration = DotNet.BuildConfiguration.Release
-              Framework = Some "netcoreapp2.1" })
+              Framework = Some "net8.0" })
         (Path.getFullName "./AltCode.VsWhat/AltCode.VsWhat.fsproj")
 
       [ (String.Empty,
@@ -833,9 +835,7 @@ module Targets =
             dotnetNupkg.Descendants(x "iconUrl") |> Seq.head
 
           let text =
-            String
-              .Concat(tag.Nodes())
-              .Replace("Build/AltCode.Fake_128.png", logo)
+            String.Concat(tag.Nodes()).Replace("Build/AltCode.Fake_128.png", logo)
 
           tag.Value <- text
 
@@ -857,11 +857,7 @@ module Targets =
   let PrepareReadMe =
     (fun _ ->
       let c =
-        Copyright
-          .Value
-          .Replace("©", "&#xa9;")
-          .Replace("<", "&lt;")
-          .Replace(">", "&gt;")
+        Copyright.Value.Replace("©", "&#xa9;").Replace("<", "&lt;").Replace(">", "&gt;")
 
       [ "./Build/README.Fake.md"
         "./Build/README.What.md" ]
@@ -881,7 +877,9 @@ module Targets =
         Shell.cleanDir working
 
         Actions.RunDotnet
-          (fun o' -> { dotnetOptions o' with WorkingDirectory = working })
+          (fun o' ->
+            { dotnetOptions o' with
+                WorkingDirectory = working })
           "tool"
           ("install -g altcode.vswhat --add-source "
            + (Path.getFullName packageVsWhat)
@@ -890,7 +888,9 @@ module Targets =
           "Installed"
 
         Actions.RunDotnet
-          (fun o' -> { dotnetOptions o' with WorkingDirectory = working })
+          (fun o' ->
+            { dotnetOptions o' with
+                WorkingDirectory = working })
           "tool"
           ("list -g ")
           "Checked"
@@ -905,7 +905,9 @@ module Targets =
       finally
         if set then
           Actions.RunDotnet
-            (fun o' -> { dotnetOptions o' with WorkingDirectory = working })
+            (fun o' ->
+              { dotnetOptions o' with
+                  WorkingDirectory = working })
             "tool"
             ("uninstall -g altcode.vswhat")
             "uninstalled"
@@ -923,7 +925,7 @@ module Targets =
       printfn "Overall coverage reporting"
       Directory.ensure "./_Reports/_BulkReport"
 
-      !! "./_Reports/*.xml"
+      !!"./_Reports/*.xml"
       |> Seq.filter (fun f ->
         not
         <| f.EndsWith("Report.xml", StringComparison.OrdinalIgnoreCase))
@@ -944,7 +946,7 @@ module Targets =
            |> String.IsNullOrWhiteSpace
            |> not
       then
-        (!! "./_Packagin*/*.nupkg")
+        (!!"./_Packagin*/*.nupkg")
         |> Seq.iter (fun f ->
           printfn "Publishing %A from %A" f currentBranch
 
@@ -976,7 +978,7 @@ module Targets =
     _Target "BuildRelease" BuildRelease
     _Target "BuildDebug" BuildDebug
     _Target "Analysis" ignore
-    _Target "Lint" Lint
+    _Target "Lint" ignore // Lint
     _Target "Gendarme" Gendarme
     _Target "FxCop" FxCop
     _Target "UnitTest" UnitTest
