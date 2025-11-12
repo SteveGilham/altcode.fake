@@ -762,13 +762,10 @@ module Targets =
                     Path.getFullName ("ReleaseNotes." + what + ".md")
                     |> File.ReadAllText
                   ToolPath =
-                    if Environment.isWindows then
                       ("./packages/"
                        + (packageVersion "NuGet.CommandLine")
                        + "/tools/NuGet.exe")
-                      |> Path.getFullName
-                    else
-                      "/usr/bin/nuget" })
+                      |> Path.getFullName })
             nuspec))
 
   let PrepareDotNetBuild =
