@@ -1,3 +1,6 @@
+# 6.1.4.68
+* Formal release of .net10.0, Fake ≥ 6.1.4 support
+
 # 5.23.0.42
 * Formal release of .net7.0, Fake ≥ 5.23.0 support
 
