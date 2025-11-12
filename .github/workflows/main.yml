@@ -12,7 +12,7 @@ on:
     - master
 
 env:
-  VERSIONTEMPLATE: 5.23.0.{build}
+  VERSIONTEMPLATE: 6.1.4.{build}
   DOTNET_ROLL_FORWARD : LatestMajor
 
 jobs:
