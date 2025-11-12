@@ -20,6 +20,9 @@
       <Build Project="false" />
     </Project>
   </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path=".github/workflows/main.yml" />
+  </Folder>
   <Project Path="AltCode.Fake.DotNet.Gendarme/AltCode.Fake.DotNet.Gendarme.fsproj" />
   <Project Path="AltCode.Fake.Tests/AltCode.Fake.Tests.fsproj">
     <Build Solution="Release|*" Project="false" />
