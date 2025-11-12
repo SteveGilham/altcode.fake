@@ -389,8 +389,8 @@ module Targets =
       [ (rules,
          [ "_Binaries/AltCode.Fake.DotNet.Gendarme/Debug+AnyCPU/netstandard2.0/AltCode.Fake.DotNet.Gendarme.dll" ])
         (Path.getFullName "./Build/build-rules.xml",
-         [ "$Binaries/Build/Debug+AnyCPU/net7.0/Build.dll"
-           "$Binaries/Setup/Debug+AnyCPU/net7.0/Setup.dll" ]) ]
+         [ "$Binaries/Build/Debug+AnyCPU/net10.0/Build.dll"
+           "$Binaries/Setup/Debug+AnyCPU/net10.0/Setup.dll" ]) ]
       |> Seq.iter (fun (ruleset, files) ->
         Gendarme.run
           { Gendarme.Params.Create() with
