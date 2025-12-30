@@ -17,7 +17,7 @@
       "rollForward": false
     },
     "dotnet-fsharplint": {
-      "version": "0.26.8",
+      "version": "0.26.10",
       "commands": [
         "dotnet-fsharplint"
       ],
