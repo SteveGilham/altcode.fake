@@ -778,7 +778,7 @@ module Targets =
               MSBuildParams = cliArguments
               OutputPath = Some(publish + ".vsWhat")
               Configuration = DotNet.BuildConfiguration.Release
-              Framework = Some "net8.0" })
+              Framework = Some "net10.0" })
         (Path.getFullName "./AltCode.VsWhat/AltCode.VsWhat.fsproj")
 
       [ (String.Empty,
