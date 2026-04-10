@@ -67,7 +67,7 @@
     <PackageVersion Include="xunit.extensibility.execution" Version="2.4.2" />
     <PackageVersion Include="xunit.runner.console" Version="2.4.2" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="2.4.5" />
-    <PackageVersion Include="YamlDotNet" Version="16.3.0" />
+    <PackageVersion Include="YamlDotNet" Version="17.0.1" />
     <PackageVersion Include="YoloDev.Expecto.TestSdk" Version="0.15.5" />
   </ItemGroup>
 </Project>
