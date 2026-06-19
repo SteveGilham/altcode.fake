@@ -78,7 +78,7 @@ module Setup =
   let fxcop =
     if Environment.isWindows then
       BlackFox.VsWhere.VsInstances.getAll ()
-      |> Seq.filter (fun i -> System.Version(i.InstallationVersion).Major = 17)
+      |> Seq.filter (fun i -> System.Version(i.InstallationVersion).Major = 18)
       |> Seq.map (fun i ->
         i.InstallationPath
         @@ "Team Tools/Static Analysis Tools/FxCop")
