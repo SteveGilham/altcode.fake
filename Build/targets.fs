@@ -416,7 +416,8 @@ module Targets =
         |> Seq.map (fun (k, v) -> k.ToLowerInvariant(), v)
         |> Map.ofSeq
 
-      printfn "%A" dd
+      dd |> Seq.iter (printfn "%A")
+      //printfn "%A" dd
 
       let ddItem x =
         try
