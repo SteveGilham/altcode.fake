@@ -46,6 +46,9 @@ type LogKind =
 
 /// Parameter type for Gendarme
 [<NoComparison; NoEquality; AutoSerializable(false)>]
+[<SuppressMessage("Gendarme.Rules.Performance",
+                  "AvoidLargeNumberOfLocalVariablesRule",
+                  Justification = "Compiler fabrications")>]
 type Params =
   {
     /// Path to gendarme.exe
