@@ -17,6 +17,7 @@
     <PackageVersion Include="Expecto.TestResults" Version="8.13.2" />
     <PackageVersion Include="FAKE.Core.Environment" Version="6.1.4" />
     <PackageVersion Include="FAKE.Core.Process" Version="6.1.4" />
+    <PackageVersion Include="FAKE.Core.String" Version="6.1.4" />
     <PackageVersion Include="FAKE.Core.Target" Version="6.1.4" />
     <PackageVersion Include="FAKE.Core.Trace" Version="6.1.4" />
     <PackageVersion Include="FAKE.DotNet.AssemblyInfoFile" Version="6.1.4" />

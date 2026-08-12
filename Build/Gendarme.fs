@@ -215,6 +215,7 @@ let run parameters =
 [<assembly: SuppressMessage("Gendarme.Rules.Performance",
                             "AvoidLargeNumberOfLocalVariablesRule",
                             Scope = "member", // MethodDefinition
-                            Target = "AltCode.Fake.DotNet.Gendarme::composeCommandLine(AltCode.Fake.DotNet.Gendarme/Params)",
+                            Target =
+                              "AltCode.Fake.DotNet.Gendarme::composeCommandLine(AltCode.Fake.DotNet.Gendarme/Params)",
                             Justification = "Compiler fabrications")>]
 ()

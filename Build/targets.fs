@@ -438,6 +438,7 @@ module Targets =
            "-Microsoft.Naming#CA1709"
            "-Microsoft.Naming#CA1724"
            "-Microsoft.Usage#CA2208"
+           "-Microsoft.Performance#CA1809:AvoidExcessiveLocals" // compiler nonsense
            "-Microsoft.Usage#CA2243:AttributeStringLiteralsShouldParseCorrectly" ]) ]
       |> Seq.iter (fun (files, types, ruleset) ->
         files
@@ -450,6 +451,10 @@ module Targets =
                 [ nugetCache
                   @@ "fake.core.process/"
                      + (ddItem "fake.core.process")
+                     + "/lib/netstandard2.0"
+                  nugetCache
+                  @@ "fake.core.string/"
+                     + (ddItem "fake.core.string")
                      + "/lib/netstandard2.0"
                   nugetCache
                   @@ "fake.core.trace/"
@@ -763,10 +768,10 @@ module Targets =
                     Path.getFullName ("ReleaseNotes." + what + ".md")
                     |> File.ReadAllText
                   ToolPath =
-                      ("./packages/"
-                       + (packageVersion "NuGet.CommandLine")
-                       + "/tools/NuGet.exe")
-                      |> Path.getFullName })
+                    ("./packages/"
+                     + (packageVersion "NuGet.CommandLine")
+                     + "/tools/NuGet.exe")
+                    |> Path.getFullName })
             nuspec))
 
   let PrepareDotNetBuild =
