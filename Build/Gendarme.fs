@@ -46,9 +46,6 @@ type LogKind =
 
 /// Parameter type for Gendarme
 [<NoComparison; NoEquality; AutoSerializable(false)>]
-[<SuppressMessage("Gendarme.Rules.Performance",
-                  "AvoidLargeNumberOfLocalVariablesRule",
-                  Justification = "Compiler fabrications")>]
 type Params =
   {
     /// Path to gendarme.exe
@@ -214,3 +211,10 @@ let run parameters =
 
   command |> Proc.run |> ignore
   __.MarkSuccess()
+
+[<assembly: SuppressMessage("Gendarme.Rules.Performance",
+                            "AvoidLargeNumberOfLocalVariablesRule",
+                            Scope = "member", // MethodDefinition
+                            Target = "AltCode.Fake.DotNet.Gendarme::composeCommandLine(AltCode.Fake.DotNet.Gendarme/Params)",
+                            Justification = "Compiler fabrications")>]
+()
