@@ -15,8 +15,8 @@
     <PackageVersion Include="Expecto" Version="11.1.0" />
     <PackageVersion Include="Expecto.FsCheck" Version="11.1.0" />
     <PackageVersion Include="Expecto.TestResults" Version="8.13.2" />
-    <PackageVersion Include="FAKE.Core.Environment" Version="6.1.4" />
-    <PackageVersion Include="FAKE.Core.Process" Version="6.1.4" />
+    <PackageVersion Include="FAKE.Core.Environment" Version="6.2.0" />
+    <PackageVersion Include="FAKE.Core.Process" Version="6.2.0" />
     <PackageVersion Include="FAKE.Core.String" Version="6.1.4" />
     <PackageVersion Include="FAKE.Core.Target" Version="6.1.4" />
     <PackageVersion Include="FAKE.Core.Trace" Version="6.1.4" />
@@ -28,7 +28,7 @@
     <PackageVersion Include="FAKE.DotNet.Testing.NUnit" Version="6.1.4" />
     <PackageVersion Include="FAKE.DotNet.Testing.OpenCover" Version="6.1.4" />
     <PackageVersion Include="FAKE.DotNet.Testing.XUnit2" Version="6.1.4" />
-    <PackageVersion Include="FAKE.IO.FileSystem" Version="6.1.4" />
+    <PackageVersion Include="FAKE.IO.FileSystem" Version="6.2.0" />
     <PackageVersion Include="FAKE.Tools.Git" Version="6.1.4" />
     <PackageVersion Include="FAKE.Testing.ReportGenerator" Version="6.1.4" />
     <PackageVersion Include="FsCheck" Version="3.3.4" />
