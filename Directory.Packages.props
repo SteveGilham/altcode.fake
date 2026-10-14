@@ -21,10 +21,10 @@
     <PackageVersion Include="FAKE.Core.Target" Version="6.1.4" />
     <PackageVersion Include="FAKE.Core.Trace" Version="6.1.4" />
     <PackageVersion Include="FAKE.DotNet.AssemblyInfoFile" Version="6.1.4" />
-    <PackageVersion Include="FAKE.DotNet.Cli" Version="6.1.4" />
+    <PackageVersion Include="FAKE.DotNet.Cli" Version="6.2.0" />
     <PackageVersion Include="FAKE.DotNet.FxCop" Version="6.1.4" />
-    <PackageVersion Include="FAKE.DotNet.MSBuild" Version="6.1.4" />
-    <PackageVersion Include="FAKE.DotNet.Nuget" Version="6.1.4" />
+    <PackageVersion Include="FAKE.DotNet.MSBuild" Version="6.2.0" />
+    <PackageVersion Include="FAKE.DotNet.Nuget" Version="6.2.0" />
     <PackageVersion Include="FAKE.DotNet.Testing.NUnit" Version="6.1.4" />
     <PackageVersion Include="FAKE.DotNet.Testing.OpenCover" Version="6.1.4" />
     <PackageVersion Include="FAKE.DotNet.Testing.XUnit2" Version="6.2.0" />
