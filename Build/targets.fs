@@ -54,7 +54,8 @@ module Targets =
         LocalSource = true
         TypeFilter =
           [ @"System\."; "Microsoft" ]
-          @ (p.TypeFilter |> Seq.toList) }
+          @ (p.TypeFilter |> Seq.toList)
+    }
 
   let dotnetOptions (o: DotNet.Options) =
     match dotnetPath with
@@ -103,16 +104,19 @@ module Targets =
         ConsoleLogParameters = []
         DistributedLoggers = None
         Properties = [ ("CheckEolTargetFramework", "false") ]
-        DisableInternalBinLog = true }
+        DisableInternalBinLog = true
+    }
 
   let withWorkingDirectoryVM dir o =
     { dotnetOptions o with
         WorkingDirectory = Path.getFullName dir
-        Verbosity = Some DotNet.Verbosity.Minimal }
+        Verbosity = Some DotNet.Verbosity.Minimal
+    }
 
   let withWorkingDirectoryOnly dir o =
     { dotnetOptions o with
-        WorkingDirectory = Path.getFullName dir }
+        WorkingDirectory = Path.getFullName dir
+    }
 
   let withCLIArgs (o: Fake.DotNet.DotNet.TestOptions) =
     { o with MSBuildParams = cliArguments }
@@ -197,7 +201,8 @@ module Targets =
     DotNet.build
       (fun p ->
         { p.WithCommon dotnetOptions with
-            Configuration = DotNet.BuildConfiguration.Release }
+            Configuration = DotNet.BuildConfiguration.Release
+        }
         |> buildWithCLIArguments)
       (Path.GetFullPath proj)
 
@@ -205,7 +210,8 @@ module Targets =
     DotNet.build
       (fun p ->
         { p.WithCommon dotnetOptions with
-            Configuration = DotNet.BuildConfiguration.Debug }
+            Configuration = DotNet.BuildConfiguration.Debug
+        }
         |> buildWithCLIArguments)
       (Path.GetFullPath proj)
 
@@ -282,18 +288,22 @@ module Targets =
       Actions.InternalsVisibleTo(Version.Value)
       let v' = Version.Value
 
-      [ "./_Generated/AssemblyVersion.fs"
-        "./_Generated/AssemblyVersion.cs" ]
+      [
+        "./_Generated/AssemblyVersion.fs"
+        "./_Generated/AssemblyVersion.cs"
+      ]
       |> List.iter (fun file ->
         AssemblyInfoFile.create
           file
-          [ AssemblyInfo.Product "AltCode.Fake"
+          [
+            AssemblyInfo.Product "AltCode.Fake"
             AssemblyInfo.Version(majmin + ".0.0")
             AssemblyInfo.FileVersion v'
             AssemblyInfo.Company "Steve Gilham"
             AssemblyInfo.Trademark ""
             AssemblyInfo.InformationalVersion(infoV)
-            AssemblyInfo.Copyright copy ]
+            AssemblyInfo.Copyright copy
+          ]
           (Some AssemblyInfoFileConfig.Default))
 
       let hack =
@@ -386,11 +396,17 @@ module Targets =
       let rules =
         Path.getFullName "./Build/rules-fake.xml"
 
-      [ (rules,
-         [ "_Binaries/AltCode.Fake.DotNet.Gendarme/Debug+AnyCPU/netstandard2.0/AltCode.Fake.DotNet.Gendarme.dll" ])
+      [
+        (rules,
+         [
+           "_Binaries/AltCode.Fake.DotNet.Gendarme/Debug+AnyCPU/netstandard2.0/AltCode.Fake.DotNet.Gendarme.dll"
+         ])
         (Path.getFullName "./Build/build-rules.xml",
-         [ "$Binaries/Build/Debug+AnyCPU/net10.0/Build.dll"
-           "$Binaries/Setup/Debug+AnyCPU/net10.0/Setup.dll" ]) ]
+         [
+           "$Binaries/Build/Debug+AnyCPU/net10.0/Build.dll"
+           "$Binaries/Setup/Debug+AnyCPU/net10.0/Setup.dll"
+         ])
+      ]
       |> Seq.iter (fun (ruleset, files) ->
         Gendarme.run
           { Gendarme.Params.Create() with
@@ -403,7 +419,8 @@ module Targets =
               LogKind = Gendarme.LogKind.Html
               Targets = files
               ToolType = ToolType.CreateLocalTool()
-              FailBuildOnDefect = true }))
+              FailBuildOnDefect = true
+          }))
 
   let FxCop =
     (fun _ -> // Needs debug because release is compiled --standalone which contaminates everything
@@ -426,9 +443,13 @@ module Targets =
           printfn "Failed to get %A" x
           reraise ()
 
-      [ ([ "_Binaries/AltCode.Fake.DotNet.Gendarme/Debug+AnyCPU/netstandard2.0/AltCode.Fake.DotNet.Gendarme.dll" ],
+      [
+        ([
+          "_Binaries/AltCode.Fake.DotNet.Gendarme/Debug+AnyCPU/netstandard2.0/AltCode.Fake.DotNet.Gendarme.dll"
+         ],
          [],
-         [ "-Microsoft.Design#CA1006"
+         [
+           "-Microsoft.Design#CA1006"
            "-Microsoft.Design#CA1011"
            "-Microsoft.Design#CA1020"
            "-Microsoft.Design#CA1062"
@@ -439,7 +460,9 @@ module Targets =
            "-Microsoft.Naming#CA1724"
            "-Microsoft.Usage#CA2208"
            "-Microsoft.Performance#CA1809:AvoidExcessiveLocals" // compiler nonsense
-           "-Microsoft.Usage#CA2243:AttributeStringLiteralsShouldParseCorrectly" ]) ]
+           "-Microsoft.Usage#CA2243:AttributeStringLiteralsShouldParseCorrectly"
+         ])
+      ]
       |> Seq.iter (fun (files, types, ruleset) ->
         files
         |> FxCop.run
@@ -448,7 +471,8 @@ module Targets =
               ToolPath = Option.get dixon
               PlatformDirectory = Option.get refdir
               DependencyDirectories =
-                [ nugetCache
+                [
+                  nugetCache
                   @@ "fake.core.process/"
                      + (ddItem "fake.core.process")
                      + "/lib/netstandard2.0"
@@ -467,14 +491,16 @@ module Targets =
                   nugetCache
                   @@ "fsharp.core/"
                      + (ddItem "fsharp.core")
-                     + "/lib/netstandard2.0" ]
+                     + "/lib/netstandard2.0"
+                ]
               UseGAC = true
               Verbose = false
               ReportFileName = "_Reports/FxCopReport.xml"
               Types = types
               Rules = ruleset
               FailOnError = FxCop.ErrorLevel.Warning
-              IgnoreGeneratedCode = true }))
+              IgnoreGeneratedCode = true
+          }))
 
   // Unit Test
 
@@ -496,7 +522,8 @@ module Targets =
       |> Seq.iter (
         DotNet.build (fun p ->
           { p.WithCommon dotnetOptions with
-              Configuration = DotNet.BuildConfiguration.Debug }
+              Configuration = DotNet.BuildConfiguration.Debug
+          }
           |> withMSBuildParams)
       ))
 
@@ -510,7 +537,8 @@ module Targets =
           DotNet.test (fun p ->
             { p.WithCommon dotnetOptions with
                 Configuration = DotNet.BuildConfiguration.Debug
-                NoBuild = true }
+                NoBuild = true
+            }
             |> withCLIArgs)
         )
       with x ->
@@ -523,7 +551,8 @@ module Targets =
       |> Seq.iter (
         DotNet.build (fun p ->
           { p.WithCommon dotnetOptions with
-              Configuration = DotNet.BuildConfiguration.Debug }
+              Configuration = DotNet.BuildConfiguration.Debug
+          }
           |> withMSBuildParams)
       ))
 
@@ -556,7 +585,8 @@ module Targets =
             let setBaseOptions (o: DotNet.Options) =
               { o with
                   WorkingDirectory = Path.getFullName testDirectory
-                  Verbosity = Some DotNet.Verbosity.Minimal }
+                  Verbosity = Some DotNet.Verbosity.Minimal
+              }
 
             let collect =
               AltCover.CollectOptions.Primitive(Primitive.CollectOptions.Create()) // FSApi
@@ -564,7 +594,8 @@ module Targets =
             let prepare =
               AltCover.PrepareOptions.Primitive(
                 { Primitive.PrepareOptions.Create() with
-                    Report = altReport }
+                    Report = altReport
+                }
                 |> AltCoverFilter
               )
 
@@ -584,7 +615,8 @@ module Targets =
                 (fun to' ->
                   { (to'.WithCommon(setBaseOptions)) with
                       Framework = Some "net10.0"
-                      MSBuildParams = cliArguments }
+                      MSBuildParams = cliArguments
+                  }
                     .WithAltCoverOptions
                     prepare
                     collect
@@ -602,9 +634,12 @@ module Targets =
           { p with
               ToolType = ToolType.CreateLocalTool()
               ReportTypes =
-                [ ReportGenerator.ReportType.Html
-                  ReportGenerator.ReportType.XmlSummary ]
-              TargetDir = report })
+                [
+                  ReportGenerator.ReportType.Html
+                  ReportGenerator.ReportType.XmlSummary
+                ]
+              TargetDir = report
+          })
         coverage
 
       let reportLines =
@@ -659,7 +694,8 @@ module Targets =
         Actions.Run
           ("dotnet",
            "_Reports",
-           [ "csmacnz.Coveralls"
+           [
+             "csmacnz.Coveralls"
              "--opencover"
              "-i"
              coverage
@@ -676,7 +712,8 @@ module Targets =
              "--commitMessage"
              commit
              "--jobId"
-             DateTime.UtcNow.ToString("yyMMdd-HHmmss") ])
+             DateTime.UtcNow.ToString("yyMMdd-HHmmss")
+           ])
           "Coveralls upload failed"
 
       (report @@ "Summary.xml")
@@ -693,10 +730,12 @@ module Targets =
         Path.getFullName "_Binaries/AltCode.Fake.DotNet.Gendarme/Release+AnyCPU"
 
       let gendarmeFiles =
-        [ (Path.getFullName "./LICENS*", Some "", None)
+        [
+          (Path.getFullName "./LICENS*", Some "", None)
           (Path.getFullName "./Build/AltCode.Fake_128.*g", Some "", None)
           (Path.getFullName "./Build/README.Fake.md", Some "", None)
-          (Path.getFullName "./_Binaries/README.Fake.html", Some "", None) ]
+          (Path.getFullName "./_Binaries/README.Fake.html", Some "", None)
+        ]
 
       let gendarmeNetcoreFiles =
         (!!(gendarmeDir
@@ -719,12 +758,15 @@ module Targets =
         |> Seq.toList
 
       let whatPack =
-        [ (Path.getFullName "./LICENS*", Some "", None)
+        [
+          (Path.getFullName "./LICENS*", Some "", None)
           (Path.getFullName "./Build/AltCode.VsWhat_128.*g", Some "", None)
           (Path.getFullName "./Build/README.What.md", Some "", None)
-          (Path.getFullName "./_Binaries/README.What.html", Some "", None) ]
+          (Path.getFullName "./_Binaries/README.What.html", Some "", None)
+        ]
 
-      [ (List.concat [ gendarmeFiles; gendarmeNetcoreFiles ],
+      [
+        (List.concat [ gendarmeFiles; gendarmeNetcoreFiles ],
          packageGendarme,
          "./_Generated/altcode.fake.dotnet.gendarme.nuspec",
          "AltCode.Fake.DotNet.Gendarme",
@@ -734,16 +776,20 @@ module Targets =
            ("Fake.Core.Environment", "5.23.0")
            ("Fake.DotNet.Cli", "5.23.0")
            ("FSharp.Core", "4.7")
-           ("System.Collections.Immutable", "1.6.0") ])
+           ("System.Collections.Immutable", "1.6.0")
+         ])
         (List.concat
-          [ whatFiles "tools/netcoreapp2.1/any"
-            whatPack ],
+          [
+            whatFiles "tools/netcoreapp2.1/any"
+            whatPack
+          ],
          packageVsWhat,
          "./_Generated/altcode.vswhat.nuspec",
          "AltCode.VsWhat",
          "A tool to list Visual Studio instances and their installed packages",
          "VsWhat",
-         []) ]
+         [])
+      ]
       |> List.iter
         (fun (files, output, nuspec, project, description, what, dependencies) ->
           let outputPath = "./" + output
@@ -771,7 +817,8 @@ module Targets =
                     ("./packages/"
                      + (packageVersion "NuGet.CommandLine")
                      + "/tools/NuGet.exe")
-                    |> Path.getFullName })
+                    |> Path.getFullName
+              })
             nuspec))
 
   let PrepareDotNetBuild =
@@ -784,10 +831,12 @@ module Targets =
               MSBuildParams = cliArguments
               OutputPath = Some(publish + ".vsWhat")
               Configuration = DotNet.BuildConfiguration.Release
-              Framework = Some "net10.0" })
+              Framework = Some "net10.0"
+          })
         (Path.getFullName "./AltCode.VsWhat/AltCode.VsWhat.fsproj")
 
-      [ (String.Empty,
+      [
+        (String.Empty,
          "./_Generated/altcode.fake.dotnet.gendarme.nuspec",
          "AltCode.Fake.DotNet.Gendarme (FAKE task helper)",
          None,
@@ -798,7 +847,8 @@ module Targets =
          "AltCode.VsWhat (Visual Studio package listing tool)",
          Some "Build/AltCode.VsWhat_128.png",
          Some "Visual Studio",
-         "README.What.md") ]
+         "README.What.md")
+      ]
       |> List.iter (fun (ptype, path, caption, icon, tags, readme) ->
         let x s =
           XName.Get(s, "http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd")
@@ -853,8 +903,10 @@ module Targets =
       let c =
         Copyright.Value.Replace("©", "&#xa9;").Replace("<", "&lt;").Replace(">", "&gt;")
 
-      [ "./Build/README.Fake.md"
-        "./Build/README.What.md" ]
+      [
+        "./Build/README.Fake.md"
+        "./Build/README.What.md"
+      ]
       |> Seq.iter (Actions.PrepareReadMe c))
 
   // Post-packaging deployment touch test
@@ -873,7 +925,8 @@ module Targets =
         Actions.RunDotnet
           (fun o' ->
             { dotnetOptions o' with
-                WorkingDirectory = working })
+                WorkingDirectory = working
+            })
           "tool"
           ("install -g altcode.vswhat --add-source "
            + (Path.getFullName packageVsWhat)
@@ -884,7 +937,8 @@ module Targets =
         Actions.RunDotnet
           (fun o' ->
             { dotnetOptions o' with
-                WorkingDirectory = working })
+                WorkingDirectory = working
+            })
           "tool"
           ("list -g ")
           "Checked"
@@ -901,7 +955,8 @@ module Targets =
           Actions.RunDotnet
             (fun o' ->
               { dotnetOptions o' with
-                  WorkingDirectory = working })
+                  WorkingDirectory = working
+              })
             "tool"
             ("uninstall -g altcode.vswhat")
             "uninstalled"
@@ -928,7 +983,8 @@ module Targets =
         { p with
             ToolType = ToolType.CreateLocalTool()
             ReportTypes = [ ReportGenerator.ReportType.Html ]
-            TargetDir = "_Reports/_BulkReport" }))
+            TargetDir = "_Reports/_BulkReport"
+        }))
 
   let All =
     (fun _ ->
@@ -947,13 +1003,15 @@ module Targets =
           Actions.Run
             ("dotnet",
              ".",
-             [ "nuget"
+             [
+               "nuget"
                "push"
                f
                "--api-key"
                Environment.environVar "NUGET_API_TOKEN"
                "--source"
-               "https://api.nuget.org/v3/index.json" ])
+               "https://api.nuget.org/v3/index.json"
+             ])
             ("NuGet upload failed " + f)))
 
   let resetColours _ =

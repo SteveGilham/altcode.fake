@@ -98,18 +98,20 @@ open System.Runtime.CompilerServices
 do ()"""
 
   let prefix =
-    [| 0x00uy
-       0x24uy
-       0x00uy
-       0x00uy
-       0x04uy
-       0x80uy
-       0x00uy
-       0x00uy
-       0x94uy
-       0x00uy
-       0x00uy
-       0x00uy |]
+    [|
+      0x00uy
+      0x24uy
+      0x00uy
+      0x00uy
+      0x04uy
+      0x80uy
+      0x00uy
+      0x00uy
+      0x94uy
+      0x00uy
+      0x00uy
+      0x00uy
+    |]
 
   let GetPublicKey (stream: Stream) =
     // see https://social.msdn.microsoft.com/Forums/vstudio/en-US/d9ef264e-1a74-4f48-b93f-3e2c7902f660/determine-contents-of-a-strong-name-key-file-snk?forum=netfxbcl
@@ -287,9 +289,11 @@ a:hover {color: #ecc;}
       xmlform.Descendants(XName.Get "body")
 
     let eliminate =
-      [ "Continuous Integration"
+      [
+        "Continuous Integration"
         "Building"
-        "Thanks to" ]
+        "Thanks to"
+      ]
 
     let keep = ref true
 
