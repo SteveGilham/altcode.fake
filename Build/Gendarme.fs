@@ -87,7 +87,8 @@ type Params =
 
   /// Default parameters.
   static member Create() =
-    { ToolPath = "gendarme"
+    {
+      ToolPath = "gendarme"
       ToolType =
         Fake.DotNet.ToolType.CreateGlobalTool().WithDefaultToolCommandName("gendarme")
       WorkingDirectory = String.Empty
@@ -109,7 +110,8 @@ type Params =
       /// Filter defects for the specified confidence levels.
       /// Default is 'normal+'
       Confidence = Confidence.Normal Grade.Plus
-      FailBuildOnDefect = true }
+      FailBuildOnDefect = true
+    }
 
 /// Builds the arguments for the Gendarme task
 /// [omit]
@@ -135,7 +137,8 @@ let internal composeCommandLine parameters =
 
   let flag a predicate = if predicate then [ a ] else []
 
-  [ item "--config" parameters.Configuration
+  [
+    item "--config" parameters.Configuration
     item "--set" parameters.RuleSet
     (match parameters.LogKind with
      | Text -> item "--log"
@@ -153,17 +156,17 @@ let internal composeCommandLine parameters =
 
     item "--severity"
     <| (sprintf "%A" parameters.Severity)
-      .ToLowerInvariant()
-      .Replace(" plus", "+")
-      .Replace(" minus", "-")
-      .Replace(" neutral", String.Empty)
+        .ToLowerInvariant()
+        .Replace(" plus", "+")
+        .Replace(" minus", "-")
+        .Replace(" neutral", String.Empty)
 
     item "--confidence"
     <| (sprintf "%A" parameters.Confidence)
-      .ToLowerInvariant()
-      .Replace(" plus", "+")
-      .Replace(" minus", "-")
-      .Replace(" neutral", String.Empty)
+        .ToLowerInvariant()
+        .Replace(" plus", "+")
+        .Replace(" minus", "-")
+        .Replace(" neutral", String.Empty)
     (if parameters.Verbosity > 0uy then
        seq { 1 .. int parameters.Verbosity }
        |> Seq.map (fun _ -> "--v")
@@ -172,7 +175,8 @@ let internal composeCommandLine parameters =
        [])
 
     ((itemList String.Empty parameters.Targets)
-     |> List.filter (String.isNullOrWhiteSpace >> not)) ]
+     |> List.filter (String.isNullOrWhiteSpace >> not))
+  ]
   |> List.concat
 
 let internal withWorkingDirectory parameters c =

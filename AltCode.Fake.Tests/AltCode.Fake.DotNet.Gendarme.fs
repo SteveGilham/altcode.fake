@@ -12,7 +12,8 @@ open Expecto.ExpectoFsCheck
 let serializingObject = Object()
 
 let testCases =
-  [ testCase "Test that default arguments are processed as expected"
+  [
+    testCase "Test that default arguments are processed as expected"
     <| fun _ ->
       let p = Gendarme.Params.Create()
       let args = Gendarme.composeCommandLine p
@@ -20,11 +21,13 @@ let testCases =
 
       Expect.equal
         args
-        [ "--console"
+        [
+          "--console"
           "--severity"
           "medium+"
           "--confidence"
-          "normal+" ]
+          "normal+"
+        ]
         "The defaults should be simple"
     testCase "Test that string arguments are processed as expected"
     <| fun _ ->
@@ -33,12 +36,16 @@ let testCases =
       let log = Guid.NewGuid().ToString()
 
       let ignore =
-        [ Guid.NewGuid().ToString()
-          Guid.NewGuid().ToString() ]
+        [
+          Guid.NewGuid().ToString()
+          Guid.NewGuid().ToString()
+        ]
 
       let targets =
-        [ Guid.NewGuid().ToString()
-          Guid.NewGuid().ToString() ]
+        [
+          Guid.NewGuid().ToString()
+          Guid.NewGuid().ToString()
+        ]
 
       let p =
         { Gendarme.Params.Create() with
@@ -46,121 +53,141 @@ let testCases =
             RuleSet = rules
             Log = log
             Ignore = ignore
-            Targets = targets }
+            Targets = targets
+        }
 
       let args = Gendarme.composeCommandLine p
 
       Expect.equal
         args
-        ([ "--config"
-           config
-           "--set"
-           rules
-           "--html"
-           log
-           "--ignore"
-           ignore |> Seq.head
-           "--ignore"
-           ignore |> Seq.last
-           "--console"
-           "--severity"
-           "medium+"
-           "--confidence"
-           "normal+" ]
+        ([
+          "--config"
+          config
+          "--set"
+          rules
+          "--html"
+          log
+          "--ignore"
+          ignore |> Seq.head
+          "--ignore"
+          ignore |> Seq.last
+          "--console"
+          "--severity"
+          "medium+"
+          "--confidence"
+          "normal+"
+         ]
          @ targets)
         "The defaults should be simple"
 
     testCase "Test that log-kind arguments are processed as expected"
     <| fun _ ->
-      [ (Guid.NewGuid().ToString(), Gendarme.LogKind.Text, "--log")
+      [
+        (Guid.NewGuid().ToString(), Gendarme.LogKind.Text, "--log")
         (Guid.NewGuid().ToString(), Gendarme.LogKind.Html, "--html")
-        (Guid.NewGuid().ToString(), Gendarme.LogKind.Xml, "--xml") ]
+        (Guid.NewGuid().ToString(), Gendarme.LogKind.Xml, "--xml")
+      ]
       |> Seq.iter (fun (log, kind, name) ->
         let p =
           { Gendarme.Params.Create() with
               Log = log
-              LogKind = kind }
+              LogKind = kind
+          }
 
         let args = Gendarme.composeCommandLine p
 
         Expect.equal
           args
-          [ name
+          [
+            name
             log
             "--console"
             "--severity"
             "medium+"
             "--confidence"
-            "normal+" ]
+            "normal+"
+          ]
           ("The log kind should be " + name))
     testCase "Test that limit arguments are processed as expected"
     <| fun _ ->
       let p =
         { Gendarme.Params.Create() with
-            Limit = uint8 (23 + DateTime.Now.Second) }
+            Limit = uint8 (23 + DateTime.Now.Second)
+        }
 
       let args = Gendarme.composeCommandLine p
 
       Expect.equal
         args
-        [ "--limit"
+        [
+          "--limit"
           (sprintf "%A" p.Limit).Replace("uy", String.Empty)
           "--console"
           "--severity"
           "medium+"
           "--confidence"
-          "normal+" ]
+          "normal+"
+        ]
         (sprintf "The limit should be %A" p.Limit)
 
     testCase "Test that console may be switched off"
     <| fun _ ->
       let p =
         { Gendarme.Params.Create() with
-            Console = false }
+            Console = false
+        }
 
       let args = Gendarme.composeCommandLine p
 
       Expect.equal
         args
-        [ "--severity"
+        [
+          "--severity"
           "medium+"
           "--confidence"
-          "normal+" ]
+          "normal+"
+        ]
         "The console should be gone"
 
     testCase "Test that output may be hushed"
     <| fun _ ->
       let p =
         { Gendarme.Params.Create() with
-            Quiet = true }
+            Quiet = true
+        }
 
       let args = Gendarme.composeCommandLine p
 
       Expect.equal
         args
-        [ "--console"
+        [
+          "--console"
           "--quiet"
           "--severity"
           "medium+"
           "--confidence"
-          "normal+" ]
+          "normal+"
+        ]
         "The output should be quieted"
 
     testProperty "Test that verbosity may be set"
     <| fun (x: uint8) ->
       let p =
         { Gendarme.Params.Create() with
-            Verbosity = x }
+            Verbosity = x
+        }
 
       let args = Gendarme.composeCommandLine p
 
       Expect.equal
         args
-        ([ "--console"
-           "--severity"
-           "medium+"
-           "--confidence"
-           "normal+" ]
+        ([
+          "--console"
+          "--severity"
+          "medium+"
+          "--confidence"
+          "normal+"
+         ]
          @ (Seq.initInfinite (fun _ -> "--v")
             |> Seq.take (int x)
             |> Seq.toList))
@@ -168,7 +195,8 @@ let testCases =
 
     testCase "Test that severity may be set"
     <| fun _ ->
-      [ Gendarme.Severity.All, "all"
+      [
+        Gendarme.Severity.All, "all"
         Gendarme.Severity.Audit Gendarme.Grade.Plus, "audit+"
         Gendarme.Severity.Audit Gendarme.Grade.Neutral, "audit"
         Gendarme.Severity.Audit Gendarme.Grade.Minus, "audit-"
@@ -183,26 +211,31 @@ let testCases =
         Gendarme.Severity.High Gendarme.Grade.Minus, "high-"
         Gendarme.Severity.Critical Gendarme.Grade.Plus, "critical+"
         Gendarme.Severity.Critical Gendarme.Grade.Neutral, "critical"
-        Gendarme.Severity.Critical Gendarme.Grade.Minus, "critical-" ]
+        Gendarme.Severity.Critical Gendarme.Grade.Minus, "critical-"
+      ]
       |> List.iter (fun (s, m) ->
         let p =
           { Gendarme.Params.Create() with
-              Severity = s }
+              Severity = s
+          }
 
         let args = Gendarme.composeCommandLine p
 
         Expect.equal
           args
-          [ "--console"
+          [
+            "--console"
             "--severity"
             m
             "--confidence"
-            "normal+" ]
+            "normal+"
+          ]
           ("The severity should be " + m))
 
     testCase "Test that confidence may be set"
     <| fun _ ->
-      [ Gendarme.Confidence.All, "all"
+      [
+        Gendarme.Confidence.All, "all"
         Gendarme.Confidence.Low Gendarme.Grade.Plus, "low+"
         Gendarme.Confidence.Low Gendarme.Grade.Neutral, "low"
         Gendarme.Confidence.Low Gendarme.Grade.Minus, "low-"
@@ -214,21 +247,25 @@ let testCases =
         Gendarme.Confidence.High Gendarme.Grade.Minus, "high-"
         Gendarme.Confidence.Total Gendarme.Grade.Plus, "total+"
         Gendarme.Confidence.Total Gendarme.Grade.Neutral, "total"
-        Gendarme.Confidence.Total Gendarme.Grade.Minus, "total-" ]
+        Gendarme.Confidence.Total Gendarme.Grade.Minus, "total-"
+      ]
       |> List.iter (fun (c, m) ->
         let p =
           { Gendarme.Params.Create() with
-              Confidence = c }
+              Confidence = c
+          }
 
         let args = Gendarme.composeCommandLine p
 
         Expect.equal
           args
-          [ "--console"
+          [
+            "--console"
             "--severity"
             "medium+"
             "--confidence"
-            m ]
+            m
+          ]
           ("The severity should be " + m))
 
     testCase "Test that command arguments are processed as expected"
@@ -260,7 +297,8 @@ let testCases =
         { Gendarme.Params.Create() with
             ToolPath = fake
             ToolType =
-              Fake.DotNet.ToolType.CreateFullFramework().WithDefaultToolCommandName fake }
+              Fake.DotNet.ToolType.CreateFullFramework().WithDefaultToolCommandName fake
+        }
 
       let args = Gendarme.composeCommandLine p
       let proc = Gendarme.createProcess args p
@@ -277,7 +315,8 @@ let testCases =
 
       let p =
         { Gendarme.Params.Create() with
-            WorkingDirectory = fake }
+            WorkingDirectory = fake
+        }
 
       let args = Gendarme.composeCommandLine p
       let proc = Gendarme.createProcess args p
@@ -298,7 +337,8 @@ let testCases =
             ToolPath = fake
             ToolType =
               Fake.DotNet.ToolType.CreateFullFramework().WithDefaultToolCommandName fake
-            Targets = [ fake ] }
+            Targets = [ fake ]
+        }
 
       Expect.equal (Gendarme.run args) () "Should be silent"
 
@@ -317,7 +357,8 @@ let testCases =
             ToolType =
               Fake.DotNet.ToolType.CreateFullFramework().WithDefaultToolCommandName fake
             Targets = [ fake + ".nonesuch" ]
-            FailBuildOnDefect = false }
+            FailBuildOnDefect = false
+        }
 
       Expect.equal (Gendarme.run args) () "Should be silent"
 
@@ -347,7 +388,8 @@ let testCases =
             ToolPath = fake
             ToolType =
               Fake.DotNet.ToolType.CreateFullFramework().WithDefaultToolCommandName fake
-            Targets = [ fake + ".nonesuch" ] }
+            Targets = [ fake + ".nonesuch" ]
+        }
 
       Expect.throwsC (fun () -> Gendarme.run args) (fun ex ->
         Expect.equal
@@ -370,18 +412,22 @@ let testCases =
             RuleSet = null
             Log = null
             Ignore = null
-            Targets = null }
+            Targets = null
+        }
 
       let args = Gendarme.composeCommandLine p
 
       Expect.equal
         args
-        [ "--console"
+        [
+          "--console"
           "--severity"
           "medium+"
           "--confidence"
-          "normal+" ]
-        "The defaults should be simple" ]
+          "normal+"
+        ]
+        "The defaults should be simple"
+  ]
 
 [<Tests>]
 let tests =
