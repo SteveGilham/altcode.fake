@@ -991,10 +991,6 @@ module Targets =
       if
         Environment.isWindows
         && currentBranch.StartsWith "release/"
-        && "NUGET_API_TOKEN"
-           |> Environment.environVar
-           |> String.IsNullOrWhiteSpace
-           |> not
       then
         (!!"./_Packagin*/*.nupkg")
         |> Seq.iter (fun f ->
@@ -1007,8 +1003,6 @@ module Targets =
                "nuget"
                "push"
                f
-               "--api-key"
-               Environment.environVar "NUGET_API_TOKEN"
                "--source"
                "https://api.nuget.org/v3/index.json"
              ])
