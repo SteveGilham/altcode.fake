@@ -16,16 +16,6 @@ env:
   DOTNET_ROLL_FORWARD : LatestMajor
 
 jobs:
-
-  set-environment:
-    runs-on: windows-latest
-    outputs:
-      ENVIRONMENT_NAME: ${{ steps.set-env-step.outputs.ENVIRONMENT_NAME }}
-    
-    steps:
-      - id: set-env-step
-        run: echo "ENVIRONMENT_NAME=altcode.fake" >> $GITHUB_OUTPUT
-
   windows:
     runs-on: windows-latest
     steps:
