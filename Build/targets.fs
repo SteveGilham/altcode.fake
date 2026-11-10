@@ -403,8 +403,8 @@ module Targets =
          ])
         (Path.getFullName "./Build/build-rules.xml",
          [
-           "$Binaries/Build/Debug+AnyCPU/net10.0/Build.dll"
-           "$Binaries/Setup/Debug+AnyCPU/net10.0/Setup.dll"
+           "$Binaries/Build/Debug+AnyCPU/net11.0/Build.dll"
+           "$Binaries/Setup/Debug+AnyCPU/net11.0/Setup.dll"
          ])
       ]
       |> Seq.iter (fun (ruleset, files) ->
@@ -614,7 +614,7 @@ module Targets =
               DotNet.test
                 (fun to' ->
                   { (to'.WithCommon(setBaseOptions)) with
-                      Framework = Some "net10.0"
+                      Framework = Some "net11.0"
                       MSBuildParams = cliArguments
                   }
                     .WithAltCoverOptions
@@ -831,7 +831,7 @@ module Targets =
               MSBuildParams = cliArguments
               OutputPath = Some(publish + ".vsWhat")
               Configuration = DotNet.BuildConfiguration.Release
-              Framework = Some "net10.0"
+              Framework = Some "net11.0"
           })
         (Path.getFullName "./AltCode.VsWhat/AltCode.VsWhat.fsproj")
 

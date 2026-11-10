@@ -32,7 +32,7 @@
     <PackageVersion Include="FAKE.Tools.Git" Version="6.2.0" />
     <PackageVersion Include="FAKE.Testing.ReportGenerator" Version="6.2.0" />
     <PackageVersion Include="FsCheck" Version="3.3.4" />
-    <PackageVersion Include="FSharp.Core" Version="10.1.400" />
+    <PackageVersion Include="FSharp.Core" Version="11.0.101" />
     <PackageVersion Include="FsUnit" Version="5.1.0" />
     <!-- PackageVersion Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" / -->
     <PackageVersion Include="Markdown" Version="2.2.1" />
