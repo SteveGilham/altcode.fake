@@ -3,16 +3,17 @@ FAKE helper code that I've written as a side-effect of other projects
 
 ## What's in the box?
 
-For FAKE ≥ 5.23.0 or later for .net core
+For FAKE ≥ 6.2.0 or later for dotnet 11.0
 
 * [`AltCode.Fake.DotNet.Gendarme` ![Nuget](https://buildstats.info/nuget/AltCode.Fake.DotNet.Gendarme)](http://nuget.org/packages/altcode.fake.dotnet.gendarme), a gendarme helper along the lines of the FxCop task `Fake.DotNet.FxCop`
 
 Can be used with the most recent [homebrew release from my fork](https://www.nuget.org/packages/altcode.gendarme/) to analyze netcore/netstandard builds.  
 
+<!--
 DotNet global tools
 
 *  [`AltCode.VsWhat` ![Nuget](https://buildstats.info/nuget/AltCode.VsWhat)](http://nuget.org/packages/altcode.vswhat), a tool to list Visual Studio instances and their installed packages; a thin wrapper over [BlackFox.VsWhere](https://github.com/vbfox/FoxSharp/blob/master/src/BlackFox.VsWhere/Readme.md) to make this one specific query.
-
+-->
 
 ## Continuous Integration
 
