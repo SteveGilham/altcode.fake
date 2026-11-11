@@ -48,7 +48,7 @@ jobs:
 
     - name: Store API token
       if: github.ref == 'refs/heads/release/Gendarme'
-      run: echo "NUGET_API_TOKEN=${{steps.login.outputs.NUGET_API_KEY}}" >> $GITHUB_ENV
+      run: echo "NUGET_API_TOKEN=${{steps.login.outputs.NUGET_API_KEY}}" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
     - name: Build
       env:
