@@ -37,14 +37,14 @@ jobs:
       run: dotnet run --project .\Build\Setup.fsproj
 
     - name: NuGet login (OIDC → temp API key)
-      if: github.ref == 'refs/release/Gendarme'
+      if: github.ref == 'refs/heads/release/Gendarme'
       uses: NuGet/login@v1
       id: login
       with:
         user: ${{ secrets.NUGET_USER }}
 
     - name: Store API token
-      if: github.ref == 'refs/release/Gendarme'
+      if: github.ref == 'refs/heads/release/Gendarme'
       run: echo "NUGET_API_TOKEN=${{steps.login.outputs.NUGET_API_KEY}}" >> $GITHUB_ENV
 
     - name: Build
