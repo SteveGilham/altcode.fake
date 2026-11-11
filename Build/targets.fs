@@ -773,22 +773,21 @@ module Targets =
          "A helper task for running Mono.Gendarme from FAKE ( >= 5.23.0 )",
          "Gendarme",
          [ // make these explicit, as this package implies an opt-in
-           ("Fake.Core.Environment", "5.23.0")
-           ("Fake.DotNet.Cli", "5.23.0")
-           ("FSharp.Core", "4.7")
-           ("System.Collections.Immutable", "1.6.0")
+           ("Fake.Core.Environment", "6.2.0")
+           ("Fake.DotNet.Cli", "6.2.0")
          ])
-        (List.concat
-          [
-            whatFiles "tools/netcoreapp2.1/any"
-            whatPack
-          ],
-         packageVsWhat,
-         "./_Generated/altcode.vswhat.nuspec",
-         "AltCode.VsWhat",
-         "A tool to list Visual Studio instances and their installed packages",
-         "VsWhat",
-         [])
+        // VsWhat TODO: add the following back in when the package is ready for release
+        //(List.concat
+        //  [
+        //    whatFiles "tools/netcoreapp2.1/any"
+        //    whatPack
+        //  ],
+        // packageVsWhat,
+        // "./_Generated/altcode.vswhat.nuspec",
+        // "AltCode.VsWhat",
+        // "A tool to list Visual Studio instances and their installed packages",
+        // "VsWhat",
+        // [])
       ]
       |> List.iter
         (fun (files, output, nuspec, project, description, what, dependencies) ->
@@ -796,6 +795,24 @@ module Targets =
           let workingDir = "./_Binaries/" + output
           Directory.ensure workingDir
           Directory.ensure outputPath
+
+          let rn =
+            File.ReadAllLines("./ReleaseNotes." + what + ".md")
+
+          let tag =
+            rn
+            |> Array.findIndex _.StartsWith("# ", StringComparison.Ordinal)
+
+          printfn "tag %A %A" tag (rn.[tag])
+
+          let hashv =
+            String.Format("# {0}", Version.Value)
+
+          printfn "hashv %A" hashv
+
+          rn.[tag] <- hashv
+          printfn "%s" rn.[tag]
+          File.WriteAllLines("./_Generated/ReleaseNotes." + what + ".md", rn)
 
           NuGet
             (fun p ->
@@ -811,7 +828,7 @@ module Targets =
                   Copyright = Copyright.Value.Replace("©", "(c)")
                   Publish = false
                   ReleaseNotes =
-                    Path.getFullName ("ReleaseNotes." + what + ".md")
+                    Path.getFullName ("./_Generated/ReleaseNotes." + what + ".md")
                     |> File.ReadAllText
                   ToolPath =
                     ("./packages/"
@@ -1043,7 +1060,7 @@ module Targets =
     _Target "PrepareFrameworkBuild" ignore
     _Target "PrepareDotNetBuild" PrepareDotNetBuild
     _Target "PrepareReadMe" PrepareReadMe
-    _Target "AltCodeVsWhatGlobalIntegration" AltCodeVsWhatGlobalIntegration
+    //    _Target "AltCodeVsWhatGlobalIntegration" AltCodeVsWhatGlobalIntegration
     _Target "Deployment" ignore
     _Target "BulkReport" BulkReport
     _Target "All" All
@@ -1107,9 +1124,9 @@ module Targets =
 
     "OperationalTest" ==> "All" |> ignore
 
-    "Packaging" ==> "AltCodeVsWhatGlobalIntegration"
-    =?> ("Deployment", Environment.isWindows) // Not sure about VS for non-Windows
-    |> ignore
+    //"Packaging" ==> "AltCodeVsWhatGlobalIntegration"
+    //=?> ("Deployment", Environment.isWindows) // Not sure about VS for non-Windows
+    //|> ignore
 
     "Deployment" ==> "BulkReport" ==> "All" |> ignore
 
